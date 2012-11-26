@@ -1,0 +1,13 @@
+<%
+  release_url = "http://yum.puppetlabs.com/el/#{@host.operatingsystem.major}/products/x86_64/puppetlabs-release-$os.noarch.rpm"
+
+  case @host.operatingsystem.major
+  when "5"
+  release_url.gsub!("$os","5-6")
+  when "6"
+  release_url.gsub!("$os","6-6")
+  else
+  ""
+  end
+-%>
+su -c 'rpm -Uvh <%= @host.os.medium_uri(@host, release_url) %>'
