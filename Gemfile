@@ -17,11 +17,6 @@ gem 'rabl', '>= 0.7.5'
 gem 'oauth'
 gem "safemode", "~> 1.1.0"
 
-unless RUBY_VERSION >= '1.9.3'
-  # Previous versions collide with Environment model
-  gem 'ruby_parser', '>= 2.3.1'
-end
-
 Dir["#{File.dirname(__FILE__)}/bundler.d/*.rb"].each do |bundle|
  # puts "adding custom gem file #{bundle}"
   self.instance_eval(Bundler.read_file(bundle))
