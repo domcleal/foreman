@@ -8,7 +8,6 @@ group :test do
   gem 'minitest', '~> 3.5', :platforms => :ruby_19
   gem 'capybara'
   gem 'database_cleaner'
-  gem 'headless'
   gem 'launchy'
   gem 'spork'
   gem 'spork-testunit'

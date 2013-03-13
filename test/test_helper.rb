@@ -107,12 +107,6 @@ Spork.prefork do
     # Stop ActiveRecord from wrapping tests in transactions
     self.use_transactional_fixtures = false
 
-    headless = Headless.new
-    headless.start
-    at_exit do
-      headless.destroy
-    end
-
     def assert_index_page(index_path,title_text,new_link_text = nil,has_search = true,has_pagination = true)
       visit index_path
       assert page.has_selector?('h1', :text => title_text), "#{title_text} was expected in the <h1> tag, but was not found"
