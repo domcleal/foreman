@@ -2,7 +2,7 @@ begin
   testtool = RUBY_VERSION =~ /^1\.8/ ? 'test_unit' : 'minitest'
   require "ci/reporter/rake/#{testtool}"
   namespace :jenkins do
-    task :unit => ["jenkins:setup:#{testtool}", 'rake:test']
+    task :unit => ["jenkins:setup:#{testtool}", 'rake:test:integration']
 
     namespace :setup do
       task :pre_ci do
