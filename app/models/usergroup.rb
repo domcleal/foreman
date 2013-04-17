@@ -52,6 +52,19 @@ class Usergroup < ActiveRecord::Base
     users.each { |u| u.expire_topbar_cache(sweeper) }
   end
 
+  def ldap_users
+    external_usergroups.select { |eu| eu.auth_source.class == AuthSourceLdap }.map(&:ldap_users).flatten.uniq
+  end
+
+  def add_users(userlist)
+    users << User.where( {:login => userlist } )
+  end
+
+  def remove_users(userlist)
+    old_users = User.select { |user| userlist.include?(user.login) }
+    self.users = self.users - old_users
+  end
+
   protected
   # Recurses down the tree of usergroups and finds the users
   # [+group_list+]: Array of Usergroups that have already been processed
@@ -69,15 +82,6 @@ class Usergroup < ActiveRecord::Base
 
   def ensure_uniq_name
     errors.add :name, _("is already used by a user account") if User.where(:login => name).first
-  end
-
-  def add_users(userlist)
-    users << User.where( {:login => userlist } )
-  end
-
-  def remove_users(userlist)
-    old_users = User.select { |user| userlist.include?(user.login) }
-    self.users = self.users - old_users
   end
 
   def ensure_last_admin_remains_admin
@@ -99,5 +103,4 @@ class Usergroup < ActiveRecord::Base
   def other_admins
     User.unscoped.only_admin.except_hidden - all_users
   end
-
 end
