@@ -9,7 +9,7 @@ $(function () {
   var password = $('#spice-area').data('password');
 
   if ((!host) || (!port)) {
-    console.log("must set host and port");
+    console.log(_("must set host and port"));
     return;
   }
 
@@ -30,6 +30,7 @@ function spice_error(e) {
 }
 
 function spice_success(m) {
+  // FIXME: this is broken, it replaces text in ../../views/hosts/console/spice.html.erb
   $('#spice-status').text($('#spice-status').text().replace('Connecting','Connected'));
   $('#spice-status').addClass('label-success');
 }

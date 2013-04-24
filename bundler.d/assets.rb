@@ -9,4 +9,5 @@ group :assets do
   gem "spice-html5-rails"
   gem "flot-rails"
   gem "quiet_assets"
+  gem 'gettext_i18n_rails_js'
 end

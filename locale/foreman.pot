@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-23 15:23+0200\n"
+"POT-Creation-Date: 2013-04-26 12:53+0100\n"
 "PO-Revision-Date: 2013-03-01 15:45-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+msgid "%d item selected."
+msgid_plural "%d items selected."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%s - Press Shift-F12 to release the cursor."
+msgstr ""
+
+msgid "%s - the following hosts are about to be changed:"
 msgstr ""
 
 msgid "%s Distribution"
@@ -593,6 +601,9 @@ msgstr ""
 msgid "Canceled pending build for %s"
 msgstr ""
 
+msgid "Canvas not supported."
+msgstr ""
+
 msgid "Certificate Name"
 msgstr ""
 
@@ -632,7 +643,13 @@ msgstr ""
 msgid "Click to edit"
 msgstr ""
 
+msgid "Click to edit.."
+msgstr ""
+
 msgid "Click to remove %s"
+msgstr ""
+
+msgid "Click to undo adding this class"
 msgstr ""
 
 msgid "Client SSL certificates are used to identify Smart Proxies accessing fact/report importers and ENC output over HTTPS (:require_ssl should also be enabled)"
@@ -749,6 +766,9 @@ msgstr ""
 msgid "Create a Smart Proxy"
 msgstr ""
 
+msgid "Ctrl-Alt-Del"
+msgstr ""
+
 #. host's status: first character of "disabled"
 msgid "D"
 msgstr ""
@@ -799,6 +819,9 @@ msgid "Data Store"
 msgstr ""
 
 msgid "Datacenter"
+msgstr ""
+
+msgid "Default"
 msgstr ""
 
 msgid "Default Puppet server hostname"
@@ -1071,7 +1094,13 @@ msgstr ""
 msgid "Errors only"
 msgstr ""
 
+msgid "Expand the chart"
+msgstr ""
+
 msgid "Expires"
+msgstr ""
+
+msgid "Fact Chart"
 msgstr ""
 
 msgid "Fact Name"
@@ -1294,9 +1323,6 @@ msgid "Full trace"
 msgstr ""
 
 msgid "Future content goes here!"
-msgstr ""
-
-msgid "General"
 msgstr ""
 
 msgid "General useful description, for example this kind of hardware needs a special BIOS setup"
@@ -1696,6 +1722,9 @@ msgstr ""
 msgid "It is not possible to assign provisioning templates at this stage"
 msgstr ""
 
+msgid "Item"
+msgstr ""
+
 msgid "Key Binding"
 msgstr ""
 
@@ -1756,7 +1785,16 @@ msgstr ""
 msgid "Load Tenants"
 msgstr ""
 
+msgid "Loading ..."
+msgstr ""
+
 msgid "Loading Images information"
+msgstr ""
+
+msgid "Loading Virtual Machines information ..."
+msgstr ""
+
+msgid "Loading parameters..."
 msgstr ""
 
 msgid "Location"
@@ -2012,6 +2050,9 @@ msgstr ""
 msgid "Networks"
 msgstr ""
 
+msgid "New"
+msgstr ""
+
 msgid "New %s"
 msgstr ""
 
@@ -2124,6 +2165,9 @@ msgid "New partition table"
 msgstr ""
 
 msgid "New role"
+msgstr ""
+
+msgid "New window"
 msgstr ""
 
 #. "Table name" or "Table name|Column name" for error messages
@@ -2307,6 +2351,9 @@ msgid "OS Image"
 msgstr ""
 
 msgid "Off"
+msgstr ""
+
+msgid "Old"
 msgstr ""
 
 msgid "On"
@@ -2563,6 +2610,9 @@ msgstr ""
 msgid "Please save the Operating System first and try again."
 msgstr ""
 
+msgid "Please select"
+msgstr ""
+
 msgid "Please select an Environment first"
 msgstr ""
 
@@ -2646,9 +2696,6 @@ msgstr ""
 
 #. "Table name" or "Table name|Column name" for error messages
 msgid "Ptable|Os family"
-msgstr ""
-
-msgid "Puppet"
 msgstr ""
 
 msgid "Puppet CA"
@@ -2777,7 +2824,7 @@ msgstr ""
 msgid "Reports"
 msgstr ""
 
-msgid "Reports from the last"
+msgid "Reports from the last %{days} days - %{count} reports found"
 msgstr ""
 
 #. "Table name" or "Table name|Column name" for error messages
@@ -2798,6 +2845,9 @@ msgstr ""
 msgid "Required parameter without value.<br/><b>Please override!</b> <br><br><b>Description:</b>: %s"
 msgstr ""
 
+msgid "Reset zoom"
+msgstr ""
+
 msgid "Resolve"
 msgstr ""
 
@@ -2811,6 +2861,12 @@ msgid "Restart<br>Failures"
 msgstr ""
 
 msgid "Restarted"
+msgstr ""
+
+msgid "Revert"
+msgstr ""
+
+msgid "Revert to revision from: %s"
 msgstr ""
 
 msgid "Review"
@@ -2922,6 +2978,9 @@ msgstr ""
 msgid "Select all"
 msgstr ""
 
+msgid "Select all items in this page"
+msgstr ""
+
 msgid "Select template"
 msgstr ""
 
@@ -2999,6 +3058,9 @@ msgid "Should foreman use OAuth for authorization in API"
 msgstr ""
 
 msgid "Should the smart variables be exposed via the ENC yaml output?"
+msgstr ""
+
+msgid "Show Diff"
 msgstr ""
 
 msgid "Show Host"
@@ -3218,6 +3280,9 @@ msgstr ""
 msgid "Template / Hardware Profile to use"
 msgstr ""
 
+msgid "Template Diff"
+msgstr ""
+
 msgid "Template Type"
 msgstr ""
 
@@ -3370,6 +3435,9 @@ msgstr ""
 msgid "There was an error creating the PXE Default file: %s"
 msgstr ""
 
+msgid "There was an error listing VMs: %(status) %(statusText)"
+msgstr ""
+
 msgid "There was an error rendering the %s template: "
 msgstr ""
 
@@ -3444,7 +3512,7 @@ msgstr ""
 msgid "Trend counter"
 msgstr ""
 
-msgid "Trend of the last"
+msgid "Trend of the last %s days."
 msgstr ""
 
 #. "Table name" or "Table name|Column name" for error messages
@@ -3510,6 +3578,9 @@ msgid "Unable to save"
 msgstr ""
 
 msgid "Uncheck all"
+msgstr ""
+
+msgid "Uncheck to clear selection"
 msgstr ""
 
 msgid "Undo remove"
@@ -3706,6 +3777,9 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
+msgid "View Diff"
+msgstr ""
+
 msgid "View last report details"
 msgstr ""
 
@@ -3719,6 +3793,9 @@ msgid "Virtual Machines on %s"
 msgstr ""
 
 msgid "Volumes"
+msgstr ""
+
+msgid "Wait"
 msgstr ""
 
 msgid "Waiting for %s to come online"
@@ -3767,6 +3844,12 @@ msgid "YAML"
 msgstr ""
 
 msgid "You Are about to change the default PXE menu on all configured TFTP servers - continue ?"
+msgstr ""
+
+msgid "You are about to override the editor content with a previous version, are you sure?"
+msgstr ""
+
+msgid "You are about to override the editor content, are you sure?"
 msgstr ""
 
 msgid "You are currently logged in, suicidal?"
@@ -3899,12 +3982,6 @@ msgid "can't contain white spaces"
 msgstr ""
 
 msgid "cant be blank unless a custom partition has been defined"
-msgstr ""
-
-msgid "days - %s reports found"
-msgstr ""
-
-msgid "days."
 msgstr ""
 
 msgid "does not appear to be a valid nfs mount path"
@@ -4083,6 +4160,12 @@ msgstr ""
 msgid "must provide a provider"
 msgstr ""
 
+msgid "must set host and port"
+msgstr ""
+
+msgid "new"
+msgstr ""
+
 msgid "no puppet proxy defined - cant continue"
 msgstr ""
 
@@ -4099,6 +4182,9 @@ msgid "page"
 msgstr ""
 
 msgid "parameters require an associated domain, host or hostgroup"
+msgstr ""
+
+msgid "pending"
 msgstr ""
 
 msgid "plus all"
@@ -4119,7 +4205,7 @@ msgstr ""
 msgid "remove volume"
 msgstr ""
 
-msgid "run_distribution"
+msgid "revoked"
 msgstr ""
 
 msgid "select an owner"
@@ -4183,6 +4269,9 @@ msgid "using %s"
 msgstr ""
 
 msgid "using %{allocation} GB out of %{capacity} GB (%{pool_name} storage pool - %{path})"
+msgstr ""
+
+msgid "valid"
 msgstr ""
 
 msgid "value to use when there is no match"

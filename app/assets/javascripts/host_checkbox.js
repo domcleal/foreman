@@ -104,7 +104,7 @@ function toggle_multiple_ok_button(elem){
 $(function() {
   $('#submit_multiple a').click(function(){
     if ($.foremanSelectedHosts.length == 0) { return false }
-    var title = $(this).attr('data-original-title') + ' - The following hosts are about to be changed';
+    var title = Jed.sprintf(_("%s - the following hosts are about to be changed:"), $(this).attr('data-original-title'));
     var url = $(this).attr('href') + "?" + $.param({host_ids: $.foremanSelectedHosts});
     $('#confirmation-modal .modal-header h3').text(title);
     $('#confirmation-modal .modal-body').empty().append("<img class='modal-loading' src='/assets/spinner.gif'>");
@@ -139,9 +139,11 @@ function update_counter(id) {
     $("#check_all").attr("checked", $.foremanSelectedHosts.length > 0 );
   }
 
-  if ($("#check_all").attr("checked"))
-    $("#check_all").attr("title", $.foremanSelectedHosts.length + " - items selected.\nUncheck to Clear Selection" );
-  else
-    $("#check_all").attr("title", "Select all items in this page" );
+  if ($("#check_all").attr("checked")) {
+    count = $.foremanSelectedHosts.length;
+    $("#check_all").attr("title", Jed.sprintf(n_("%d item selected.", "%d items selected.", count), count) + "\n" + _("Uncheck to clear selection"));
+  } else {
+    $("#check_all").attr("title", n_("Select all items in this page") );
+  }
   return false;
 }
