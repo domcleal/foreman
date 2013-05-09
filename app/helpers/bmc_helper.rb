@@ -22,14 +22,10 @@ module BmcHelper
 
     confirm = _('Are you sure?')
 
-    action_buttons("Select device",
-                   display_link_if_authorized(_('Disk'), controller_options.merge(:ipmi_device => 'disk'),
-                                              :confirm => confirm, :method => :put),
-                   display_link_if_authorized(_('CDROM'), controller_options.merge(:ipmi_device => 'cdrom'),
-                                              :confirm => confirm, :method => :put),
-                   display_link_if_authorized(_('PXE'), controller_options.merge(:ipmi_device => 'pxe'),
-                                              :confirm => confirm, :method => :put),
-                   display_link_if_authorized(_('BIOS'), controller_options.merge(:ipmi_device => 'bios'),
-                                              :confirm => confirm, :method => :put))
+    links = HostsController::BOOT_DEVICES.map do |device,label|
+       display_link_if_authorized(_(label), controller_options.merge(:ipmi_device => device),
+                                  :confirm => confirm, :method => :put)
+    end
+    action_buttons("Select device", links)
   end
 end

@@ -1,5 +1,5 @@
 class PowerManager
-  SUPPORTED_ACTIONS = [:start, :stop, :poweroff, :reboot, :reset, :state]
+  SUPPORTED_ACTIONS = [N_('start'), N_('stop'), N_('poweroff'), N_('reboot'), N_('reset'), N_('state')]
 
   def initialize(opts = {})
     @host = opts[:host]

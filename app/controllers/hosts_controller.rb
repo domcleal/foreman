@@ -11,6 +11,7 @@ class HostsController < ApplicationController
   PUPPETMASTER_ACTIONS=[ :externalNodes, :lookup ]
   SEARCHABLE_ACTIONS= %w[index active errors out_of_sync pending disabled ]
   AJAX_REQUESTS=%w{compute_resource_selected hostgroup_or_environment_selected current_parameters puppetclass_parameters}
+  BOOT_DEVICES={ :disk => N_('Disk'), :cdrom => N_('CDROM'), :pxe => N_('PXE'), :bios => N_('BIOS') }
 
   add_puppetmaster_filters PUPPETMASTER_ACTIONS
   before_filter :ajax_request, :only => AJAX_REQUESTS
@@ -200,7 +201,7 @@ class HostsController < ApplicationController
     @host.power.send(params[:power_action].to_sym)
     process_success :success_redirect => :back, :success_msg => _("%{host} is now %{state}") % { :host => @host, :state => _(@host.power.state) }
   rescue => e
-    process_error :redirect => :back, :error_msg => _("Failed to %{action} %{host}: %{e}") % { :action => params[:power_action], :host => @host, :e => e }
+    process_error :redirect => :back, :error_msg => _("Failed to %{action} %{host}: %{e}") % { :action => _(params[:power_action]), :host => @host, :e => e }
   end
 
   def bmc
@@ -216,9 +217,9 @@ class HostsController < ApplicationController
     device = params[:ipmi_device]
     begin
       @host.ipmi_boot(device)
-      process_success :success_redirect => :back, :success_msg => "#{@host.name} now boots from #{device.downcase}"
+      process_success :success_redirect => :back, :success_msg => _("%{host} now boots from %{device}") % { :host => @host.name, :device => _(BOOT_DEVICES[device.downcase.to_sym] || device) }
     rescue => e
-      process_error :redirect => :back, :error_msg => "Failed to boot from #{device} at #{@host}: #{e}"
+      process_error :redirect => :back, :error_msg => _("Failed to configure %{host} to boot from %{device}: %{e}") % { :device => _(BOOT_DEVICES[device.downcase.to_sym] || device), :host => @host.name, :e => e }
     end
   end
 

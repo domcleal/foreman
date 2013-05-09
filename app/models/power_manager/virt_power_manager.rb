@@ -21,7 +21,7 @@ class VirtPowerManager < PowerManager
     vm.state
   end
 
-  (SUPPORTED_ACTIONS - [:state]).each do |method|
+  (SUPPORTED_ACTIONS - ['state']).each do |method|
     define_method method do
       vm.send(method)
     end

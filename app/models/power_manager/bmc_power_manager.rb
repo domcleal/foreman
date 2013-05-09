@@ -5,10 +5,10 @@ class BMCPowerManager < PowerManager
     @proxy = host.bmc_proxy
   end
 
-  (SUPPORTED_ACTIONS).each do |method|
-    define_method method do                      # def start
-      proxy.power(:action => action_map[method]) #   proxy.power(:action => 'on')
-    end                                          # end
+  SUPPORTED_ACTIONS.each do |method|
+    define_method method do                             # def start
+      proxy.power(:action => action_map[method.to_sym]) #   proxy.power(:action => 'on')
+    end                                                 # end
   end
 
   private
