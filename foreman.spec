@@ -113,8 +113,6 @@ Summary: Foreman CLI
 Group: Applications/System
 Requires: %{name} = %{version}-%{release}
 Requires: %{?scl_prefix}rubygem(foremancli) >= 1.0
-Requires: %{name}-%{version}-%{release}
-Requires: rubygem(foremancli) >= 1.0
 
 %description cli
 Meta Package to install rubygem-cli and its dependencies
