@@ -348,10 +348,11 @@ mv Gemfile Gemfile.in
 # upstream bug https://github.com/wvanbergen/scoped_search/issues/53
 sed -i "s/gem 'scoped_search'/gem 'sprockets'\n&/" Gemfile.in
 cp config/database.yml.example config/database.yml
+cp config/settings.yaml.example config/settings.yaml
 export BUNDLER_EXT_NOSTRICT=1
 export BUNDLER_EXT_GROUPS="default assets"
 %{scl_rake} assets:precompile:all RAILS_ENV=production --trace
-rm config/database.yml
+rm config/database.yml config/settings.yaml
 
 %install
 rm -rf %{buildroot}
