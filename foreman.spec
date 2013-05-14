@@ -339,8 +339,8 @@ plugins required for Foreman to work.
 		script/rails script/performance/profiler script/performance/benchmarker script/foreman-config ; do
 	    sed -ri '1sX(/usr/bin/ruby|/usr/bin/env ruby)X%{scl_ruby}X' $f
     done
-    sed -ri '1,$sX/usr/bin/rubyX%{scl_ruby}X' foreman.init
-    sed -ri '1,$s|THIN=/usr/bin/thin|THIN="run_in_scl"|' foreman.init
+    sed -ri '1,$sX/usr/bin/rubyX%{scl_ruby}X' %{confdir}/foreman.init
+    sed -ri '1,$s|THIN=/usr/bin/thin|THIN="run_in_scl"|' %{confdir}/foreman.init
 %endif
 
 mv Gemfile Gemfile.in
