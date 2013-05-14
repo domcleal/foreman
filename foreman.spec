@@ -496,6 +496,12 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Tue May 14 2013 Dominic Cleal <dcleal@redhat.com> 1.1.9999-3
+- Bump.
+* Mon May 06 2013 Sam Kottler <shk@redhat.com> 1.1.9999-2
+- Upgraded to latest.
+* Tue Apr 30 2013 Sam Kottler <shk@redhat.com> 1.1.9999-1
+- Updated to 1.1.9999 (1.2-pre)
 * Tue Apr 30 2013 Sam Kottler <shk@redhat.com> 1.1.9999-1
 - Updated to 1.1.9999 (1.2-pre)
 * Fri Feb 15 2013 shk@redhat.com 1.1-3
