@@ -15,7 +15,7 @@
 
 Name:   foreman
 Version: 1.1.9999
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:Systems Management web application
 
 Group:  Applications/System
@@ -503,6 +503,9 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Sun May 19 2013 Dominic Cleal <dcleal@redhat.com> 1.1.9999-4
+- Packaging fixes (dcleal@redhat.com)
+
 * Tue May 14 2013 Dominic Cleal <dcleal@redhat.com> 1.1.9999-3
 - Bump.
 * Mon May 06 2013 Sam Kottler <shk@redhat.com> 1.1.9999-2
