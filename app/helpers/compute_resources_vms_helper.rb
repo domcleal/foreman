@@ -46,8 +46,8 @@ module ComputeResourcesVmsHelper
     networks   = compute.networks
     interfaces = compute.interfaces
     select     = []
-    select << _('Physical (Bridge)') if interfaces.any?
-    select << _('Virtual (NAT)')     if networks.any?
+    select << [_('Physical (Bridge)'), :bridge] if interfaces.any?
+    select << [_('Virtual (NAT)'), :network]    if networks.any?
     select
   end
 

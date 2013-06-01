@@ -131,11 +131,11 @@ function libvirt_network_selected(item){
       disable_libvirt_dropdown(bridge);
       disable_libvirt_dropdown(nat);
       break;
-    case nat.attr('data-name'):
+    case 'network':
       disable_libvirt_dropdown(bridge);
       enable_libvirt_dropdown(nat);
       break;
-    case bridge.attr('data-name'):
+    case 'bridge':
       disable_libvirt_dropdown(nat);
       enable_libvirt_dropdown(bridge);
       break;
