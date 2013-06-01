@@ -46,16 +46,9 @@ module ComputeResourcesVmsHelper
     networks   = compute.networks
     interfaces = compute.interfaces
     select     = []
-    select << [_('Physical (Bridge)'), :bridge] if interfaces.any?
-    select << [_('Virtual (NAT)'), :network]    if networks.any?
+    select << [_('Physical (Bridge)'), :bridge]
+    select << [_('Virtual (NAT)'), :network] if networks.any?
     select
-  end
-
-  def hide_libvirt_network(networks, interfaces)
-    return true  if interfaces.empty?
-    return true  if interfaces.any? && networks.any?
-    return false if interfaces.any? && networks.empty?
-    true
   end
 
 end
