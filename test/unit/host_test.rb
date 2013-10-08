@@ -492,12 +492,10 @@ class HostTest < ActiveSupport::TestCase
 
     h.expects(:initialize_puppetca).returns(true)
     mock_puppetca = Object.new
-    mock_puppetca.expects(:del_certificate).with(some_uuid)
-    mock_puppetca.expects(:set_autosign).with(h.name)
+    mock_puppetca.expects(:del_certificate).with(some_uuid).returns(true)
+    mock_puppetca.expects(:set_autosign).with(h.name).returns(true)
     h.instance_variable_set("@puppetca", mock_puppetca)
 
-    h.expects(:delCertificate).returns(true)
-    h.expects(:setAutosign).returns(true)
     assert h.handle_ca
     assert_equal h.certname, h.name
   end
