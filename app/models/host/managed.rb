@@ -227,7 +227,7 @@ class Host::Managed < Host::Base
     return true unless puppetca?
 
     # From here out, we expect things to work and return true
-    return false respond_to?(:initialize_puppetca, true)
+    return false unless respond_to?(:initialize_puppetca, true)
     return false unless initialize_puppetca
     return false unless delCertificate
 
