@@ -499,7 +499,7 @@ class HostTest < ActiveSupport::TestCase
     h.expects(:delCertificate).returns(true)
     h.expects(:setAutosign).returns(true)
     assert h.handle_ca
-    assert h.certname.nil?
+    assert_equal h.certname, h.name
   end
 
   test "custom_disk_partition_with_erb" do
