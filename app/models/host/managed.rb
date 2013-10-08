@@ -548,10 +548,9 @@ class Host::Managed < Host::Base
     managed? and !compute? or (compute? and !compute_resource.provided_attributes.keys.include?(:ip))
   end
 
-  # If we're using uuid certificates, try to use the certname. If certname does not exist, use hostname instead.
-  # If the option was previously set and is now disabled, don't use the now-hidden certname value.
+  # if certname does not exist, use hostname instead
   def certname
-    Setting[:use_uuid_for_certificates] ? read_attribute(:certname) || name : name
+    read_attribute(:certname) || name
   end
 
   def progress_report_id
