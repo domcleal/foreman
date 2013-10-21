@@ -14,7 +14,7 @@
 
 Name:   foreman
 Version: 1.3.9999
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:Systems Management web application
 
 Group:  Applications/System
@@ -74,6 +74,7 @@ Requires: %{?scl_prefix}rubygem(therubyracer)
 Requires: %{?scl_prefix}rubygem(jquery-ui-rails)
 Requires: %{?scl_prefix}rubygem(twitter-bootstrap-rails)
 Requires: %{?scl_prefix}rubygem(foreigner) >= 1.4.2
+Requires: %{?scl_prefix}rubygem(rails3_before_render)
 BuildRequires: %{?scl_prefix}rubygem(ancestry) >= 2.0.0
 BuildRequires: %{?scl_prefix}rubygem(ancestry) < 3.0.0
 BuildRequires: %{?scl_prefix}rubygem(apipie-rails) >= 0.0.23
@@ -109,6 +110,7 @@ BuildRequires: %{?scl_prefix}rubygem(quiet_assets)
 BuildRequires: %{?scl_prefix}rubygem(spice-html5-rails)
 BuildRequires: %{?scl_prefix}rubygem(flot-rails) = 0.0.3
 BuildRequires: %{?scl_prefix}rubygem(foreigner) >= 1.4.2
+BuildRequires: %{?scl_prefix}rubygem(rails3_before_render)
 BuildRequires: %{?scl_prefix}facter
 BuildRequires: gettext
 
@@ -531,6 +533,9 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Mon Oct 21 2013 Dominic Cleal <dcleal@redhat.com> - 1.3.9999-4
+- Add new rails3_before_render dependency
+
 * Mon Sep 30 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 1.3.9999-3
 - Adding Foreman plugins repo
 
