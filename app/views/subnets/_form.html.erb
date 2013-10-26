@@ -1,4 +1,4 @@
-<%= form_for @subnet do |f| %>
+<%= form_for @subnet, :url => (@subnet.new_record? ? subnets_path : subnet_path(@subnet)) do |f| %>
   <%= base_errors_for @subnet %>
   <ul class="nav nav-tabs" data-tabs="tabs">
     <li class="active"><a href="#primary" data-toggle="tab"><%= _("Subnet") %></a></li>

@@ -1,4 +1,5 @@
 <%= text_f f, :name %>
+<%= selectable_f f, :type, [[_("IPv4"), 'Subnet::Ipv4'], [_("IPv6"), 'Subnet::Ipv6']], {:label => _("Protocol")}, :disabled => !f.object.new_record? %>
 <%= text_f f, :network %>
 <%= text_f f, :mask, :help_inline => _("Netmask for this subnet") %>
 <%= text_f f, :gateway, :help_inline => _("Optional: Gateway for this subnet") %>

@@ -1,9 +1,9 @@
 require 'test_helper'
 
-class SubnetTest < ActiveSupport::TestCase
+class Ipv4Test < ActiveSupport::TestCase
   def setup
     User.current = User.find_by_login "admin"
-    @subnet = Subnet.new
+    @subnet = Subnet::Ipv4.new
     @attrs = {  :network= => "123.123.123.1",
       :mask= => "255.255.255.0",
       :domains= => [domains(:mydomain)],
@@ -44,14 +44,14 @@ class SubnetTest < ActiveSupport::TestCase
     set_attr(:network=, :mask=, :domains=, :name=)
     @subnet.save
 
-    other_subnet = Subnet.create(:network => "123.123.123.1", :mask => "255.255.255.0")
+    other_subnet = Subnet::Ipv4.create(:network => "123.123.123.1", :mask => "255.255.255.0")
     assert !other_subnet.save
   end
 
   test "the name should be unique in the domain scope" do
     create_a_domain_with_the_subnet
 
-    other_subnet = Subnet.new( :mask => "111.111.111.1",
+    other_subnet = Subnet::Ipv4.new( :mask => "111.111.111.1",
                                  :network => "255.255.252.0",
                                  :name => "valid",
                                  :domain_ids => [domains(:mydomain).id] )
@@ -66,10 +66,10 @@ class SubnetTest < ActiveSupport::TestCase
   end
 
   test "should find the subnet by ip" do
-    @subnet = Subnet.new(:network => "123.123.123.1",:mask => "255.255.255.0",:name => "valid")
+    @subnet = Subnet::Ipv4.new(:network => "123.123.123.1",:mask => "255.255.255.0",:name => "valid")
     assert @subnet.save
     assert @subnet.domain_ids = [domains(:mydomain).id]
-    assert_equal @subnet, Subnet.subnet_for("123.123.123.1")
+    assert_equal @subnet, Subnet::Ipv4.subnet_for("123.123.123.1")
   end
 
   def set_attr(*attr)
@@ -80,7 +80,7 @@ class SubnetTest < ActiveSupport::TestCase
 
   def create_a_domain_with_the_subnet
     @domain = Domain.find_or_create_by_name("domain")
-    @subnet = Subnet.new(:network => "123.123.123.1",:mask => "255.255.255.0",:name => "valid")
+    @subnet = Subnet::Ipv4.new(:network => "123.123.123.1",:mask => "255.255.255.0",:name => "valid")
     assert @subnet.save
     assert @subnet.domain_ids = [domains(:mydomain).id]
     @subnet.save!
@@ -99,7 +99,7 @@ class SubnetTest < ActiveSupport::TestCase
 
   test "user with create permissions should be able to create" do
     setup_user "create"
-    record = Subnet.create :name => "dummy2", :network => "1.2.3.4", :mask => "255.255.255.0"
+    record = Subnet::Ipv4.create :name => "dummy2", :network => "1.2.3.4", :mask => "255.255.255.0"
     assert record.domain_ids = [Domain.first.id]
     assert record.valid?
     assert !record.new_record?
@@ -107,7 +107,7 @@ class SubnetTest < ActiveSupport::TestCase
 
   test "user with view permissions should not be able to create" do
     setup_user "view"
-    record =  Subnet.new :name => "dummy", :network => "1.2.3.4", :mask => "255.255.255.0"
+    record =  Subnet::Ipv4.new :name => "dummy", :network => "1.2.3.4", :mask => "255.255.255.0"
     assert record.valid?
     assert !record.save
     assert record.new_record?
@@ -127,21 +127,21 @@ class SubnetTest < ActiveSupport::TestCase
 
   test "user with edit permissions should not be able to destroy" do
     setup_user "edit"
-    record =  Subnet.first
+    record =  Subnet::Ipv4.first
     assert !record.destroy
     assert !record.frozen?
   end
 
   test "user with edit permissions should be able to edit" do
     setup_user "edit"
-    record      =  Subnet.first
+    record      =  Subnet::Ipv4.first
     record.name = "renamed"
     assert record.save
   end
 
   test "user with destroy permissions should not be able to edit" do
     setup_user "destroy"
-    record      =  Subnet.first
+    record      =  Subnet::Ipv4.first
     record.name = "renamed"
     as_admin do
       record.domains = [domains(:unuseddomain)]
@@ -179,6 +179,13 @@ class SubnetTest < ActiveSupport::TestCase
     assert s.save
   end
 
+  test "should not be able to save ranges if one of them is invalid" do
+    s=subnets(:one)
+    s.from = "2.3.4.abc"
+    s.to   = "2.3.4.17"
+    assert !s.save
+  end
+
   test "should strip whitespace before save" do
     s = subnets(:one)
     s.network = " 10.0.0.22   "
@@ -212,7 +219,7 @@ class SubnetTest < ActiveSupport::TestCase
     s = subnets(:one)
     s.mask = "255.255.255.1111"
     refute s.save
-    assert_match /must be at most 15 characters/, s.errors.full_messages.join("\n")
+    assert_match /is invalid/, s.errors.full_messages.join("\n")
   end
 
   test "should invalidate addresses are indeed invalid" do
@@ -233,7 +240,7 @@ class SubnetTest < ActiveSupport::TestCase
 
   # test module StripWhitespace which strips leading and trailing whitespace on :name field
   test "should strip whitespace on name" do
-    s = Subnet.new(:name => '    ABC Network     ', :network => "10.10.20.1", :mask => "255.255.255.0")
+    s = Subnet::Ipv4.new(:name => '    ABC Network     ', :network => "10.10.20.1", :mask => "255.255.255.0")
     assert s.save!
     assert_equal "ABC Network", s.name
   end

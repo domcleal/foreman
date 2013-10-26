@@ -20,16 +20,16 @@ module Authorization
     enforce_permissions("create") if enforce?
   end
 
+  # Override in model, return the plural class name used for permissions and a translated singular description
+  def effective_permissions_class
+    [self.class.name.tableize, self.class.name.downcase]
+  end
+
   def enforce_permissions operation
     # We get called again with the operation being set to create
     return true if operation == "edit" and new_record?
 
-    klass   = self.class.name.downcase
-    klasses   = self.class.name.tableize
-    klasses.gsub!(/auth_source.*/, "authenticators")
-    klasses.gsub!(/common_parameters.*/, "global_variables")
-    klasses.gsub!(/lookup_key.*/, "external_variables")
-    klasses.gsub!(/lookup_value.*/, "external_variables")
+    klasses, klass = effective_permissions_class
     return true if User.current and User.current.allowed_to?("#{operation}_#{klasses}".to_sym)
 
     errors.add :base, _("You do not have permission to %{operation} this %{klass}") % { :operation => operation, :klass => klass }

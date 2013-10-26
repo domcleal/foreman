@@ -1,7 +1,11 @@
 require 'ipaddr'
 class Subnet < ActiveRecord::Base
   include Authorization
+  include Foreman::STI
   include Taxonomix
+
+  IP_FIELDS = [:network, :mask, :gateway, :dns_primary, :dns_secondary, :from, :to]
+  REQUIRED_IP_FIELDS = [:network, :mask]
 
   before_destroy EnsureNotUsedBy.new(:hosts, :interfaces )
   has_many_hosts
@@ -14,21 +18,12 @@ class Subnet < ActiveRecord::Base
   has_many :interfaces, :class_name => 'Nic::Base'
   validates :network, :mask, :name, :presence => true
   validates_associated    :subnet_domains
-  validates :network, :uniqueness => true,
-                      :format => {:with => Net::Validations::IP_REGEXP},
-                      :length => {:maximum => 15, :message => N_("must be at most 15 characters")}
-  validates :gateway, :dns_primary, :dns_secondary,
-                      :allow_blank => true,
-                      :allow_nil => true,
-                      :format => {:with => Net::Validations::IP_REGEXP},
-                      :length => { :maximum => 15, :message => N_("must be at most 15 characters") }
-  validates :mask,    :format => {:with => Net::Validations::IP_REGEXP},
-                      :length => {:maximum => 15, :message => N_("must be at most 15 characters")}
+  validates :network, :uniqueness => true
 
-  validate :ensure_ip_addr_new
   before_validation :cleanup_addresses
+  before_validation :normalize_addresses
+  validate :ensure_ip_addrs_valid
   validate :name_should_be_uniq_across_domains
-
   validate :validate_ranges
 
   default_scope lambda {
@@ -68,15 +63,20 @@ class Subnet < ActiveRecord::Base
   # [+ip+] : "doted quad" string
   # Returns : Subnet object or nil if not found
   def self.subnet_for(ip)
-    Subnet.all.each {|s| return s if s.contains? IPAddr.new(ip)}
+    ip = IPAddr.new(ip)
+    Subnet.all.each {|s| return s if s.family == ip.family && s.contains?(ip)}
     nil
   end
 
   # Indicates whether the IP is within this subnet
-  # [+ip+] String: Contains 4 dotted decimal values
+  # [+ip+] String: IPv4 or IPv6 address
   # Returns Boolean: True if if ip is in this subnet
   def contains? ip
-    IPAddr.new("#{network}/#{mask}", Socket::AF_INET).include? IPAddr.new(ip, Socket::AF_INET)
+    ipaddr.include? IPAddr.new(ip, family)
+  end
+
+  def ipaddr
+    IPAddr.new("#{network}/#{mask}", family)
   end
 
   def cidr
@@ -130,15 +130,14 @@ class Subnet < ActiveRecord::Base
   private
 
   def validate_ranges
-    errors.add(:from, _("invalid IP address"))            if from.present? and !from =~ Net::Validations::IP_REGEXP
-    errors.add(:to, _("invalid IP address"))              if to.present?   and !to   =~ Net::Validations::IP_REGEXP
-    errors.add(:from, _("does not belong to subnet"))     if from.present? and not self.contains?(f=IPAddr.new(from))
-    errors.add(:to, _("does not belong to subnet"))       if to.present?   and not self.contains?(t=IPAddr.new(to))
-    errors.add(:from, _("can't be bigger than to range")) if from.present? and t.present? and f > t
     if from.present? or to.present?
       errors.add(:from, _("must be specified if to is defined"))   if from.blank?
       errors.add(:to,   _("must be specified if from is defined")) if to.blank?
     end
+    return if errors.keys.include?(:from) || errors.keys.include?(:to)
+    errors.add(:from, _("does not belong to subnet"))     if from.present? and not self.contains?(f=IPAddr.new(from))
+    errors.add(:to, _("does not belong to subnet"))       if to.present?   and not self.contains?(t=IPAddr.new(to))
+    errors.add(:from, _("can't be bigger than to range")) if from.present? and t.present? and f > t
   end
 
   def name_should_be_uniq_across_domains
@@ -150,26 +149,34 @@ class Subnet < ActiveRecord::Base
   end
 
   def cleanup_addresses
-    self.network = cleanup_ip(network) if network.present?
-    self.mask = cleanup_ip(mask) if mask.present?
-    self.gateway = cleanup_ip(gateway) if gateway.present?
-    self.dns_primary = cleanup_ip(dns_primary) if dns_primary.present?
-    self.dns_secondary = cleanup_ip(dns_secondary) if dns_secondary.present?
+    IP_FIELDS.each do |f|
+      send("#{f}=", cleanup_ip(send(f))) if send(f).present?
+    end
     self
   end
 
   def cleanup_ip(address)
     address.gsub!(/\.\.+/, ".")
-    address.gsub!(/2555+/, "255")
     address
   end
 
-  def ensure_ip_addr_new
-    errors.add(:network, _("is invalid")) if network.present? && (IPAddr.new(network) rescue nil).nil? && !errors.keys.include?(:network)
-    errors.add(:mask, _("is invalid")) if mask.present? && (IPAddr.new(mask) rescue nil).nil? && !errors.keys.include?(:mask)
-    errors.add(:gateway, _("is invalid")) if gateway.present? && (IPAddr.new(gateway) rescue nil).nil? && !errors.keys.include?(:gateway)
-    errors.add(:dns_primary, _("is invalid")) if dns_primary.present? && (IPAddr.new(dns_primary) rescue nil).nil? && !errors.keys.include?(:dns_primary)
-    errors.add(:dns_secondary, _("is invalid")) if dns_secondary.present? && (IPAddr.new(dns_secondary) rescue nil).nil? && !errors.keys.include?(:dns_secondary)
+  def normalize_addresses
+    IP_FIELDS.each do |f|
+      val = send(f)
+      send("#{f}=", normalize_ip(val)) if val.present?
+    end
+    self
+  end
+
+  def ensure_ip_addrs_valid
+    IP_FIELDS.each do |f|
+      errors.add(f, _("is invalid")) if (send(f).present? || REQUIRED_IP_FIELDS.include?(f)) && !validate_ip(send(f)) && !errors.keys.include?(f)
+    end
+  end
+
+  # Permit equal access to all subclasses
+  def effective_permissions_class
+    ['subnets', _("subnet")]
   end
 
 end

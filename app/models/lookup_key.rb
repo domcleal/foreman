@@ -266,4 +266,7 @@ class LookupKey < ActiveRecord::Base
     errors.add(:default_value, _("%{default_value} is not one of %{validator_rule}") % { :default_value => default_value, :validator_rule => validator_rule }) and return false unless validator_rule.split(KEY_DELM).map(&:strip).include?(default_value)
   end
 
+  def effective_permissions_class
+    ['external_variables', _("variable")]
+  end
 end

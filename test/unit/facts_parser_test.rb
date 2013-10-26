@@ -14,6 +14,26 @@ class FactsParserTest < ActiveSupport::TestCase
     assert importer.interfaces.keys.include?(importer.primary_interface)
   end
 
+  test "should return IPv6-only interfaces in list" do
+    @importer = Facts::Parser.new facts.delete_if { |k,v| k == 'ipaddress_br180' }
+    assert_equal '2001:db8::1', importer.interfaces['br180'][:ip6]
+  end
+
+  test "should return IPv4-only interfaces in list" do
+    @importer = Facts::Parser.new facts.delete_if { |k,v| k == 'ipaddress6_br180' }
+    assert_equal '10.35.27.2', importer.interfaces['br180'][:ip]
+  end
+
+  test "should identify primary interface using IPv4 only" do
+    @importer = Facts::Parser.new facts.delete_if { |k,v| k == 'ipaddress6' }
+    assert_equal 'br180', importer.primary_interface
+  end
+
+  test "should identify primary interface using IPv6 only" do
+    @importer = Facts::Parser.new facts.delete_if { |k,v| k == 'ipaddress' }
+    assert_equal 'br180', importer.primary_interface
+  end
+
   test "should return an os" do
     assert_kind_of Operatingsystem, importer.operatingsystem
   end
@@ -67,6 +87,14 @@ class FactsParserTest < ActiveSupport::TestCase
 
   test "should not set os.release_name to the lsbdistcodename on non-Debian OS" do
     assert_not_equal 'Santiago', @importer.operatingsystem.release_name
+  end
+
+  test "should identify the primary IPv4 address" do
+    assert_equal '10.35.27.2', @importer.ip
+  end
+
+  test "should identify the primary IPv6 address" do
+    assert_equal '2001:db8::1', @importer.ip6
   end
 
   private

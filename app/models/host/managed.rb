@@ -45,8 +45,8 @@ class Host::Managed < Host::Base
 
   class Jail < ::Safemode::Jail
     allow :name, :diskLayout, :puppetmaster, :puppet_ca_server, :operatingsystem, :os, :environment, :ptable, :hostgroup, :location,
-      :organization, :url_for_boot, :params, :info, :hostgroup, :compute_resource, :domain, :ip, :mac, :shortname, :architecture,
-      :model, :certname, :capabilities, :provider, :subnet, :token, :location, :organization
+      :organization, :url_for_boot, :params, :info, :hostgroup, :compute_resource, :domain, :ip, :ip6, :mac, :shortname, :architecture,
+      :model, :certname, :capabilities, :provider, :subnet, :subnet6, :token, :location, :organization
   end
 
   attr_reader :cached_host_params
@@ -129,12 +129,13 @@ class Host::Managed < Host::Base
     include Orchestration::SSHProvision
     include HostTemplateHelpers
 
-    validates :ip, :uniqueness => true, :if => Proc.new {|host| host.require_ip_validation?}
+    validates :ip, :uniqueness => true, :allow_blank => true, :allow_nil => true, :if => Proc.new {|host| host.require_ip_validation?}
+    validates :ip6, :uniqueness => true, :allow_blank => true, :allow_nil => true, :if => Proc.new {|host| host.require_ip_validation?}
+    validate :ip_presence_and_formats
     validates :mac, :uniqueness => true, :format => {:with => Net::Validations::MAC_REGEXP}, :unless => Proc.new { |host| host.compute? or !host.managed }
     validates :architecture_id, :operatingsystem_id, :domain_id, :presence => true, :if => Proc.new {|host| host.managed}
     validates :mac, :presence => true, :unless => Proc.new { |host| host.compute? or !host.managed }
     validates :root_pass, :length => {:minimum => 8, :message => _('should be 8 characters or more')}
-    validates :ip, :format => {:with => Net::Validations::IP_REGEXP}, :if => Proc.new { |host| host.require_ip_validation? }
     validates :ptable_id, :presence => {:message => N_("cant be blank unless a custom partition has been defined")},
                           :if => Proc.new { |host| host.managed and host.disk.empty? and not defined?(Rake) and capabilities.include?(:build) }
     validates :serial, :format => {:with => /[01],\d{3,}n\d/, :message => N_("should follow this format: 0,9600n8")},
@@ -375,7 +376,7 @@ class Host::Managed < Host::Base
 
   def attributes_to_import_from_facts
     attrs = []
-    attrs = [:mac, :ip] unless managed? and Setting[:ignore_puppet_facts_for_provisioning]
+    attrs = [:mac, :ip, :ip6] unless managed? and Setting[:ignore_puppet_facts_for_provisioning]
     super + [:domain, :architecture, :operatingsystem] + attrs
   end
 
@@ -508,12 +509,21 @@ class Host::Managed < Host::Base
     assign_hostgroup_attributes(%w{environment domain puppet_proxy puppet_ca_proxy})
     if SETTINGS[:unattended] and (new_record? or managed?)
       assign_hostgroup_attributes(%w{operatingsystem architecture})
-      assign_hostgroup_attributes(%w{medium ptable subnet}) if capabilities.include?(:build)
+      assign_hostgroup_attributes(%w{medium ptable subnet subnet6}) if capabilities.include?(:build)
     end
   end
 
   def set_ip_address
-    self.ip ||= subnet.unused_ip if subnet and SETTINGS[:unattended] and (new_record? or managed?)
+    if SETTINGS[:unattended] && (new_record? || managed?)
+      self.ip  ||= subnet.unused_ip if subnet.present?
+      self.ip6 ||= subnet6.unused_ip if subnet6.present?
+    end
+  end
+
+  def ip_presence_and_formats
+    errors.add(:base, _("Either an IPv4 or IPv6 address must be supplied")) unless !require_ip_validation? || ip.present? || ip6.present?
+    errors.add(:ip, _("is invalid")) if ip.present? && !Net::Validations.validate_ip(ip)
+    errors.add(:ip6, _("is invalid")) if ip6.present? && !Net::Validations.validate_ip6(ip6)
   end
 
   # returns a rundeck output
@@ -553,7 +563,7 @@ class Host::Managed < Host::Base
   end
 
   def require_ip_validation?
-    managed? and !compute? or (compute? and !compute_resource.provided_attributes.keys.include?(:ip))
+    managed? and !compute? or (compute? and !(compute_resource.provided_attributes.keys.include?(:ip) || compute_resource.provided_attributes.keys.include?(:ip6)))
   end
 
   # if certname does not exist, use hostname instead
@@ -593,7 +603,7 @@ class Host::Managed < Host::Base
     host_parameters.each{|param| new.host_parameters << HostParameter.new(:name => param.name, :value => param.value, :nested => true)}
     interfaces.each {|int| new.interfaces << int.clone }
     # clear up the system specific attributes
-    [:name, :mac, :ip, :uuid, :certname, :last_report].each do |attr|
+    [:name, :mac, :ip, :ip6, :uuid, :certname, :last_report].each do |attr|
       new.send "#{attr}=", nil
     end
     new.puppet_status = 0
@@ -650,7 +660,7 @@ class Host::Managed < Host::Base
 
   def smart_proxy_ids
     ids = []
-    [subnet, hostgroup.try(:subnet)].compact.each do |s|
+    [subnet, subnet6, hostgroup.try(:subnet), hostgroup.try(:subnet6)].compact.each do |s|
       ids << s.dhcp_id
       ids << s.tftp_id
       ids << s.dns_id
@@ -786,7 +796,7 @@ class Host::Managed < Host::Base
   # if we are managing DNS, we can query the correct DNS server
   # otherwise, use normal systems dns settings to resolv
   def to_ip_address name_or_ip
-    return name_or_ip if name_or_ip =~ Net::Validations::IP_REGEXP
+    return name_or_ip if Net::Validators.validate_ip(name_or_ip) || Net::Validators.validate_ip6(name_or_ip)
     return dns_ptr_record.dns_lookup(name_or_ip).ip if dns_ptr_record
     # fall back to normal dns resolution
     domain.resolver.getaddress(name_or_ip).to_s
@@ -803,7 +813,8 @@ class Host::Managed < Host::Base
 
   def normalize_addresses
     self.mac = Net::Validations.normalize_mac(mac)
-    self.ip  = Net::Validations.normalize_ip(ip)
+    self.ip  = Net::Validations.normalize_ip(ip) if ip.present?
+    self.ip6 = Net::Validations.normalize_ip6(ip6) if ip6.present?
   end
 
   def force_lookup_value_matcher

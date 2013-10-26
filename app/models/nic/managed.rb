@@ -40,7 +40,7 @@ module Nic
     protected
 
     def uniq_fields_with_hosts
-      [:mac, :ip, :name]
+      super.push(:name)
     end
 
     # returns a hash of dhcp record attributes
@@ -49,6 +49,7 @@ module Nic
       {
         :hostname => name,
         :ip       => ip,
+        :ip6      => ip6,
         :mac      => mac,
         :proxy    => subnet.dhcp_proxy,
         :network  => network

@@ -23,7 +23,8 @@ module Api
       param :host, Hash, :required => true do
         param :name, String, :required => true
         param :environment_id, String, :required => true
-        param :ip, String, :desc => "not required if using a subnet with dhcp proxy"
+        param :ip, String, :desc => "IPv4 address, not required if using a subnet with dhcp proxy"
+        param :ip6, String, :desc => "IPv6 address"
         param :mac, String, :desc => "not required if its a virtual machine"
         param :architecture_id, :number, :required => true
         param :domain_id, :number, :required => true
@@ -31,7 +32,8 @@ module Api
         param :operatingsystem_id, String, :required => true
         param :medium_id, :number
         param :ptable_id, :number
-        param :subnet_id, :number
+        param :subnet_id, :number, :desc => "IPv4 subnet"
+        param :subnet6_id, :number, :desc => "IPv6 subnet"
         param :sp_subnet_id, :number
         param :model_id_id, :number
         param :hostgroup_id, :number
@@ -53,7 +55,8 @@ module Api
       param :host, Hash, :required => true do
         param :name, String
         param :environment_id, String
-        param :ip, String, :desc => "not required if using a subnet with dhcp proxy"
+        param :ip, String, :desc => "IPv4 address, not required if using a subnet with dhcp proxy"
+        param :ip6, String, :desc => "IPv6 address"
         param :mac, String, :desc => "not required if its a virtual machine"
         param :architecture_id, :number
         param :domain_id, :number
@@ -61,7 +64,8 @@ module Api
         param :operatingsystem_id, String
         param :medium_id, :number
         param :ptable_id, :number
-        param :subnet_id, :number
+        param :subnet_id, :number, :desc => "IPv4 subnet"
+        param :subnet6_id, :number, :desc => "IPv6 subnet"
         param :sp_subnet_id, :number
         param :model_id_id, :number
         param :hostgroup_id, :number

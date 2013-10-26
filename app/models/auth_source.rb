@@ -66,4 +66,8 @@ class AuthSource < ActiveRecord::Base
     end
     nil
   end
+
+  def effective_permissions_class
+    ['authenticators', _("authentication source")]
+  end
 end

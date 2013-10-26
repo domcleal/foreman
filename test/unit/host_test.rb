@@ -31,6 +31,11 @@ class HostTest < ActiveSupport::TestCase
     assert_equal "123.1.2.3", host.ip
   end
 
+  test "should normalize IPv6 address" do
+    host = Host.create :name => "myhost", :mac => "aabbccddeeff", :ip6 => "2001:0000::1"
+    assert_equal "2001::1", host.ip6
+  end
+
   test "should add domain name to hostname" do
     host = Host.create :name => "myhost", :mac => "aabbccddeeff", :ip => "123.01.02.03",
       :domain => Domain.find_or_create_by_name("company.com")
@@ -890,6 +895,57 @@ class HostTest < ActiveSupport::TestCase
     hosts = Host.search_for("params.foo = bar")
     assert_equal hosts.count, 1
     assert_equal hosts.first.params['foo'], 'bar'
+  end
+
+  test "unused DHCP IPv4 address assigned when creating a host without IP" do
+    host = FactoryGirl.build(:host_managed, :with_ipv4, :ip => nil)
+    host.subnet.expects(:unused_ip).returns('2.3.4.2')
+    assert host.save
+    assert_equal '2.3.4.2', host.ip
+  end
+
+  test "unused DHCP IPv6 address assigned when creating a host without IP" do
+    host = FactoryGirl.build(:host_managed, :with_ipv6, :ip6 => nil)
+    host.subnet6.expects(:unused_ip).returns('2001::2')
+    assert host.save
+    assert_equal '2001::2', host.ip6
+  end
+
+  test "hosts are valid when no IP is required" do
+    host = FactoryGirl.build(:host_managed)
+    host.stubs(:require_ip_validation?).returns(false)
+    assert host.valid?
+    refute host.ip.present?
+  end
+
+  test "hosts are valid when an IP is required and a v4 address is given" do
+    host = FactoryGirl.build(:host_managed, :with_ipv4)
+    host.stubs(:require_ip_validation?).returns(true)
+    assert host.valid?
+  end
+
+  test "hosts are valid when an IP is required and a v6 address is given" do
+    host = FactoryGirl.build(:host_managed, :with_ipv6)
+    host.stubs(:require_ip_validation?).returns(true)
+    assert host.valid?
+  end
+
+  test "hosts are invalid when an IP is required and none is given" do
+    host = FactoryGirl.build(:host_managed)
+    host.stubs(:require_ip_validation?).returns(true)
+    refute host.valid?
+  end
+
+  test "hosts are invalid when an invalid IPv4 addresses is given" do
+    host = FactoryGirl.build(:host_managed, :with_ipv4, :ip => 'xyz.2.3.6')
+    host.stubs(:require_ip_validation?).returns(true)
+    refute host.valid?
+  end
+
+  test "hosts are invalid when an invalid IPv6 addresses is given" do
+    host = FactoryGirl.build(:host_managed, :with_ipv6, :ip => '2001:xyz::1')
+    host.stubs(:require_ip_validation?).returns(true)
+    refute host.valid?
   end
 
   def parse_json_fixture(relative_path)

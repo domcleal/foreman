@@ -89,4 +89,8 @@ class LookupValue < ActiveRecord::Base
     return false
   end
 
+  def effective_permissions_class
+    ['external_variables', _("matcher")]
+  end
+
 end

@@ -26,10 +26,12 @@ module Api
       param :host_id, String, :required => true, :desc => 'id or name of host'
       param :interface, Hash, :required => true, :desc => 'interface information' do
         param :mac, String, :required => true, :desc => 'MAC address of interface'
-        param :ip, String, :required => true, :desc => 'IP address of interface'
+        param :ip, String, :desc => 'IPv4 address of interface'
+        param :ip6, String, :desc => 'IPv6 address of interface'
         param :type, String, :required => true, :desc => 'Interface type, i.e: Nic::BMC'
         param :name, String, :required => true, :desc => 'Interface name'
-        param :subnet_id, Fixnum, :desc => 'Foreman subnet id of interface'
+        param :subnet_id, Fixnum, :desc => 'Foreman subnet id of IPv4 address'
+        param :subnet6_id, Fixnum, :desc => 'Foreman subnet id of IPv6 address'
         param :domain_id, Fixnum, :desc => 'Foreman domain id of interface'
         param :username, String
         param :password, String
@@ -49,10 +51,12 @@ module Api
       param :host_id, String, :required => true, :desc => 'id or name of host'
       param :interface, Hash, :required => true, :desc => 'interface information' do
         param :mac, String, :desc => 'MAC address of interface'
-        param :ip, String, :desc => 'IP address of interface'
+        param :ip, String, :desc => 'IPv4 address of interface'
+        param :ip6, String, :desc => 'IPv6 address of interface'
         param :type, String, :desc => 'Interface type, i.e: Nic::BMC'
         param :name, String, :desc => 'Interface name'
-        param :subnet_id, Fixnum, :desc => 'Foreman subnet id of interface'
+        param :subnet_id, Fixnum, :desc => 'Foreman subnet id of IPv4 address'
+        param :subnet6_id, Fixnum, :desc => 'Foreman subnet id of IPv6 address'
         param :domain_id, Fixnum, :desc => 'Foreman domain id of interface'
         param :username, String
         param :password, String

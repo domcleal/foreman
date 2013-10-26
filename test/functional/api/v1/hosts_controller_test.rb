@@ -7,6 +7,7 @@ class Api::V1::HostsControllerTest < ActionController::TestCase
       :environment_id     => environments(:production).id,
       :domain_id          => domains(:mydomain).id,
       :ip                 => '10.0.0.20',
+      :ip6                => '2001:db8::1',
       :mac                => '52:53:00:1e:85:93',
       :architecture_id    => Architecture.find_by_name('x86_64').id,
       :operatingsystem_id => Operatingsystem.find_by_name('Redhat').id,

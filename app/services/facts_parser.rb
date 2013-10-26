@@ -76,10 +76,13 @@ module Facts
     end
 
     def primary_interface
-      mac    = facts[:macaddress]
-      ip     = facts[:ipaddress]
+      mac = facts[:macaddress]
+      ip  = facts[:ipaddress]
+      ip6 = facts[:ipaddress6]
       interfaces.each do |int, values|
-        return int.to_s if (values[:mac] == mac and values[:ip] == ip)
+        return int.to_s if (values[:mac] == mac &&
+                            ((ip.present? && values[:ip] == ip) ||
+                             (ip6.present? && values[:ip6] == ip6)))
       end
       nil
     end
@@ -92,8 +95,12 @@ module Facts
       interfaces = HashWithIndifferentAccess.new
 
       (ifs - EXCLUDED_INTERFACES).each do |int|
-        if (ip = facts["ipaddress_#{int}".to_sym]) and (mac = facts["macaddress_#{int}".to_sym])
-          interfaces[int] = { :ip => ip, :mac => mac }
+        ip = facts["ipaddress_#{int}".to_sym]
+        ip6 = facts["ipaddress6_#{int}".to_sym]
+        if (ip.present? || ip6.present?) && (mac = facts["macaddress_#{int}".to_sym])
+          interfaces[int] = { :mac => mac }
+          interfaces[int][:ip]  = ip  if ip.present?
+          interfaces[int][:ip6] = ip6 if ip6.present?
         end
       end
       interfaces
@@ -106,6 +113,10 @@ module Facts
 
     def ip
       facts[:ipaddress]
+    end
+
+    def ip6
+      facts[:ipaddress6]
     end
 
     def certname
