@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Api::TestableController < Api::BaseController
+class Api::TestableController < Api::V1::BaseController
 
   def index
     render :text => 'dummy', :status => 200
