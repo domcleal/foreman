@@ -80,9 +80,48 @@ class PluginTest < ActiveSupport::TestCase
     assert_nil Menu::Manager.items(:project_menu).detect {|i| i.name == :foo_menu_item}
   end
 
-  def test_requires_foreman
+  def test_requires_foreman_2_part
     plugin = Foreman::Plugin.register(:foo) {}
-    SETTINGS[:version].stubs(:to_s).returns('2.1.3')
+    SETTINGS[:version].stubs(:notag).returns('2.1')
+
+    # Specific version without hash
+    assert plugin.requires_foreman('= 2.1')
+    assert plugin.requires_foreman('~> 2.1')
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('2.2')
+    end
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('3')
+    end
+
+    # Specific version
+    assert plugin.requires_foreman('= 2.1')
+    assert plugin.requires_foreman('~> 2.1')
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('= 2.2')
+    end
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('= 2.0')
+    end
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('= 3')
+    end
+
+    # Version or higher
+    assert plugin.requires_foreman('>= 0.1')
+    assert plugin.requires_foreman('>= 2.1')
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('>= 2.2')
+    end
+    assert_raise Foreman::PluginRequirementError do
+      plugin.requires_foreman('>= 3')
+    end
+  end
+
+  def test_requires_foreman_3_part
+    plugin = Foreman::Plugin.register(:foo) {}
+    SETTINGS[:version].stubs(:notag).returns('2.1.3')
+
     # Specific version without hash
     assert plugin.requires_foreman('= 2.1.3')
     assert plugin.requires_foreman('~> 2.1.0')
@@ -92,6 +131,7 @@ class PluginTest < ActiveSupport::TestCase
     assert_raise Foreman::PluginRequirementError do
       plugin.requires_foreman('2.2')
     end
+
     # Specific version
     assert plugin.requires_foreman('= 2.1.3')
     assert plugin.requires_foreman('~> 2.1')

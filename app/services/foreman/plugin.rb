@@ -107,7 +107,7 @@ module Foreman #:nodoc:
     # Raises a PluginRequirementError exception if the requirement is not met
     # matcher format is gem dependency format
     def requires_foreman(matcher)
-      current = SETTINGS[:version].to_s.gsub('-', '.')
+      current = SETTINGS[:version].notag
       unless Gem::Dependency.new('', matcher).match?('', current)
         raise PluginRequirementError.new(N_("%{id} plugin requires Foreman %{matcher} but current is %{current}" % {:id=>id, :matcher => matcher, :current=>current}))
       end
