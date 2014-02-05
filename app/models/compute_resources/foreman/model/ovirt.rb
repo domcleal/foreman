@@ -50,7 +50,10 @@ module Foreman::Model
     end
 
     def template(id)
-      client.templates.get(id) || raise(ActiveRecord::RecordNotFound)
+      compute = client.templates.get(id) || raise(ActiveRecord::RecordNotFound)
+      compute.interfaces
+      compute.volumes
+      compute
     end
 
     def clusters

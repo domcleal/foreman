@@ -370,10 +370,12 @@ function update_provisioning_image(){
         });
         if (image_options.find('option').length > 0) {
           image_options.attr('disabled', false);
-          var template_select = $('#host_compute_attributes_template');
-          if (template_select.length > 0) {
-            template_select.val(image_options.val());
-            ovirt_templateSelected(image_options);
+          if ($('#host_provision_method_image')[0].checked && $('#provider').val() == 'Ovirt') {
+            var template_select = $('#host_compute_attributes_template');
+            if (template_select.length > 0) {
+              template_select.val(image_options.val());
+              ovirt_templateSelected(image_options);
+            }
           }
         }
       }
@@ -503,7 +505,8 @@ $(document).on('change', '#host_provision_method_build', function () {
   $('#network_provisioning').show();
   $('#image_provisioning').hide();
   $('#image_selection select').attr('disabled', true);
-  $('#host_compute_attributes_template').attr('disabled', false);
+  if ($('#provider').val() == 'Ovirt')
+    $('#host_compute_attributes_template').attr('disabled', false);
 });
 
 $(document).on('change', '#host_provision_method_image', function () {
@@ -511,11 +514,13 @@ $(document).on('change', '#host_provision_method_image', function () {
   $('#image_provisioning').show();
   var image_options = $('#image_selection select');
   image_options.attr('disabled', false);
-  var template_options = $('#host_compute_attributes_template');
-  if (template_options.length > 0) {
-    template_options.attr('disabled', true);
-    template_options.val(image_options.val());
-    ovirt_templateSelected(image_options);
+  if ($('#provider').val() == 'Ovirt') {
+    var template_options = $('#host_compute_attributes_template');
+    if (template_options.length > 0) {
+      template_options.attr('disabled', true);
+      template_options.val(image_options.val());
+      ovirt_templateSelected(image_options);
+    }
   }
 });
 

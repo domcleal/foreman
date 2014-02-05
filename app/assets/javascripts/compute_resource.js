@@ -72,6 +72,7 @@ function ovirt_templateSelected(item){
     })
   }
 }
+
 // fill in the template interfaces.
 function add_network_interface(item){
   var new_id = add_child_node($("#network_interfaces .add_nested_fields"));
