@@ -117,8 +117,8 @@ class HostTest < ActiveSupport::TestCase
       h = Host.create! :name => "abc", :mac => "aabbecddeeff", :ip => "2.3.4.3",
         :domain => domains(:mydomain), :operatingsystem => operatingsystems(:redhat),
         :subnet => subnets(:one), :architecture => architectures(:x86_64), :puppet_proxy => smart_proxies(:puppetmaster),
-        :environment => environments(:production), :disk => "empty partition"
-      h.update_attributes(:lookup_values_attributes => {"new_123456" => {"lookup_key_id" => lookup_keys(:complex).id, "value"=>"some_value"}})
+        :environment => environments(:production), :disk => "empty partition", :managed => true,
+        :lookup_values_attributes => {"new_123456" => {"lookup_key_id" => lookup_keys(:complex).id, "value"=>"some_value"}}
     end
   end
 
