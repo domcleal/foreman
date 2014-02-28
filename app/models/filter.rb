@@ -20,7 +20,7 @@ class Filter < ActiveRecord::Base
   has_many :filterings, :dependent => :destroy
   has_many :permissions, :through => :filterings
 
-  default_scope lambda { order('role_id') }
+  default_scope lambda { order(['role_id', "#{self.table_name}.id"]) }
   scope :unlimited, lambda { where(:search => nil, :taxonomy_search => nil) }
   scope :limited, lambda { where("search IS NOT NULL OR taxonomy_search IS NOT NULL") }
 
