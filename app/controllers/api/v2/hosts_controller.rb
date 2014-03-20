@@ -9,7 +9,6 @@ module Api
 
       before_filter :find_resource, :except => %w{index create facts}
       before_filter :permissions_check, :only => %w{power boot puppetrun}
-
       add_puppetmaster_filters :facts
 
       api :GET, "/hosts/", "List all hosts."
@@ -57,6 +56,7 @@ module Api
           param :managed, :bool
           param :progress_report_id, String, :desc => 'UUID to track orchestration tasks status, GET /api/orchestration/:UUID/tasks'
           param :capabilities, String
+          param :compute_profile_id, :number
           param :compute_attributes, Hash do
           end
         end
@@ -67,6 +67,12 @@ module Api
       param_group :host, :as => :create
 
       def create
+        # popular compute_attributes if compute_profile_id is passed
+        if params[:host].present? && params[:host][:compute_profile_id].present? && params[:host][:compute_resource_id].present?
+          compute_attribute = ComputeAttribute.where(:compute_profile_id => params[:host][:compute_profile_id],
+                                                     :compute_resource_id => params[:host][:compute_resource_id]).first
+          params[:host][:compute_attributes] ||= compute_attribute.try(:vm_attrs)
+        end
         @host = Host.new(params[:host])
         @host.managed = true if (params[:host] && params[:host][:managed].nil?)
         forward_request_url
@@ -196,6 +202,8 @@ Return value may either be one of the following:
         permission = "#{params[:action]}_hosts".to_sym
         deny_access unless Host.authorized(permission).find(@host.id)
       end
+
     end
   end
 end
+
