@@ -158,14 +158,15 @@ module Foreman::Model
     # +searchIndex.FindChild("Resources")+ in RbVmomi that then returns nil
     # because it has no children.
     def clone_vm args
-      vm = client.servers.get(args["image_id"], datacenter)
-      path_replace = /\/Datacenters\/#{datacenter}\/vm(\/|)/
+      path_replace = %r{/Datacenters/#{datacenter}/vm(/|)}
 
       interfaces = client.list_vm_interfaces(args["image_id"])
       interface = interfaces.detect{|i| i[:name] == "Network adapter 1" }
       network_adapter_device_key = interface[:key]
 
       opts = {
+        "datacenter" => datacenter,
+        "template_path" => args["image_id"],
         "dest_folder" => args["path"].gsub(path_replace, ''),
         "power_on" => false,
         "start" => args["start"],
@@ -176,9 +177,7 @@ module Foreman::Model
         "network_label" => args["interfaces"].first["network"],
         "network_adapter_device_key" => network_adapter_device_key
       }
-
-      vm.relative_path = vm.folder.path.gsub(path_replace, '')
-      vm.clone(opts)
+      client.servers.get(client.vm_clone(opts)['new_vm']['id'])
     end
 
     def server
