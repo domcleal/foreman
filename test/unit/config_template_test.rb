@@ -77,25 +77,25 @@ class ConfigTemplateTest < ActiveSupport::TestCase
       @tk = FactoryGirl.create(:template_kind)
 
       # Most specific template association
-      @ct1 = FactoryGirl.create(:config_template, :template_kind_id => @tk.id, :operatingsystems => [@os1])
+      @ct1 = FactoryGirl.create(:config_template, :template_kind => @tk, :operatingsystems => [@os1])
       @ct1.template_combinations.create(:hostgroup => @hg1, :environment => @ev1)
 
       # HG only
       # We add an association on HG2/EV2 to ensure that we're not just blindly
       # selecting all template_combinations where environment_id => nil
-      @ct2 = FactoryGirl.create(:config_template, :template_kind_id => @tk.id, :operatingsystems => [@os1])
+      @ct2 = FactoryGirl.create(:config_template, :template_kind => @tk, :operatingsystems => [@os1])
       @ct2.template_combinations.create(:hostgroup => @hg1, :environment => nil)
       @ct2.template_combinations.create(:hostgroup => @hg2, :environment => @ev2)
 
       # Env only
       # We add an association on HG2/EV2 to ensure that we're not just blindly
       # selecting all template_combinations where hostgroup_id => nil
-      @ct3 = FactoryGirl.create(:config_template, :template_kind_id => @tk.id, :operatingsystems => [@os1])
+      @ct3 = FactoryGirl.create(:config_template, :template_kind => @tk, :operatingsystems => [@os1])
       @ct3.template_combinations.create(:hostgroup => nil, :environment => @ev1)
       @ct3.template_combinations.create(:hostgroup => @hg2, :environment => @ev2)
 
       # Default template for the OS
-      @ctd = FactoryGirl.create(:config_template, :template_kind_id => @tk.id, :operatingsystems => [@os1])
+      @ctd = FactoryGirl.create(:config_template, :template_kind => @tk, :operatingsystems => [@os1])
       @ctd.os_default_templates.create(:operatingsystem => @os1,
                                       :template_kind_id => @ctd.template_kind_id)
     end
