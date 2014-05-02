@@ -154,6 +154,7 @@ Foreman::Application.routes.draw do
       resources :config_groups, :except => [:new, :edit]
 
       resources :compute_attributes, :only => [:create, :update]
+
       resources :compute_profiles, :except => [:new, :edit] do
         resources :compute_attributes, :only => [:create, :update]
         resources :compute_resources, :except => [:new, :edit] do

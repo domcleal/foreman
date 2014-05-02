@@ -67,12 +67,6 @@ module Api
       param_group :host, :as => :create
 
       def create
-        # popular compute_attributes if compute_profile_id is passed
-        if params[:host].present? && params[:host][:compute_profile_id].present? && params[:host][:compute_resource_id].present?
-          compute_attribute = ComputeAttribute.where(:compute_profile_id => params[:host][:compute_profile_id],
-                                                     :compute_resource_id => params[:host][:compute_resource_id]).first
-          params[:host][:compute_attributes] ||= compute_attribute.try(:vm_attrs)
-        end
         @host = Host.new(params[:host])
         @host.managed = true if (params[:host] && params[:host][:managed].nil?)
         forward_request_url

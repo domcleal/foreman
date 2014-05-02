@@ -369,8 +369,6 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
         post :create, { :host => valid_attrs.merge!(:compute_profile_id => compute_profiles(:one).id) }
       end
       assert_response :success
-      # fixture compute_attributes(:two) uses compute_resourses(:one) and compute_profiles(:one) which is used to create host
-      assert_equal compute_attributes(:two).vm_attrs, @controller.params[:host][:compute_attributes]
     end
   end
 
