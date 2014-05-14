@@ -11,17 +11,17 @@ module Api
       before_filter :permissions_check, :only => %w{power boot puppetrun}
       add_puppetmaster_filters :facts
 
-      api :GET, "/hosts/", "List all hosts."
-      param :search, String, :desc => "Filter results"
-      param :order, String, :desc => "Sort results"
-      param :page, String, :desc => "paginate results"
-      param :per_page, String, :desc => "number of entries per request"
+      api :GET, "/hosts/", N_("List all hosts.")
+      param :search, String, :desc => N_("Filter results")
+      param :order, String, :desc => N_("Sort results")
+      param :page, String, :desc => N_("paginate results")
+      param :per_page, String, :desc => N_("number of entries per request")
 
       def index
         @hosts = resource_scope.search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/hosts/:id/", "Show a host."
+      api :GET, "/hosts/:id/", N_("Show a host.")
       param :id, :identifier_dottable, :required => true
 
       def show
@@ -31,8 +31,8 @@ module Api
         param :host, Hash, :action_aware => true do
           param :name, String, :required => true
           param :environment_id, String
-          param :ip, String, :desc => "not required if using a subnet with dhcp proxy"
-          param :mac, String, :desc => "not required if its a virtual machine"
+          param :ip, String, :desc => N_("not required if using a subnet with dhcp proxy")
+          param :mac, String, :desc => N_("not required if its a virtual machine")
           param :architecture_id, :number
           param :domain_id, :number
           param :realm_id, :number
@@ -54,7 +54,7 @@ module Api
           param :enabled, :bool
           param :provision_method, String
           param :managed, :bool
-          param :progress_report_id, String, :desc => 'UUID to track orchestration tasks status, GET /api/orchestration/:UUID/tasks'
+          param :progress_report_id, String, :desc => N_("UUID to track orchestration tasks status, GET /api/orchestration/:UUID/tasks")
           param :capabilities, String
           param :compute_profile_id, :number
           param :compute_attributes, Hash do
@@ -63,7 +63,7 @@ module Api
       end
 
 
-      api :POST, "/hosts/", "Create a host."
+      api :POST, "/hosts/", N_("Create a host.")
       param_group :host, :as => :create
 
       def create
@@ -73,7 +73,7 @@ module Api
         process_response @host.save
       end
 
-      api :PUT, "/hosts/:id/", "Update a host."
+      api :PUT, "/hosts/:id/", N_("Update a host.")
       param :id, :identifier, :required => true
       param_group :host
 
@@ -81,14 +81,14 @@ module Api
         process_response @host.update_attributes(params[:host])
       end
 
-      api :DELETE, "/hosts/:id/", "Delete an host."
+      api :DELETE, "/hosts/:id/", N_("Delete an host.")
       param :id, :identifier, :required => true
 
       def destroy
         process_response @host.destroy
       end
 
-      api :GET, "/hosts/:id/status", "Get status of host"
+      api :GET, "/hosts/:id/status", N_("Get status of host")
       param :id, :identifier_dottable, :required => true
       # TRANSLATORS: API documentation - do not translate
       description <<-eos
@@ -107,7 +107,7 @@ Return value may either be one of the following:
         render :json => { :status => @host.host_status }.to_json if @host
       end
 
-      api :PUT, "/hosts/:id/puppetrun", "Force a puppet run on the agent."
+      api :PUT, "/hosts/:id/puppetrun", N_("Force a puppet run on the agent.")
       param :id, :identifier_dottable, :required => true
 
       def puppetrun
@@ -115,37 +115,37 @@ Return value may either be one of the following:
         process_response @host.puppetrun!
       end
 
-      api :PUT, "/hosts/:id/power", "Run power operation on host."
+      api :PUT, "/hosts/:id/power", N_("Run power operation on host.")
       param :id, :identifier_dottable, :required => true
-      param :power_action, String, :required => true, :desc => "power action, valid actions are ('on', 'start')', ('off', 'stop'), ('soft', 'reboot'), ('cycle', 'reset'), ('state', 'status')"
+      param :power_action, String, :required => true, :desc => N_("power action, valid actions are ('on', 'start')', ('off', 'stop'), ('soft', 'reboot'), ('cycle', 'reset'), ('state', 'status')")
 
       def power
         valid_actions = PowerManager::SUPPORTED_ACTIONS
         if valid_actions.include? params[:power_action]
           render :json => { :power => @host.power.send(params[:power_action]) } , :status => 200
         else
-          render :json => { :error => "Unknown power action: Available methods are #{valid_actions.join(', ')}" }, :status => 422
+          render :json => { :error => N_("Unknown power action: Available methods are #{valid_actions.join(', ')}") }, :status => 422
         end
       end
 
-      api :PUT, "/hosts/:id/boot", "Boot host from specified device."
+      api :PUT, "/hosts/:id/boot", N_("Boot host from specified device.")
       param :id, :identifier_dottable, :required => true
-      param :device, String, :required => true, :desc => "boot device, valid devices are disk, cdrom, pxe, bios"
+      param :device, String, :required => true, :desc => N_("boot device, valid devices are disk, cdrom, pxe, bios")
 
       def boot
         valid_devices = ProxyAPI::BMC::SUPPORTED_BOOT_DEVICES
         if valid_devices.include? params[:device]
           render :json => { :boot => @host.ipmi_boot(params[:device]) }, :status => 200
         else
-          render :json => { :error => "Unknown device: Available devices are #{valid_devices.join(', ')}" }, :status => 422
+          render :json => { :error => N_("Unknown device: Available devices are #{valid_devices.join(', ')}") }, :status => 422
         end
       end
 
-      api :POST, "/hosts/facts", "Upload facts for a host, creating the host if required."
-      param :name, String, :required => true, :desc => "hostname of the host"
-      param :facts, Hash,      :required => true, :desc => "hash containing the facts for the host"
-      param :certname, String, :desc => "optional: certname of the host"
-      param :type, String,     :desc => "optional: the STI type of host to create"
+      api :POST, "/hosts/facts", N_("Upload facts for a host, creating the host if required.")
+      param :name, String, :required => true, :desc => N_("hostname of the host")
+      param :facts, Hash,      :required => true, :desc => N_("hash containing the facts for the host")
+      param :certname, String, :desc => N_("optional: certname of the host")
+      param :type, String,     :desc => N_("optional: the STI type of host to create")
 
       def facts
         @host, state = detect_host_type.import_host_and_facts params[:name], params[:facts], params[:certname], detected_proxy.try(:id)
@@ -186,10 +186,10 @@ Return value may either be one of the following:
           logger.debug "Creating host of type: #{params[:type]}"
           return params[:type].constantize
         else
-          raise "Invalid type for host creation via facts: #{params[:type]}"
+          raise N_("Invalid type for host creation via facts: #{params[:type]}")
         end
       rescue => e
-        raise ::Foreman::Exception.new("A problem occurred when detecting host type: #{e.message}")
+        raise ::Foreman::Exception.new(N_("A problem occurred when detecting host type: #{e.message}"))
       end
 
       def permissions_check

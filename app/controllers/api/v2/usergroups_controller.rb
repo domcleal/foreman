@@ -3,11 +3,11 @@ module Api
     class UsergroupsController < V2::BaseController
       before_filter :find_resource, :only => %w{show update destroy}
 
-      api :GET, "/usergroups/", "List all usergroups."
-      param :page, String, :desc => "paginate results"
-      param :per_page, String, :desc => "number of entries per request"
-      param :search, String, :desc => "filter results"
-      param :order, String, :desc => "sort results"
+      api :GET, "/usergroups/", N_("List all usergroups.")
+      param :page, String, :desc => N_("paginate results")
+      param :per_page, String, :desc => N_("number of entries per request")
+      param :search, String, :desc => N_("filter results")
+      param :order, String, :desc => N_("sort results")
 
       def index
         @usergroups = Usergroup.
@@ -15,7 +15,7 @@ module Api
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/usergroups/:id/", "Show a usergroup."
+      api :GET, "/usergroups/:id/", N_("Show a usergroup.")
       param :id, :identifier, :required => true
 
       def show
@@ -27,7 +27,7 @@ module Api
         end
       end
 
-      api :POST, "/usergroups/", "Create a usergroup."
+      api :POST, "/usergroups/", N_("Create a usergroup.")
       param_group :usergroup, :as => :create
 
       def create
@@ -35,7 +35,7 @@ module Api
         process_response @usergroup.save
       end
 
-      api :PUT, "/usergroups/:id/", "Update a usergroup."
+      api :PUT, "/usergroups/:id/", N_("Update a usergroup.")
       param :id, String, :required => true
       param_group :usergroup
 
@@ -43,7 +43,7 @@ module Api
         process_response @usergroup.update_attributes(params[:usergroup])
       end
 
-      api :DELETE, "/usergroups/:id/", "Delete a usergroup."
+      api :DELETE, "/usergroups/:id/", N_("Delete a usergroup.")
       param :id, String, :required => true
 
       def destroy
