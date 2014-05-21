@@ -66,4 +66,13 @@ FactoryGirl.define do
       end
     end
   end
+
+  factory :config_group do
+    sequence(:name) {|n| "config_group#{n}" }
+
+    trait :with_puppetclass do
+      puppetclasses { [ FactoryGirl.create(:puppetclass) ] }
+    end
+  end
+
 end

@@ -37,6 +37,10 @@ FactoryGirl.define do
       puppetclasses { [ FactoryGirl.create(:puppetclass, :environments => [environment]) ] }
     end
 
+    trait :with_config_group do
+      config_groups { [ FactoryGirl.create(:config_group, :with_puppetclass) ] }
+    end
+
     trait :with_parameter do
       after_create do |hg,evaluator|
         FactoryGirl.create(:hostgroup_parameter, :hostgroup => hg)
