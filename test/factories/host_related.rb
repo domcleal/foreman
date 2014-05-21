@@ -38,7 +38,8 @@ FactoryGirl.define do
     end
 
     trait :with_config_group do
-      config_groups { [ FactoryGirl.create(:config_group, :with_puppetclass) ] }
+      environment
+      config_groups { [ FactoryGirl.create(:config_group, :with_puppetclass, :class_environments => [environment]) ] }
     end
 
     trait :with_parameter do

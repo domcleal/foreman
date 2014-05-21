@@ -930,7 +930,7 @@ class HostTest < ActiveSupport::TestCase
   end
 
   test "can search hosts by puppet class from config group in parent hostgroup" do
-    hostgroup = FactoryGirl.create(:hostgroup, :with_puppetclass, :with_config_group)
+    hostgroup = FactoryGirl.create(:hostgroup, :with_config_group)
     host = FactoryGirl.create(:host, :hostgroup => hostgroup, :environment => hostgroup.environment)
     puppetclass = hostgroup.config_groups.first.puppetclasses.first
     results = Host.search_for("class = #{puppetclass.name}")
