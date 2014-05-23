@@ -189,4 +189,22 @@ class Api::V2::ComputeResourcesControllerTest < ActionController::TestCase
     assert !available_storage_domains.empty?
   end
 
+  test "should associate hosts that match" do
+    uuid = Foreman.uuid
+    vm2 = mock('vm2')
+    vm2.expects(:identity).at_least_once.returns(uuid)
+    vms = [mock('vm1', :identity => hosts(:one).uuid), vm2]
+    ComputeResource.any_instance.expects(:vms).returns(vms)
+
+    Foreman::Model::Libvirt.any_instance.expects(:associated_host).returns(hosts(:bare_metal))
+    put :associate, { :id => compute_resources(:one).to_param }
+    assert_response :success
+
+    hosts = ActiveSupport::JSON.decode(@response.body)
+    assert_equal [hosts(:bare_metal).id], hosts['results'].map { |h| h['id'] }
+    assert_equal uuid, hosts(:bare_metal).reload.uuid
+    assert_equal compute_resources(:one).id, hosts(:bare_metal).compute_resource_id
+    assert hosts(:bare_metal).compute?
+  end
+
 end
