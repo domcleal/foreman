@@ -7,7 +7,7 @@ module Api
 
       before_filter :find_resource, :only => %w{show update destroy}
 
-      api :GET, "/hostgroups/", N_("List all hostgroups.")
+      api :GET, "/hostgroups/", N_("List all host groups")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
@@ -20,7 +20,7 @@ module Api
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/hostgroups/:id/", N_("Show a hostgroup.")
+      api :GET, "/hostgroups/:id/", N_("Show a host group")
       param :id, :identifier, :required => true
 
       def show
@@ -43,7 +43,7 @@ module Api
         end
       end
 
-      api :POST, "/hostgroups/", N_("Create an hostgroup.")
+      api :POST, "/hostgroups/", N_("Create a host group")
       param_group :hostgroup, :as => :create
 
       def create
@@ -51,7 +51,7 @@ module Api
         process_response @hostgroup.save
       end
 
-      api :PUT, "/hostgroups/:id/", N_("Update an hostgroup.")
+      api :PUT, "/hostgroups/:id/", N_("Update a host group")
       param :id, :identifier, :required => true
       param_group :hostgroup
 
@@ -59,7 +59,7 @@ module Api
         process_response @hostgroup.update_attributes(params[:hostgroup])
       end
 
-      api :DELETE, "/hostgroups/:id/", N_("Delete an hostgroup.")
+      api :DELETE, "/hostgroups/:id/", N_("Delete a host group")
       param :id, :identifier, :required => true
 
       def destroy

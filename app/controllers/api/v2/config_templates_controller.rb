@@ -10,7 +10,7 @@ module Api
       before_filter :process_template_kind, :only => [:create, :update]
       before_filter :process_operatingsystems, :only => [:create, :update]
 
-      api :GET, "/config_templates/", N_("List templates")
+      api :GET, "/config_templates/", N_("List provisioning templates")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
@@ -23,7 +23,7 @@ module Api
           includes(:operatingsystems, :template_combinations, :template_kind)
       end
 
-      api :GET, "/config_templates/:id", N_("Show template details")
+      api :GET, "/config_templates/:id", N_("Show provisioning template details")
       param :id, :identifier, :required => true
 
       def show
@@ -38,11 +38,11 @@ module Api
           param :template_kind_id, :number, :allow_nil => true, :desc => N_("not relevant for snippet")
           param :template_combinations_attributes, Array,
                 :desc => N_("Array of template combinations (hostgroup_id, environment_id)")
-          param :operatingsystem_ids, Array, :desc => N_("Array of operating systems ID to associate the template with")
+          param :operatingsystem_ids, Array, :desc => N_("Array of operating system IDs to associate with the template")
         end
       end
 
-      api :POST, "/config_templates/", N_("Create a template")
+      api :POST, "/config_templates/", N_("Create a provisioning template")
       param_group :config_template, :as => :create
 
       def create
@@ -50,7 +50,7 @@ module Api
         process_response @config_template.save
       end
 
-      api :PUT, "/config_templates/:id", N_("Update a template")
+      api :PUT, "/config_templates/:id", N_("Update a provisioning template")
       param :id, :identifier, :required => true
       param_group :config_template
 
@@ -66,14 +66,14 @@ module Api
         render :json => audit.revision.template
       end
 
-      api :DELETE, "/config_templates/:id", N_("Delete a template")
+      api :DELETE, "/config_templates/:id", N_("Delete a provisioning template")
       param :id, :identifier, :required => true
 
       def destroy
         process_response @config_template.destroy
       end
 
-      api :GET, "/config_templates/build_pxe_default", N_("Change the default PXE menu on all configured TFTP servers")
+      api :GET, "/config_templates/build_pxe_default", N_("Update the default PXE menu on all configured TFTP servers")
 
       def build_pxe_default
         status, msg = ConfigTemplate.authorized(:deploy_templates).build_pxe_default(self)

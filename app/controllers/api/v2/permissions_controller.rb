@@ -3,7 +3,7 @@ module Api
     class PermissionsController < V2::BaseController
       before_filter :find_resource, :only => %w{show}
 
-      api :GET, "/permissions/", N_("List all permissions.")
+      api :GET, "/permissions/", N_("List all permissions")
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
       param :resource_type, String
@@ -21,7 +21,7 @@ module Api
         end
       end
 
-      api :GET, "/permissions/:id/", N_("Show a permission.")
+      api :GET, "/permissions/:id/", N_("Show a permission")
       param :id, :identifier, :required => true
 
       def show

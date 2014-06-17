@@ -8,8 +8,8 @@ module Api
       before_filter :find_resource, :only => %w{show update destroy}
 
       api :GET, '/subnets', N_("List of subnets")
-      param :search, String, :desc => N_("Filter results")
-      param :order, String, :desc => N_("Sort results")
+      param :search, String, :desc => N_("filter results")
+      param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
 
@@ -20,7 +20,7 @@ module Api
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/subnets/:id/", N_("Show a subnet.")
+      api :GET, "/subnets/:id/", N_("Show a subnet")
       param :id, :identifier, :required => true
 
       def show

@@ -8,7 +8,7 @@ module Api
       before_filter :setup_search_options, :only => [:index, :last]
       add_puppetmaster_filters :create
 
-      api :GET, "/reports/", N_("List all reports.")
+      api :GET, "/reports/", N_("List all reports")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
@@ -23,7 +23,7 @@ module Api
         @total = Report.my_reports.count
       end
 
-      api :GET, "/reports/:id/", N_("Show a report.")
+      api :GET, "/reports/:id/", N_("Show a report")
       param :id, :identifier, :required => true
 
       def show
@@ -39,7 +39,7 @@ module Api
         end
       end
 
-      api :POST, "/reports/", N_("Create a report.")
+      api :POST, "/reports/", N_("Create a report")
       param_group :report, :as => :create
 
       def create
@@ -49,14 +49,14 @@ module Api
         render :json => {'message'=>e.to_s}, :status => :unprocessable_entity
       end
 
-      api :DELETE, "/reports/:id/", N_("Delete a report.")
+      api :DELETE, "/reports/:id/", N_("Delete a report")
       param :id, String, :required => true
 
       def destroy
         process_response @report.destroy
       end
 
-      api :GET, "/hosts/:host_id/reports/last", N_("Show the last report for a given host.")
+      api :GET, "/hosts/:host_id/reports/last", N_("Show the last report for a host")
       param :id, :identifier, :required => true
 
       def last

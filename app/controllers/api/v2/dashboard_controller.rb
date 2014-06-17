@@ -4,7 +4,7 @@ module Api
     class DashboardController < V2::BaseController
 
       param :search, String, :desc => N_("filter results"), :required => false
-      api :GET, "/dashboard/", N_("Get Dashboard results")
+      api :GET, "/dashboard/", N_("Get dashboard details")
 
       def index
         status = Dashboard.status(params[:search])

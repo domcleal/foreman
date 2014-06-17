@@ -8,9 +8,9 @@ module Api
 
       before_filter :find_resource, :only => %w{show edit update destroy bootfiles}
 
-      api :GET, "/operatingsystems/", N_("List all operating systems.")
+      api :GET, "/operatingsystems/", N_("List all operating systems")
       param :search, String, :desc => N_("filter results"), :required => false
-      param :order, String, :desc => N_("sort results, e.g.: name ASC, or name DESC"), :required => false
+      param :order, String, :desc => N_("sort results"), :required => false
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
 
@@ -21,7 +21,7 @@ module Api
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/operatingsystems/:id/", N_("Show an OS.")
+      api :GET, "/operatingsystems/:id/", N_("Show an OS")
       param :id, String, :required => true
 
       def show
@@ -38,7 +38,7 @@ module Api
         end
       end
 
-      api :POST, "/operatingsystems/", N_("Create an OS.")
+      api :POST, "/operatingsystems/", N_("Create an OS")
       param_group :operatingsystem, :as => :create
 
       def create
@@ -46,7 +46,7 @@ module Api
         process_response @operatingsystem.save
       end
 
-      api :PUT, "/operatingsystems/:id/", N_("Update an OS.")
+      api :PUT, "/operatingsystems/:id/", N_("Update an OS")
       param :id, String, :required => true
       param_group :operatingsystem
 
@@ -54,14 +54,14 @@ module Api
         process_response @operatingsystem.update_attributes(params[:operatingsystem])
       end
 
-      api :DELETE, "/operatingsystems/:id/", N_("Delete an OS.")
+      api :DELETE, "/operatingsystems/:id/", N_("Delete an OS")
       param :id, String, :required => true
 
       def destroy
         process_response @operatingsystem.destroy
       end
 
-      api :GET, "/operatingsystems/:id/bootfiles/", N_("List boot files an OS.")
+      api :GET, "/operatingsystems/:id/bootfiles/", N_("List boot files for an OS")
       param :id, String, :required => true
       param :medium, String
       param :architecture, String

@@ -7,7 +7,7 @@ module Api
       before_filter :find_role
       before_filter :find_resource, :only => %w{show update destroy}
 
-      api :GET, "/filters/", N_("List all filters.")
+      api :GET, "/filters/", N_("List all filters")
       param :search, String, :desc => N_("filter results"), :required => false
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
@@ -16,7 +16,7 @@ module Api
         @filters = resource_scope.search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/filters/:id/", N_("Show a filter.")
+      api :GET, "/filters/:id/", N_("Show a filter")
       param :id, :identifier, :required => true
 
       def show
@@ -32,7 +32,7 @@ module Api
         end
       end
 
-      api :POST, "/filters/", N_("Create a filter.")
+      api :POST, "/filters/", N_("Create a filter")
       param_group :filter, :as => :create
 
       def create
@@ -40,7 +40,7 @@ module Api
         process_response @filter.save
       end
 
-      api :PUT, "/filters/:id/", N_("Update a filter.")
+      api :PUT, "/filters/:id/", N_("Update a filter")
       param :id, String, :required => true
       param_group :filter
 
@@ -48,7 +48,7 @@ module Api
         process_response @filter.update_attributes(params[:filter])
       end
 
-      api :DELETE, "/filters/:id/", N_("Delete a filter.")
+      api :DELETE, "/filters/:id/", N_("Delete a filter")
       param :id, String, :required => true
 
       def destroy

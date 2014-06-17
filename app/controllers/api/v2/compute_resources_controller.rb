@@ -8,7 +8,7 @@ module Api
       before_filter :find_resource, :only => [:show, :update, :destroy, :available_images,
                                               :available_networks, :available_clusters, :available_storage_domains]
 
-      api :GET, "/compute_resources/", N_("List all compute resources.")
+      api :GET, "/compute_resources/", N_("List all compute resources")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
@@ -18,7 +18,7 @@ module Api
         @compute_resources = resource_scope.search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/compute_resources/:id/", N_("Show an compute resource.")
+      api :GET, "/compute_resources/:id/", N_("Show a compute resource")
       param :id, :identifier, :required => true
 
       def show
@@ -39,7 +39,7 @@ module Api
         end
       end
 
-      api :POST, "/compute_resources/", N_("Create a compute resource.")
+      api :POST, "/compute_resources/", N_("Create a compute resource")
       param_group :compute_resource, :as => :create
 
       def create
@@ -48,7 +48,7 @@ module Api
       end
 
 
-      api :PUT, "/compute_resources/:id/", N_("Update a compute resource.")
+      api :PUT, "/compute_resources/:id/", N_("Update a compute resource")
       param :id, String, :required => true
       param_group :compute_resource
 
@@ -56,14 +56,14 @@ module Api
         process_response @compute_resource.update_attributes(params[:compute_resource])
       end
 
-      api :DELETE, "/compute_resources/:id/", N_("Delete a compute resource.")
+      api :DELETE, "/compute_resources/:id/", N_("Delete a compute resource")
       param :id, :identifier, :required => true
 
       def destroy
         process_response @compute_resource.destroy
       end
 
-      api :GET, "/compute_resources/:id/available_images/", N_("List available images for a compute resource.")
+      api :GET, "/compute_resources/:id/available_images/", N_("List available images for a compute resource")
       param :id, :identifier, :required => true
       def available_images
         @available_images = @compute_resource.available_images
@@ -85,7 +85,7 @@ module Api
         render :available_networks, :layout => 'api/v2/layouts/index_layout'
       end
 
-      api :GET, "/compute_resources/:id/available_storage_domains", N_("List storage_domains for a compute resource")
+      api :GET, "/compute_resources/:id/available_storage_domains", N_("List storage domains for a compute resource")
       param :id, :identifier, :required => true
       def available_storage_domains
         @available_storage_domains = @compute_resource.available_storage_domains

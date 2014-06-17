@@ -1,4 +1,4 @@
-module Api
+module API
   module V2
     class RealmsController < V2::BaseController
 
@@ -8,8 +8,8 @@ module Api
       before_filter :find_resource, :only => %w{show update destroy}
 
       api :GET, "/realms/", N_("List of realms")
-      param :search, String, :desc => N_("Filter results")
-      param :order, String, :desc => N_("Sort results")
+      param :search, String, :desc => N_("filter results")
+      param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
 
@@ -19,8 +19,8 @@ module Api
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/realms/:id/", N_("Show a realm.")
-      param :id, :identifier, :required => true, :desc => N_("May be numerical id or realm name")
+      api :GET, "/realms/:id/", N_("Show a realm")
+      param :id, :identifier, :required => true, :desc => N_("Numerical ID or realm name")
 
       def show
       end
@@ -33,8 +33,7 @@ module Api
         end
       end
 
-      api :POST, "/realms/", N_("Create a realm.")
-      # TRANSLATORS: API documentation - do not translate
+      api :POST, "/realms/", N_("Create a realm")
       description <<-DOC
         The <b>name</b> field is used for the name of the realm.
       DOC
@@ -45,7 +44,7 @@ module Api
         process_response @realm.save
       end
 
-      api :PUT, "/realms/:id/", N_("Update a realm.")
+      api :PUT, "/realms/:id/", N_("Update a realm")
       param :id, :identifier, :required => true
       param_group :realm
 
@@ -53,7 +52,7 @@ module Api
         process_response @realm.update_attributes(params[:realm])
       end
 
-      api :DELETE, "/realms/:id/", N_("Delete a realm.")
+      api :DELETE, "/realms/:id/", N_("Delete a realm")
       param :id, :identifier, :required => true
 
       def destroy

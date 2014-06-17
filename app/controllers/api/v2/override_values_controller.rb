@@ -10,7 +10,7 @@ module Api
       before_filter :return_if_smart_mismatch, :only => [:index, :create, :show, :update, :destroy]
       before_filter :return_if_override_mismatch, :only => [:show, :update, :destroy]
 
-      api :GET, "/smart_variables/:smart_variable_id/override_values", N_("List of override values for a specific smart_variable")
+      api :GET, "/smart_variables/:smart_variable_id/override_values", N_("List of override values for a specific smart variable")
       api :GET, "/smart_class_parameters/:smart_class_parameter_id/override_values", N_("List of override values for a specific smart class parameter")
       param :smart_variable_id, :identifier, :required => false
       param :smart_class_parameter_id, :identifier, :required => false
@@ -20,7 +20,7 @@ module Api
       def index
       end
 
-      api :GET, "/smart_variables/:smart_variable_id/override_values/:id", N_("Show an override value for a specific smart_variable")
+      api :GET, "/smart_variables/:smart_variable_id/override_values/:id", N_("Show an override value for a specific smart variable")
       api :GET, "/smart_class_parameters/:smart_class_parameter_id/override_values/:id", N_("Show an override value for a specific smart class parameter")
       param :smart_variable_id, :identifier, :required => false
       param :smart_class_parameter_id, :identifier, :required => false
@@ -36,7 +36,7 @@ module Api
         end
       end
 
-      api :POST, "/smart_variables/:smart_variable_id/override_values", N_("Create an override value for a specific smart_variable")
+      api :POST, "/smart_variables/:smart_variable_id/override_values", N_("Create an override value for a specific smart variable")
       api :POST, "/smart_class_parameters/:smart_class_parameter_id/override_values", N_("Create an override value for a specific smart class parameter")
       param :smart_variable_id, :identifier, :required => false
       param_group :override_value, :as => :create
@@ -45,7 +45,7 @@ module Api
         @override_value = @smart.lookup_values.create!(params[:override_value])
       end
 
-      api :PUT, "/smart_variables/:smart_variable_id/override_values/:id", N_("Update an override value for a specific smart_variable")
+      api :PUT, "/smart_variables/:smart_variable_id/override_values/:id", N_("Update an override value for a specific smart variable")
       api :PUT, "/smart_class_parameters/:smart_class_parameter_id/override_values/:id", N_("Update an override value for a specific smart class parameter")
       param_group :override_value
 
@@ -54,7 +54,7 @@ module Api
         render 'api/v2/override_values/show'
       end
 
-      api :DELETE, "/smart_variables/:smart_variable_id/override_values/:id", N_("Delete an override value for a specific smart_variable")
+      api :DELETE, "/smart_variables/:smart_variable_id/override_values/:id", N_("Delete an override value for a specific smart variable")
       api :DELETE, "/smart_class_parameters/:smart_class_parameter_id/override_values/:id", N_("Delete an override value for a specific smart class parameter")
       param :id, :identifier, :required => true
 
@@ -77,7 +77,7 @@ module Api
 
       def return_if_override_mismatch
         if (@override_values && @override_value && !@override_values.find_by_id(@override_value.id)) || (@override_values && !@override_value) || !@override_values
-          not_found N_("Override value not found by id '#{params[:id]}'")
+          not_found "Override value not found by id '#{params[:id]}'"
         end
       end
 

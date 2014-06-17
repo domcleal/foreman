@@ -7,12 +7,12 @@ module Api
 
       api :GET, "/smart_variables", N_("List all smart variables")
       api :GET, "/hosts/:host_id/smart_variables", N_("List of smart variables for a specific host")
-      api :GET, "/hostgroups/:hostgroup_id/smart_variables", N_("List of smart variables for a specific hostgroup")
-      api :GET, "/puppetclasses/:puppetclass_id/smart_variables", N_("List of smart variables for a specific puppetclass")
+      api :GET, "/hostgroups/:hostgroup_id/smart_variables", N_("List of smart variables for a specific host group")
+      api :GET, "/puppetclasses/:puppetclass_id/smart_variables", N_("List of smart variables for a specific Puppet class")
       param :host_id, :identifier, :required => false
       param :hostgroup_id, :identifier, :required => false
       param :puppetclass_id, :identifier, :required => false
-      param :search, String, :desc => N_("Filter results")
+      param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
@@ -20,7 +20,7 @@ module Api
       def index
       end
 
-      api :GET, "/smart_variables/:id/", N_("Show a smart variable.")
+      api :GET, "/smart_variables/:id/", N_("Show a smart variable")
       param :id, :identifier, :required => true
 
       def show
@@ -39,7 +39,7 @@ module Api
         end
       end
 
-      api :POST, "/smart_variables", N_("Create a smart variable.")
+      api :POST, "/smart_variables", N_("Create a smart variable")
       param_group :smart_variable, :as => :create
 
       def create
@@ -48,7 +48,7 @@ module Api
         @smart_variable.save!
       end
 
-      api :PUT, "/smart_variables/:id", N_("Update a smart variable.")
+      api :PUT, "/smart_variables/:id", N_("Update a smart variable")
       param :id, :identifier, :required => true
       param_group :smart_variable
 
@@ -57,7 +57,7 @@ module Api
         render 'api/v2/smart_variables/show'
       end
 
-      api :DELETE, "/smart_variables/:id", N_("Delete a smart variable.")
+      api :DELETE, "/smart_variables/:id", N_("Delete a smart variable")
       param :id, :identifier, :required => true
 
       def destroy

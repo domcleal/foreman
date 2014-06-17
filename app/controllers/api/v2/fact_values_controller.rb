@@ -3,8 +3,8 @@ module Api
     class FactValuesController < V2::BaseController
       before_filter :setup_search_options, :only => :index
 
-      api :GET, "/fact_values/", N_("List all fact values.")
-      api :GET, "/hosts/:host_id/facts/", N_("List all fact values of a given host.")
+      api :GET, "/fact_values/", N_("List all fact values")
+      api :GET, "/hosts/:host_id/facts/", N_("List all fact values of a given host")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")

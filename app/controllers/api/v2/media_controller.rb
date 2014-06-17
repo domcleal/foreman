@@ -7,7 +7,6 @@ module Api
 
       before_filter :find_resource, :only => %w{show update destroy}
 
-      # TRANSLATORS: API documentation - do not translate
       PATH_INFO = <<-eos
 The path to the medium, can be a URL or a valid NFS server (exclusive of the architecture).
 
@@ -18,18 +17,11 @@ will be substituted for the version of the operating system.
 Solaris and Debian media may also use $release.
       eos
 
-      # TRANSLATORS: API documentation - do not translate
-      OS_FAMILY_INFO = <<-eos
-The family that the operating system belongs to.
+      OS_FAMILY_INFO = N_("Operating system family, available values: %s") % Operatingsystem.families.map { |f| "* " + f }.join("\n")
 
-Available families:
-
-#{Operatingsystem.families.map { |f| "* " + f }.join("\n")}
-      eos
-
-      api :GET, "/media/", N_("List all media.")
+      api :GET, "/media/", N_("List all installation media")
       param :search, String, :desc => N_("filter results"), :required => false
-      param :order, String, :desc => N_("sort results, e.g.: name ASC, or name DESC"), :required => false
+      param :order, String, :desc => N_("sort results"), :required => false
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
 
@@ -39,7 +31,7 @@ Available families:
           search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/media/:id/", N_("Show a medium.")
+      api :GET, "/media/:id/", N_("Show a medium")
       param :id, :identifier, :required => true
 
       def show
@@ -54,7 +46,7 @@ Available families:
         end
       end
 
-      api :POST, "/media/", N_("Create a medium.")
+      api :POST, "/media/", N_("Create a medium")
       param_group :medium, :as => :create
 
       def create
@@ -62,7 +54,7 @@ Available families:
         process_response @medium.save
       end
 
-      api :PUT, "/media/:id/", N_("Update a medium.")
+      api :PUT, "/media/:id/", N_("Update a medium")
       param :id, String, :required => true
       param_group :medium
 
@@ -71,7 +63,7 @@ Available families:
       end
 
       param :id, :identifier, :required => true
-      api :DELETE, "/media/:id/", N_("Delete a medium.")
+      api :DELETE, "/media/:id/", N_("Delete a medium")
 
       def destroy
         process_response @medium.destroy

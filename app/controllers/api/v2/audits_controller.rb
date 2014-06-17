@@ -5,8 +5,8 @@ module Api
       before_filter(:only => %w{show}) { find_resource('audit_logs') }
       before_filter :setup_search_options, :only => :index
 
-      api :GET, "/audits/", N_("List all audits.")
-      api :GET, "/hosts/:host_id/audits/", N_("List all audits for a given host.")
+      api :GET, "/audits/", N_("List all audits")
+      api :GET, "/hosts/:host_id/audits/", N_("List all audits for a given host")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")

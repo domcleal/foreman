@@ -4,7 +4,7 @@ module Api
       before_filter :find_resource, :only => %w{show update destroy}
       before_filter :find_compute_resource
 
-      api :GET, "/compute_resources/:compute_resource_id/images/", N_("List all images for compute resource")
+      api :GET, "/compute_resources/:compute_resource_id/images/", N_("List all images for a compute resource")
       param :search, String, :desc => N_("filter results")
       param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
@@ -35,7 +35,7 @@ module Api
         end
       end
 
-      api :POST, "/compute_resources/:compute_resource_id/images/", N_("Create a image")
+      api :POST, "/compute_resources/:compute_resource_id/images/", N_("Create an image")
       param :compute_resource_id, :identifier, :required => true
       param_group :image, :as => :create
 
@@ -44,7 +44,7 @@ module Api
         process_response @image.save, @compute_resource
       end
 
-      api :PUT, "/compute_resources/:compute_resource_id/images/:id/", N_("Update a image.")
+      api :PUT, "/compute_resources/:compute_resource_id/images/:id/", N_("Update an image")
       param :compute_resource_id, :identifier, :required => true
       param :id, :identifier, :required => true
       param_group :image
@@ -53,7 +53,7 @@ module Api
         process_response @image.update_attributes(params[:image])
       end
 
-      api :DELETE, "/compute_resources/:compute_resource_id/images/:id/", N_("Delete an image.")
+      api :DELETE, "/compute_resources/:compute_resource_id/images/:id/", N_("Delete an image")
       param :compute_resource_id, :identifier, :required => true
       param :id, :identifier, :required => true
 

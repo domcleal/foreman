@@ -11,9 +11,9 @@ module Api
       before_filter :permissions_check, :only => %w{power boot puppetrun}
       add_puppetmaster_filters :facts
 
-      api :GET, "/hosts/", N_("List all hosts.")
-      param :search, String, :desc => N_("Filter results")
-      param :order, String, :desc => N_("Sort results")
+      api :GET, "/hosts/", N_("List all hosts")
+      param :search, String, :desc => N_("filter results")
+      param :order, String, :desc => N_("sort results")
       param :page, String, :desc => N_("paginate results")
       param :per_page, String, :desc => N_("number of entries per request")
 
@@ -21,7 +21,7 @@ module Api
         @hosts = resource_scope.search_for(*search_options).paginate(paginate_options)
       end
 
-      api :GET, "/hosts/:id/", N_("Show a host.")
+      api :GET, "/hosts/:id/", N_("Show a host")
       param :id, :identifier_dottable, :required => true
 
       def show
@@ -31,8 +31,8 @@ module Api
         param :host, Hash, :action_aware => true do
           param :name, String, :required => true
           param :environment_id, String
-          param :ip, String, :desc => N_("not required if using a subnet with dhcp proxy")
-          param :mac, String, :desc => N_("not required if its a virtual machine")
+          param :ip, String, :desc => N_("not required if using a subnet with DHCP proxy")
+          param :mac, String, :desc => N_("not required if it's a virtual machine")
           param :architecture_id, :number
           param :domain_id, :number
           param :realm_id, :number
@@ -63,7 +63,7 @@ module Api
       end
 
 
-      api :POST, "/hosts/", N_("Create a host.")
+      api :POST, "/hosts/", N_("Create a host")
       param_group :host, :as => :create
 
       def create
@@ -73,7 +73,7 @@ module Api
         process_response @host.save
       end
 
-      api :PUT, "/hosts/:id/", N_("Update a host.")
+      api :PUT, "/hosts/:id/", N_("Update a host")
       param :id, :identifier, :required => true
       param_group :host
 
@@ -81,7 +81,7 @@ module Api
         process_response @host.update_attributes(params[:host])
       end
 
-      api :DELETE, "/hosts/:id/", N_("Delete an host.")
+      api :DELETE, "/hosts/:id/", N_("Delete a host")
       param :id, :identifier, :required => true
 
       def destroy
@@ -90,7 +90,6 @@ module Api
 
       api :GET, "/hosts/:id/status", N_("Get status of host")
       param :id, :identifier_dottable, :required => true
-      # TRANSLATORS: API documentation - do not translate
       description <<-eos
 Return value may either be one of the following:
 
@@ -100,14 +99,13 @@ Return value may either be one of the following:
 * changed
 * unchanged
 * unreported
-
       eos
 
       def status
         render :json => { :status => @host.host_status }.to_json if @host
       end
 
-      api :PUT, "/hosts/:id/puppetrun", N_("Force a puppet run on the agent.")
+      api :PUT, "/hosts/:id/puppetrun", N_("Force a Puppet agent run on the host")
       param :id, :identifier_dottable, :required => true
 
       def puppetrun
@@ -115,20 +113,20 @@ Return value may either be one of the following:
         process_response @host.puppetrun!
       end
 
-      api :PUT, "/hosts/:id/power", N_("Run power operation on host.")
+      api :PUT, "/hosts/:id/power", N_("Run a power operation on host")
       param :id, :identifier_dottable, :required => true
-      param :power_action, String, :required => true, :desc => N_("power action, valid actions are ('on', 'start')', ('off', 'stop'), ('soft', 'reboot'), ('cycle', 'reset'), ('state', 'status')")
+      param :power_action, String, :required => true, :desc => N_("power action, valid actions are (on/start), (off/stop), (soft/reboot), (cycle/reset), (state/status)")
 
       def power
         valid_actions = PowerManager::SUPPORTED_ACTIONS
         if valid_actions.include? params[:power_action]
           render :json => { :power => @host.power.send(params[:power_action]) } , :status => 200
         else
-          render :json => { :error => N_("Unknown power action: Available methods are #{valid_actions.join(', ')}") }, :status => 422
+          render :json => { :error => _("Unknown power action: available methods are %s") % valid_actions.join(', ') }, :status => 422
         end
       end
 
-      api :PUT, "/hosts/:id/boot", N_("Boot host from specified device.")
+      api :PUT, "/hosts/:id/boot", N_("Boot host from specified device")
       param :id, :identifier_dottable, :required => true
       param :device, String, :required => true, :desc => N_("boot device, valid devices are disk, cdrom, pxe, bios")
 
@@ -137,11 +135,11 @@ Return value may either be one of the following:
         if valid_devices.include? params[:device]
           render :json => { :boot => @host.ipmi_boot(params[:device]) }, :status => 200
         else
-          render :json => { :error => N_("Unknown device: Available devices are #{valid_devices.join(', ')}") }, :status => 422
+          render :json => { :error => _("Unknown device: available devices are %s") % valid_devices.join(', ') }, :status => 422
         end
       end
 
-      api :POST, "/hosts/facts", N_("Upload facts for a host, creating the host if required.")
+      api :POST, "/hosts/facts", N_("Upload facts for a host, creating the host if required")
       param :name, String, :required => true, :desc => N_("hostname of the host")
       param :facts, Hash,      :required => true, :desc => N_("hash containing the facts for the host")
       param :certname, String, :desc => N_("optional: certname of the host")
@@ -186,10 +184,10 @@ Return value may either be one of the following:
           logger.debug "Creating host of type: #{params[:type]}"
           return params[:type].constantize
         else
-          raise N_("Invalid type for host creation via facts: #{params[:type]}")
+          raise ::Foreman::Exception.new(N_("Invalid type for host creation via facts: %s"), params[:type])
         end
       rescue => e
-        raise ::Foreman::Exception.new(N_("A problem occurred when detecting host type: #{e.message}"))
+        raise ::Foreman::Exception.new(N_("A problem occurred when detecting host type: %s"), e.message)
       end
 
       def permissions_check

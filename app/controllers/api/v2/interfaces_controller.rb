@@ -9,7 +9,7 @@ module Api
       before_filter :find_required_nested_object, :only => [:index, :show, :create]
 
       api :GET, '/hosts/:host_id/interfaces', N_("List all interfaces for host")
-      param :host_id, String, :required => true, :desc => N_("id or name of host")
+      param :host_id, String, :required => true, :desc => N_("ID or name of host")
 
       def index
         @interfaces = @nested_obj.interfaces.paginate(paginate_options)
@@ -17,8 +17,8 @@ module Api
       end
 
       api :GET, '/hosts/:host_id/interfaces/:id', N_("Show an interface for host")
-      param :host_id, String, :required => true, :desc => N_("id or name of nested host")
-      param :id, String, :required => true, :desc => N_("id or name of interface")
+      param :host_id, String, :required => true, :desc => N_("ID or name of host")
+      param :id, String, :required => true, :desc => N_("ID or name of interface")
 
       def show
       end
@@ -29,16 +29,16 @@ module Api
           param :ip, String, :required => true, :desc => N_("IP address of interface")
           param :type, String, :required => true, :desc => N_("Interface type, i.e: Nic::BMC")
           param :name, String, :required => true, :desc => N_("Interface name")
-          param :subnet_id, Fixnum, :desc => N_("Foreman subnet id of interface")
-          param :domain_id, Fixnum, :desc => N_("Foreman domain id of interface")
+          param :subnet_id, Fixnum, :desc => N_("Foreman subnet ID of interface")
+          param :domain_id, Fixnum, :desc => N_("Foreman domain ID of interface")
           param :username, String
           param :password, String
-          param :provider, String, :desc => N_("Interface provider, i.e: IPMI")
+          param :provider, String, :desc => N_("Interface provider, i.e. IPMI")
         end
       end
 
-      api :POST, '/hosts/:host_id/interfaces', N_("Create an interface linked to a host")
-      param :host_id, String, :required => true, :desc => N_("id or name of host")
+      api :POST, '/hosts/:host_id/interfaces', N_("Create an interface on a host")
+      param :host_id, String, :required => true, :desc => N_("ID or name of host")
       param_group :interface, :as => :create
 
       def create
@@ -50,17 +50,17 @@ module Api
         end
       end
 
-      api :PUT, "/hosts/:host_id/interfaces/:id", N_("Update host interface")
-      param :host_id, String, :required => true, :desc => N_("id or name of host")
-      param :id, :identifier, :required => true
+      api :PUT, "/hosts/:host_id/interfaces/:id", N_("Update a host's interface")
+      param :host_id, String, :required => true, :desc => N_("ID or name of host")
+      param :id, :identifier, :required => true, :desc => N_("ID of interface")
       param_group :interface
 
       def update
         process_response @interface.update_attributes(params[:interface], :without_protection => true)
       end
 
-      api :DELETE, "/hosts/:host_id/interfaces/:id", N_("Delete a host interface")
-      param :id, String, :required => true, :desc => N_("id of interface")
+      api :DELETE, "/hosts/:host_id/interfaces/:id", N_("Delete a host's interface")
+      param :id, String, :required => true, :desc => N_("ID of interface")
 
       def destroy
         process_response @interface.destroy
