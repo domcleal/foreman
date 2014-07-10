@@ -120,7 +120,7 @@ Return value may either be one of the following:
       def disassociate
         @host.disassociate!
         render 'api/v2/hosts/show'
-      end        
+      end
 
       api :PUT, "/hosts/:id/power", "Run power operation on host."
       param :id, :identifier_dottable, :required => true

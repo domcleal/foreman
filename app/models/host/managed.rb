@@ -579,7 +579,7 @@ class Host::Managed < Host::Base
     {}
   end
 
-  def associate!(cr, vm) 
+  def associate!(cr, vm)
     self.uuid = vm.identity
     self.compute_resource_id = cr.id
     self.save!(:validate => false) # don't want to trigger callbacks

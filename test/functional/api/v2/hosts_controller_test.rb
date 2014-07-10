@@ -154,10 +154,11 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   end
 
   test "should disassociate host" do
-    assert hosts(:one).compute?
-    put :disassociate, { :id => hosts(:one).to_param }
+    host = FactoryGirl.create(:host, :on_compute_resource)
+    assert host.compute?
+    put :disassociate, { :id => host.to_param }
     assert_response :success
-    refute hosts(:one).reload.compute?
+    refute host.reload.compute?
   end
 
   def fact_json
