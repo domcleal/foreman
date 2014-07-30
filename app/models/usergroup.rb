@@ -52,10 +52,6 @@ class Usergroup < ActiveRecord::Base
     users.each { |u| u.expire_topbar_cache(sweeper) }
   end
 
-  def ldap_users
-    external_usergroups.select { |eu| eu.auth_source.class == AuthSourceLdap }.map(&:ldap_users).flatten.uniq
-  end
-
   def add_users(userlist)
     users << User.where( {:login => userlist } )
   end

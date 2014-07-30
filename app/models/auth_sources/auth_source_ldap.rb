@@ -95,6 +95,15 @@ class AuthSourceLdap < AuthSource
     end
   end
 
+  def valid_group?(name)
+    ldap_con.authenticate?(account, account_password)
+    ldap_con.valid_group?(name)
+  end
+
+  def users_in_group(name)
+    ldap_con.user_list(name)
+  end
+
   private
 
   def strip_ldap_attributes

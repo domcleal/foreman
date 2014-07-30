@@ -202,35 +202,35 @@ class UsergroupTest < ActiveSupport::TestCase
       LdapFluff.any_instance.stubs(:valid_group?).returns(false)
 
       refute @external.save
-      assert_equal @external.errors.first, [:name, 'is not an LDAP user group']
+      assert_equal @external.errors.first, [:name, 'is not found in the authentication source']
     end
 
     test "delete user if not in LDAP directory" do
-      LdapFluff.any_instance.stubs(:valid_group?).returns(false)
+      LdapFluff.any_instance.stubs(:valid_group?).at_least_once.with('aname').returns(false)
       @usergroup.users << users(:one)
       @usergroup.save
 
-      ExternalUsergroup.any_instance.stubs(:ldap_users).returns([])
+      AuthSourceLdap.any_instance.expects(:users_in_group).at_least_once.with('aname').returns([])
       @usergroup.external_usergroups.select { |eu| eu.name == 'aname'}.first.refresh
 
       refute_includes @usergroup.users, users(:one)
     end
 
     test "add user if in LDAP directory" do
-      LdapFluff.any_instance.stubs(:valid_group?).returns(true)
+      LdapFluff.any_instance.stubs(:valid_group?).at_least_once.with('aname').returns(true)
       @usergroup.save
 
-      ExternalUsergroup.any_instance.stubs(:ldap_users).returns([users(:one).login])
+      AuthSourceLdap.any_instance.expects(:users_in_group).at_least_once.with('aname').returns([users(:one).login])
       @usergroup.external_usergroups.select { |eu| eu.name == 'aname'}.first.refresh
       assert_includes @usergroup.users, users(:one)
     end
 
     test "keep user if in LDAP directory" do
-      LdapFluff.any_instance.stubs(:valid_group?).returns(true)
+      LdapFluff.any_instance.stubs(:valid_group?).at_least_once.with('aname').returns(true)
       @usergroup.users << users(:one)
       @usergroup.save
 
-      ExternalUsergroup.any_instance.stubs(:ldap_users).returns([users(:one).login])
+      AuthSourceLdap.any_instance.expects(:users_in_group).at_least_once.with('aname').returns([users(:one).login])
       @usergroup.external_usergroups.select { |eu| eu.name == 'aname'}.first.refresh
       assert_includes @usergroup.users, users(:one)
     end
