@@ -516,7 +516,7 @@ class Host::Managed < Host::Base
   def self.count_distribution(association)
     output = []
     data = group("#{Host.table_name}.#{association}_id").reorder('').count
-    associations = association.to_s.camelize.constantize.where(:id => data.keys).all
+    associations = association.to_s.camelize.constantize.where(:id => data.keys).to_a
     data.each do |k,v|
       begin
         output << {:label => associations.detect {|a| a.id == k }.to_label, :data => v }  unless v == 0
@@ -772,7 +772,7 @@ class Host::Managed < Host::Base
               else
                 uuid       = self.compute_attributes[cr.image_param_name]
                 image_kind = images.find_by_uuid(uuid).try(:user_data) ? 'user_data' : 'finish'
-                [TemplateKind.find(image_kind)]
+                [TemplateKind.friendly.find(image_kind)]
               end
             else
               TemplateKind.all

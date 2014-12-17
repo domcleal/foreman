@@ -5,7 +5,7 @@ require File.expand_path('../lib/regexp_extensions', FOREMAN_GEMFILE)
 
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.2'
+gem 'rails', '4.0.12'
 gem 'json', '~> 1.5'
 gem 'rest-client', '~> 1.6.0', :require => 'rest_client'
 gem 'audited-activerecord'#, '3.0.0'
@@ -29,7 +29,6 @@ gem 'i18n', '~> 0.6.4'
 gem 'turbolinks', '~> 2.5'
 gem 'logging', '>= 1.8.0', '< 3.0.0'
 gem 'activerecord-session_store'
-gem 'protected_attributes'
 gem 'rails-observers', git: 'https://github.com/rails/rails-observers.git'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|

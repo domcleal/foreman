@@ -148,7 +148,7 @@ module ApplicationHelper
 
   def display_delete_if_authorized(options = {}, html_options = {})
     options = {:auth_action => :destroy}.merge(options)
-    html_options = {:confirm => _('Are you sure?'), :method => :delete, :class => 'delete'}.merge(html_options)
+    html_options = {:data => {:confirm => _('Are you sure?')}, :method => :delete, :class => 'delete'}.merge(html_options)
     display_link_if_authorized(_("Delete"), options, html_options)
   end
 
@@ -377,7 +377,7 @@ module ApplicationHelper
   end
 
   def obj_type(obj)
-    obj.class.model_name.tableize.singularize
+    obj.class.model_name.to_s.tableize.singularize
   end
 
   def class_in_environment?(environment,puppetclass)
