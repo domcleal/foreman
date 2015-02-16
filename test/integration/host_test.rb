@@ -127,8 +127,6 @@ class HostTest < ActionDispatch::IntegrationTest
         end
 
         test "ok button updates overview table" do
-          skip "Temporarily disabled until issue #9138 gets resolved"
-
           go_to_interfaces_tab
 
           # edit the primary interface
@@ -177,8 +175,6 @@ class HostTest < ActionDispatch::IntegrationTest
         end
 
         test "setting primary updates host name" do
-          skip "Temporarily disabled until issue #9138 gets resolved"
-
           go_to_interfaces_tab
 
           # edit the primary interface

@@ -30,6 +30,7 @@ Spork.prefork do
   end
 
   Capybara.javascript_driver = :poltergeist
+  Capybara.default_wait_time = 10
 
   # Use our custom test runner, and register a fake plugin to skip a specific test
   Foreman::Plugin.register :skip_test do
