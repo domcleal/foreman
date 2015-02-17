@@ -1,5 +1,9 @@
 require 'test_helper'
 
+def OpenStruct.i18n_scope
+  :en
+end
+
 class EnsureNoCycleTest < ActiveSupport::TestCase
   def setup
     base = []
@@ -12,7 +16,7 @@ class EnsureNoCycleTest < ActiveSupport::TestCase
   end
 
   #apparently, ActiveModel::Errors calls that...
-  def OpenStruct.i18n_scope
+  def self.i18n_scope
     :en
   end
 

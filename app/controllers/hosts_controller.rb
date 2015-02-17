@@ -45,7 +45,7 @@ class HostsController < ApplicationController
         @hostgroup_authorizer = Authorizer.new(User.current, :collection => @hosts.map(&:hostgroup_id).compact.uniq)
         render :index if title and (@title = title)
       end
-      format.yaml { render :text => search.all(:select => "hosts.name").map(&:name).to_yaml }
+      format.yaml { render :text => search.where(:select => "hosts.name").all.map(&:name).to_yaml }
       format.json
     end
   end
@@ -371,7 +371,6 @@ class HostsController < ApplicationController
     else
       notice _("%s Parameters updated, see below for more information") % (counter)
     end
-
   end
 
   def select_multiple_hostgroup
@@ -612,7 +611,7 @@ class HostsController < ApplicationController
   def set_host_type
     return unless params[:host] and params[:host][:type]
     type = params[:host][:type]
-    if (type.constantize rescue false) && type.constantize.new.kind_of?(Host::Base)
+    if (type.constantize rescue false) && type.constantize.new.is_a?(Host::Base)
       @host      = @host.becomes(type.constantize)
       @host.type = type
     else
