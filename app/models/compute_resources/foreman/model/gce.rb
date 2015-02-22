@@ -39,10 +39,8 @@ module Foreman::Model
       attrs[:email] = email
     end
 
-    #TODO: allow to select public / private ip address that foreman tries to find
-    def provided_attributes
-      super.merge({ :ip => :public_ip_address })
-    end
+    # TODO: allow to select public / private ip address that foreman tries to find
+    #       through provided_attributes, with external_ip enabled or disabled
 
     def zones
       client.list_zones.body['items'].map { |zone| zone['name'] }
@@ -50,6 +48,10 @@ module Foreman::Model
 
     def networks
       client.list_networks.body['items'].map { |n| n['name'] }
+    end
+
+    def disks
+      client.list_disks(zone).body['items'].map { |disk| disk['name'] }
     end
 
     def zone
@@ -61,21 +63,35 @@ module Foreman::Model
     end
 
     def create_vm(args = {})
-      #Dot are not allowed in names
+      # Dots are not allowed in names
       args[:name]        = args[:name].parameterize if args[:name].present?
       args[:external_ip] = args[:external_ip] != '0'
       args[:image_name]  = args[:image_id]
+      # GCE network interfaces cannot be defined though Foreman yet
+      args[:network_interfaces] = nil
+      args[:disks]       = [create_disk(args[:name], args[:volumes][:size_gb], args[:image_id])]
+      args[:disks].first.wait_for { args[:disks].first.ready? }
 
       username = images.where(:uuid => args[:image_name]).first.try(:username)
       ssh      = { :username => username, :public_key => key_pair.public }
       super(args.merge(ssh))
     rescue Fog::Errors::Error => e
+      args[:disks].map(&:destroy) if args[:disks].present?
       logger.error "Unhandled GCE error: #{e.class}:#{e.message}\n " + e.backtrace.join("\n ")
       raise e
     end
 
     def available_images
       client.images
+    end
+
+    def create_disk(name, size, image_uuid)
+      client.disks.create(
+        :name         => name,
+        :size_gb      => size.to_i,
+        :zone_name    => zone,
+        :source_image => client.images.select { |i| i.id == image_uuid }.first.name
+      )
     end
 
     def self.model_name
@@ -100,6 +116,14 @@ module Foreman::Model
       "Google"
     end
 
+    def interfaces_attrs_name
+      :network_interfaces
+    end
+
+    def new_volume(attrs = { })
+      client.disks.new(:zone => zone)
+    end
+
     private
 
     def client
@@ -119,8 +143,8 @@ module Foreman::Model
 
     def vm_instance_defaults
       super.merge(
-        :zone_name => zone,
-        :name      => "foreman-#{Time.now.to_i}"
+        :zone => zone,
+        :name => "foreman-#{Time.now.to_i}"
       )
     end
   end
