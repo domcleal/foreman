@@ -50,6 +50,7 @@ Spork.prefork do
 
     setup :begin_gc_deferment
     teardown :reconsider_gc_deferment
+    teardown :clear_current_user
 
     DEFERRED_GC_THRESHOLD = (ENV['DEFER_GC'] || 1.0).to_f
 
@@ -67,6 +68,10 @@ Spork.prefork do
 
         @@last_gc_run = Time.now
       end
+    end
+
+    def clear_current_user
+      User.current = nil
     end
 
     # for backwards compatibility to between Minitest syntax
