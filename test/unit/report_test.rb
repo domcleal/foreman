@@ -77,4 +77,9 @@ class ReportTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "logs should be ordered naturally" do
+    report = FactoryGirl.create(:report, :with_logs)
+    assert_equal report.logs.sort_by { |l| l.message.value }, report.logs
+  end
 end
