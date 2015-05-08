@@ -14,16 +14,15 @@ module Foreman::Controller::SmartProxyAuth
       before_filter(:only => actions) { require_smart_proxy_or_login(options[:features]) }
       attr_reader :detected_proxy
 
-      skipped_actions = actions.is_a?(Symbol) ? actions.to_s : actions
-      define_method("require_ssl_with_not?") do
-        send("require_ssl_without_not?") if skipped_actions.include?(self.action_name)
+      define_method(:require_ssl_with_smart_proxy_filters?) do
+        if [actions].flatten.map(&:to_s).include?(self.action_name)
+          false
+        else
+          require_ssl_without_smart_proxy_filters?
+        end
       end
-      alias_method_chain :require_ssl?, :not
+      alias_method_chain :require_ssl?, :smart_proxy_filters
     end
-  end
-
-  def require_ssl_with_not?
-    false
   end
 
   private
