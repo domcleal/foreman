@@ -77,6 +77,29 @@ class UnattendedControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should get a yast template" do
+    os = FactoryGirl.create(:suse, :with_media, :with_ptables, :with_archs, :with_provision)
+    host = FactoryGirl.create(:host, :managed, :with_dhcp_orchestration, :build => true,
+                              :operatingsystem => os)
+    @request.env["REMOTE_ADDR"] = host.ip
+    get :provision
+    assert_response :success
+  end
+
+  test "should expand @mediapath in yast template" do
+    tmpl   = FactoryGirl.create(:config_template, :template_kind => TemplateKind.find_by_name('provision'),
+                                :template => '<%= @mediapath -%>')
+    medium = FactoryGirl.create(:medium, :suse)
+    os     = FactoryGirl.create(:suse, :with_ptables, :with_archs, :with_os_defaults,
+                                :media => [medium], :config_templates => [tmpl])
+    host   = FactoryGirl.create(:host, :managed, :with_dhcp_orchestration, :build => true,
+                                :operatingsystem => os)
+    @request.env["REMOTE_ADDR"] = host.ip
+    get :provision
+    assert_response :success
+    assert_equal 'http://mirror.isoc.org.il/pub/opensuse/distribution/11.4/repo/oss', @response.body
+  end
+
   test "unattended files content type should be text/plain" do
     @request.env["REMOTE_ADDR"] = @ub_host.ip
     get :provision
