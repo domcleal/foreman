@@ -1,9 +1,8 @@
 module Api
   module V2
     class TemplateCombinationsController < V2::BaseController
-      before_filter :find_optional_nested_object
+      before_filter :find_required_nested_object
       before_filter :find_resource, :only => [:show, :update, :destroy]
-      before_filter :find_parent_config_template, :only => [:index, :create]
 
       def_param_group :template_combination_identifiers do
         param :config_template_id, String, :desc => N_("ID of config template")
@@ -16,7 +15,7 @@ module Api
       api :GET, "/environments/:environment_id/template_combinations", N_("List template combination")
       param_group :template_combination_identifiers
       def index
-        @template_combinations = requested_resource.template_combinations
+        @template_combinations = nested_obj.template_combinations
         @total = @template_combinations.count
       end
 
@@ -34,7 +33,7 @@ module Api
       param_group :template_combination, :as => :create
 
       def create
-        @template_combination = requested_resource.template_combinations.build(params[:template_combination])
+        @template_combination = nested_obj.template_combinations.build(params[:template_combination])
         process_response @template_combination.save
       end
 
@@ -59,17 +58,6 @@ module Api
 
       def destroy
         process_response @template_combination.destroy
-      end
-
-      def find_parent_config_template
-        @config_template = ConfigTemplate.authorized(:view_templates).find(params[:config_template_id]) rescue nil
-      end
-
-      def requested_resource
-        resource = @config_template
-        resource ||= @nested_obj
-        return not_found unless resource
-        resource
       end
 
       private
