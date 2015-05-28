@@ -39,8 +39,9 @@ module Foreman::Model
       attrs[:email] = email
     end
 
-    # TODO: allow to select public / private ip address that foreman tries to find
-    #       through provided_attributes, with external_ip enabled or disabled
+    def provided_attributes
+      super.merge({ :ip => :vm_ip_address })
+    end
 
     def zones
       client.list_zones.body['items'].map { |zone| zone['name'] }
@@ -71,7 +72,7 @@ module Foreman::Model
 
       # Dots are not allowed in names
       args[:name]        = args[:name].parameterize if args[:name].present?
-      args[:external_ip] = args[:external_ip] != '0'
+      args[:external_ip] = args[:external_ip] == '1'
       # GCE network interfaces cannot be defined though Foreman yet
       args[:network_interfaces] = nil
 

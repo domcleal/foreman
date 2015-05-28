@@ -24,6 +24,10 @@ module FogExtensions
       def volumes
         disks
       end
+
+      def vm_ip_address
+        external_ip ? public_ip_addres : private_ip_address
+      end
     end
   end
 end
