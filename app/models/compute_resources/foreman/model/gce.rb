@@ -76,45 +76,42 @@ module Foreman::Model
       # GCE network interfaces cannot be defined though Foreman yet
       args[:network_interfaces] = nil
 
+      if args[:volumes].present?
+        if args[:image_id].present?
+          args[:volumes].first[:source_image] = client.images.select { |i| i.id == args[:image_id] }.first.name
+        end
+        args[:disks] = []
+        args[:volumes].each_with_index do |vol_args,i|
+          args[:disks] << new_volume(vol_args.merge(:name => "#{args[:name]}-disk#{i+1}"))
+        end
+      end
+
       super(args)
     end
 
     def create_vm(args = {})
-      vm = new_vm(args)
+      new_vm(args)
       create_volumes(args)
 
       username = images.where(:uuid => args[:image_name]).first.try(:username)
       ssh      = { :username => username, :public_key => key_pair.public }
-      super(args.merge(ssh))
+      vm = super(args.merge(ssh))
+
+      args[:disks].each { |disk| vm.set_disk_auto_delete(true, disk.name) }
+      vm
     rescue Fog::Errors::Error => e
-      args[:disks].map(&:destroy) if args[:disks].present?
+      args[:disks].find_all(&:status).map(&:destroy) if args[:disks].present?
       logger.error "Unhandled GCE error: #{e.class}:#{e.message}\n " + e.backtrace.join("\n ")
       raise e
     end
 
     def create_volumes(args)
-      args[:volumes].first[:image_id] = args[:image_id]
-
-      args[:disks] = []
-      args[:volumes].each_with_index do |vol,i|
-        args[:disks] << create_disk("#{args[:name]}-disk#{i+1}", vol[:size_gb], vol[:image_id])
-      end
-
+      args[:disks].map(&:save)
       args[:disks].each { |disk| disk.wait_for { disk.ready? } }
     end
 
     def available_images
       client.images
-    end
-
-    def create_disk(name, size, image_uuid)
-      args = {
-        :name         => name,
-        :size_gb      => size.to_i,
-        :zone_name    => zone,
-      }
-      args.merge!(:source_image => client.images.select { |i| i.id == image_uuid }.first.name) if image_uuid.present?
-      client.disks.create(args)
     end
 
     def self.model_name
@@ -144,7 +141,11 @@ module Foreman::Model
     end
 
     def new_volume(attrs = { })
-      client.disks.new(attrs.merge(:zone => zone, :size_gb => 10))
+      args = {
+        :size_gb   => (attrs[:size_gb] || 10).to_i,
+        :zone_name => zone,
+      }.merge(attrs)
+      client.disks.new(args)
     end
 
     private
