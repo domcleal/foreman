@@ -62,15 +62,25 @@ module Foreman::Model
       self.url = zone
     end
 
-    def create_vm(args = {})
+    def new_vm(args = {})
+      # convert rails nested_attributes into a plain hash
+      [:volumes].each do |collection|
+        nested_attrs = args.delete("#{collection}_attributes".to_sym)
+        args[collection] = nested_attributes_for(collection, nested_attrs) if nested_attrs
+      end
+
       # Dots are not allowed in names
       args[:name]        = args[:name].parameterize if args[:name].present?
       args[:external_ip] = args[:external_ip] != '0'
-      args[:image_name]  = args[:image_id]
       # GCE network interfaces cannot be defined though Foreman yet
       args[:network_interfaces] = nil
-      args[:disks]       = [create_disk(args[:name], args[:volumes][:size_gb], args[:image_id])]
-      args[:disks].first.wait_for { args[:disks].first.ready? }
+
+      super(args)
+    end
+
+    def create_vm(args = {})
+      vm = new_vm(args)
+      create_volumes(args)
 
       username = images.where(:uuid => args[:image_name]).first.try(:username)
       ssh      = { :username => username, :public_key => key_pair.public }
@@ -81,17 +91,29 @@ module Foreman::Model
       raise e
     end
 
+    def create_volumes(args)
+      args[:volumes].first[:image_id] = args[:image_id]
+
+      args[:disks] = []
+      args[:volumes].each_with_index do |vol,i|
+        args[:disks] << create_disk("#{args[:name]}-disk#{i+1}", vol[:size_gb], vol[:image_id])
+      end
+
+      args[:disks].each { |disk| disk.wait_for { disk.ready? } }
+    end
+
     def available_images
       client.images
     end
 
     def create_disk(name, size, image_uuid)
-      client.disks.create(
+      args = {
         :name         => name,
         :size_gb      => size.to_i,
         :zone_name    => zone,
-        :source_image => client.images.select { |i| i.id == image_uuid }.first.name
-      )
+      }
+      args.merge!(:source_image => client.images.select { |i| i.id == image_uuid }.first.name) if image_uuid.present?
+      client.disks.create(args)
     end
 
     def self.model_name
@@ -121,7 +143,7 @@ module Foreman::Model
     end
 
     def new_volume(attrs = { })
-      client.disks.new(:zone => zone)
+      client.disks.new(attrs.merge(:zone => zone, :size_gb => 10))
     end
 
     private
@@ -144,7 +166,8 @@ module Foreman::Model
     def vm_instance_defaults
       super.merge(
         :zone => zone,
-        :name => "foreman-#{Time.now.to_i}"
+        :name => "foreman-#{Time.now.to_i}",
+        :disks => [new_volume],
       )
     end
   end

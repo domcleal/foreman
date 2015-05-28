@@ -18,6 +18,12 @@ module FogExtensions
       def vm_description
         pretty_machine_type
       end
+
+      def volumes_attributes=(attrs); end
+
+      def volumes
+        disks
+      end
     end
   end
 end
