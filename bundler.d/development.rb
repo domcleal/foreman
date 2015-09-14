@@ -10,6 +10,5 @@ group :development do
   gem 'immigrant', '~> 0.1'
 
   gem 'pry'
-  gem 'bullet'
   gem "parallel_tests"
 end

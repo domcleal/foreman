@@ -50,4 +50,11 @@ Foreman::Application.configure do
 
   # Use separate cache stores for parallel_tests
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "paralleltests#{ENV['TEST_ENV_NUMBER']}")
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+    Bullet.raise = true
+  end
 end
+
