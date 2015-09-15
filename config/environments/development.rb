@@ -24,18 +24,18 @@ Foreman::Application.configure do
   # Should ANSI color codes be used when logging information
   config.colorize_logging = Foreman::Logging.config[:colorize]
 
-  # Do not compress assets
-  config.assets.compress = false
-
   # Expands the lines which load the assets
   config.assets.debug = true
 
   # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict
 
-  # Log the query plan for queries taking more than this (works
-  # with SQLite, MySQL, and PostgreSQL)
-  config.active_record.auto_explain_threshold_in_seconds = 0.5
+  # Force Rails to not create an initial schema automatically.
+  # This is necessary to avoid Jenkins throwing an error 'schema.rb does not
+  # exist yet' when there is no db and it tries to run:
+  # bundle exec rake db:drop db:create db:migrate
+  #
+  # config.active_record.maintain_test_schema = false
 
   config.after_initialize do
     Bullet.enable = true

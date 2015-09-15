@@ -15,6 +15,7 @@ Apipie.configure do |config|
   config.default_locale = FastGettext.default_locale
   config.locale = ->(loc) { loc ? FastGettext.set_locale(loc) : FastGettext.locale }
 
+  ActiveRecord::Migration.maintain_test_schema!
   substitutions = {
     :operatingsystem_families => Operatingsystem.families.join(", "),
     :providers => ComputeResource.providers.join(', '),
