@@ -15,11 +15,10 @@ Apipie.configure do |config|
   config.default_locale = FastGettext.default_locale
   config.locale = ->(loc) { loc ? FastGettext.set_locale(loc) : FastGettext.locale }
 
-  ActiveRecord::Migration.maintain_test_schema!
   substitutions = {
-    :operatingsystem_families => Operatingsystem.families.join(", "),
-    :providers => ComputeResource.providers.join(', '),
-    :default_nic_type => InterfaceTypeMapper::DEFAULT_TYPE.humanized_name.downcase,
+    :operatingsystem_families => -> { Operatingsystem.families.join(", ") },
+    :providers => -> { ComputeResource.providers.join(', ') },
+    :default_nic_type => -> { InterfaceTypeMapper::DEFAULT_TYPE.humanized_name.downcase },
     :template_kinds => -> { TemplateKind.pluck(:name).join(", ") },
     :provision_methods => -> { Host::Managed.provision_methods.map { |method, friendly_name| "#{method} (#{_(friendly_name)})" }.join(', ') },
   }
