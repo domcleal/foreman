@@ -2,7 +2,7 @@ begin
   require "ci/reporter/rake/minitest"
 
   namespace :jenkins do
-    task :unit => ['jenkins:setup:minitest', 'rake:test:units', 'rake:test:lib', 'rake:test:functionals']
+    task :unit => ['db:test:prepare', 'jenkins:setup:minitest', 'rake:test:units', 'rake:test:lib', 'rake:test:functionals']
     task :integration => ["jenkins:setup:minitest", 'rake:test:integration']
     task :lib => ["jenkins:setup:minitest", 'rake:test:lib']
     task :functionals => ["jenkins:setup:minitest", 'rake:test:functionals']
