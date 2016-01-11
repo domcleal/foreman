@@ -267,7 +267,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       fill_in 'host_interfaces_attributes_0_ip', :with => '1.1.1.1'
       click_button 'Ok' #close interfaces
       #wait for the dialog to close
-      Timeout.timeout(Capybara.default_wait_time) do
+      Timeout.timeout(Capybara.default_max_wait_time) do
         loop while find(:css, '#interfaceModal', :visible => false).visible?
       end
       click_button 'Submit' #create new host
@@ -313,7 +313,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       click_button 'Ok'
 
       #wait for the dialog to close
-      Timeout.timeout(Capybara.default_wait_time) do
+      Timeout.timeout(Capybara.default_max_wait_time) do
         loop while find(:css, '#interfaceModal', :visible => false).visible?
       end
 
@@ -333,7 +333,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
     click_link @host.fqdn
     assert page.has_link?("Delete", :href => "/hosts/#{@host.fqdn}")
     first(:link, "Delete").click
-    assert_equal(current_path, hosts_path)
+    assert_current_path hosts_path
   end
 
   describe "hosts index multiple actions" do
@@ -377,7 +377,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       assert page.has_link?('Parameters', :href => '#params')
       click_link 'Parameters'
       assert_equal class_params.find("textarea").value, "false"
-      refute class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:enabled")
       class_params.find("a[data-tag='remove']").click
       click_button('Submit')
       assert page.has_link?("Edit")
@@ -386,9 +386,9 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       assert page.has_link?('Parameters', :href => '#params')
       click_link 'Parameters'
       assert_equal class_params.find("textarea").value, "true"
-      assert class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:disabled")
       class_params.find("a[data-tag='override']").click
-      refute class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:enabled")
       class_params.find("textarea").set("false")
       click_button('Submit')
       assert page.has_link?("Edit")
@@ -397,7 +397,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       assert page.has_link?('Parameters', :href => '#params')
       click_link 'Parameters'
       assert_equal class_params.find("textarea").value, "false"
-      refute class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:enabled")
     end
 
     test 'can override puppetclass lookup values' do
@@ -412,19 +412,19 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       assert class_params.has_selector?("a[data-tag='remove']", :visible => :visible)
       assert class_params.has_selector?("a[data-tag='override']", :visible => :hidden)
       assert_equal class_params.find("textarea").value, "false"
-      refute class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:enabled")
 
       class_params.find("a[data-tag='remove']").click
       assert class_params.has_selector?("a[data-tag='remove']", :visible => :hidden)
       assert class_params.has_selector?("a[data-tag='override']", :visible => :visible)
       assert_equal class_params.find("textarea").value, "true"
-      assert class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:disabled")
 
       class_params.find("a[data-tag='override']").click
       assert class_params.has_selector?("a[data-tag='remove']", :visible => :visible)
       assert class_params.has_selector?("a[data-tag='override']", :visible => :hidden)
       assert_equal class_params.find("textarea").value, "true"
-      refute class_params.find("textarea")[:disabled]
+      assert class_params.find("textarea:enabled")
     end
 
     test 'correctly show hash type overrides' do
@@ -449,14 +449,14 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       click_link 'Parameters'
       assert page.has_selector?('#inherited_parameters .btn[data-tag=override]')
       page.find('#inherited_parameters .btn[data-tag=override]').click
-      refute page.has_selector?('#inherited_parameters .btn[data-tag=override]')
+      assert page.has_no_selector?('#inherited_parameters .btn[data-tag=override]')
       click_button('Submit')
       assert page.has_link?("Edit")
 
       visit edit_host_path(host)
       assert page.has_link?('Parameters', :href => '#params')
       click_link 'Parameters'
-      refute page.has_selector?('#inherited_parameters .btn[data-tag=override]')
+      assert page.has_no_selector?('#inherited_parameters .btn[data-tag=override]')
       page.find('#global_parameters_table a[data-original-title="Remove Parameter"]').click
       assert page.has_selector?('#inherited_parameters .btn[data-tag=override]')
     end
@@ -475,6 +475,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       fill_in "host_lookup_values_attributes_#{lookup_key.id}_value", :with => 'invalid'
       click_button('Submit')
       assert page.has_selector?('#params td.has-error')
+      wait_for_ajax
     end
 
     test 'fields are not inherited on edit' do
@@ -489,6 +490,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
 
       click_button 'Submit' #create new host
       find_link 'YAML' #wait for host details page
+      wait_for_ajax
 
       host.reload
       assert_equal env1.name, host.environment.name

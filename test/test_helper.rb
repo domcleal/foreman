@@ -23,6 +23,7 @@ Spork.prefork do
   require 'capybara/rails'
   require 'factory_girl_rails'
   require 'capybara/poltergeist'
+  require 'capybara-screenshot/minitest'
   require 'functional/shared/basic_rest_response_test'
 
   Capybara.register_driver :poltergeist do |app|
@@ -37,7 +38,7 @@ Spork.prefork do
     }
     Capybara::Poltergeist::Driver.new(app, opts)
   end
-  Capybara.default_wait_time = 30
+  Capybara.default_max_wait_time = 30
 
   Capybara.javascript_driver = :poltergeist
 
@@ -279,12 +280,12 @@ Spork.prefork do
     def assert_new_button(index_path,new_link_text,new_path)
       visit index_path
       click_link new_link_text
-      assert_equal new_path, current_path, "new path #{new_path} was expected but it was #{current_path}"
+      assert_current_path new_path
     end
 
     def assert_submit_button(redirect_path,button_text = "Submit")
       click_button button_text
-      assert_equal redirect_path, current_path, "redirect path #{redirect_path} was expected but it was #{current_path}"
+      assert_current_path redirect_path
     end
 
     def assert_delete_row(index_path, link_text, delete_text = "Delete", dropdown = false)
@@ -325,7 +326,7 @@ Spork.prefork do
     end
 
     def wait_for_ajax
-      Timeout.timeout(Capybara.default_wait_time) do
+      Timeout.timeout(Capybara.default_max_wait_time) do
         loop until page.evaluate_script('jQuery.active').zero?
       end
     end
@@ -369,15 +370,21 @@ Spork.each_run do
   end
 
   class ActionDispatch::IntegrationTest
+    include Capybara::Screenshot::MiniTestPlugin
+    setup :reset_capybara         # Reset on next test for capybara-screenshot's teardown to work
     setup :login_admin
 
     teardown do
+      wait_for_ajax if Capybara.current_driver == Capybara.javascript_driver
       DatabaseCleaner.clean       # Truncate the database
-      Capybara.reset_sessions!    # Forget the (simulated) browser state
-      Capybara.use_default_driver # Revert Capybara.current_driver to Capybara.default_driver
     end
 
     private
+
+    def reset_capybara
+      Capybara.reset_sessions!    # Forget the (simulated) browser state
+      Capybara.use_default_driver # Revert Capybara.current_driver to Capybara.default_driver
+    end
 
     def login_admin
       visit "/"
