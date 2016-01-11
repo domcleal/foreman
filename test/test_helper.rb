@@ -23,6 +23,7 @@ Spork.prefork do
   require 'capybara/rails'
   require 'factory_girl_rails'
   require 'capybara/poltergeist'
+  require 'capybara-screenshot/minitest'
   require 'functional/shared/basic_rest_response_test'
   require 'facet_test_helper'
 
@@ -370,15 +371,21 @@ Spork.each_run do
   end
 
   class ActionDispatch::IntegrationTest
+    include Capybara::Screenshot::MiniTestPlugin
+    setup :reset_capybara         # Reset on next test for capybara-screenshot's teardown to work
     setup :login_admin
 
     teardown do
+      wait_for_ajax if Capybara.current_driver == Capybara.javascript_driver
       DatabaseCleaner.clean       # Truncate the database
-      Capybara.reset_sessions!    # Forget the (simulated) browser state
-      Capybara.use_default_driver # Revert Capybara.current_driver to Capybara.default_driver
     end
 
     private
+
+    def reset_capybara
+      Capybara.reset_sessions!    # Forget the (simulated) browser state
+      Capybara.use_default_driver # Revert Capybara.current_driver to Capybara.default_driver
+    end
 
     def login_admin
       visit "/"

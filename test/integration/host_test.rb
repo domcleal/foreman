@@ -476,6 +476,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
       fill_in "host_lookup_values_attributes_#{lookup_key.id}_value", :with => 'invalid'
       click_button('Submit')
       assert page.has_selector?('#params td.has-error')
+      wait_for_ajax
     end
 
     test 'fields are not inherited on edit' do
@@ -490,6 +491,7 @@ class HostIntegrationTest < ActionDispatch::IntegrationTest
 
       click_button 'Submit' #create new host
       find_link 'YAML' #wait for host details page
+      wait_for_ajax
 
       host.reload
       assert_equal env1.name, host.environment.name
