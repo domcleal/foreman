@@ -311,7 +311,7 @@ module Api
     #Should be replaced after moving to friendly_id version >= 5.0
     def select_by_resource_id_scope(base_scope, resource_class, resource_id)
       arel = resource_class.arel_table
-      arel_query = arel[:id].eq(resource_id)
+      arel_query = arel[:id].eq(resource_id.to_i)
       arel_query.to_sql
       begin
         query_field = resource_class.friendly_id_config.query_field
