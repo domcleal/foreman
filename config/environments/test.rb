@@ -59,5 +59,5 @@ Foreman::Application.configure do
   config.active_record.maintain_test_schema = true
 
   # Maintain standard order of running tests in case of leaking changes
-  config.active_support.test_order = :sorted
+  config.active_support.test_order = :random
 end
