@@ -1,11 +1,13 @@
 require 'test_helper'
 
 class Api::V2::OperatingsystemsControllerTest < ActionController::TestCase
-  os = {
-    :name  => "awsome_os",
-    :major => "1",
-    :minor => "2"
-  }
+  setup do
+    @os_params = {
+      :name  => "awsome_os",
+      :major => "1",
+      :minor => "2"
+    }
+  end
 
   test "should get index" do
     get :index, { }
@@ -23,18 +25,17 @@ class Api::V2::OperatingsystemsControllerTest < ActionController::TestCase
 
   test "should create os" do
     assert_difference('Operatingsystem.count') do
-      post :create, { :operatingsystem => os }
+      post :create, { :operatingsystem => @os_params }
     end
     assert_response :created
     assert_not_nil assigns(:operatingsystem)
   end
 
   test "should create os with os parameters" do
-    os_with_params = os.dup
-    os_with_params[:os_parameters_attributes] = {0=>{:name => "foo", :value => "bar"}}
+    @os_params[:os_parameters_attributes] = {0=>{:name => "foo", :value => "bar"}}
     assert_difference('OsParameter.count') do
       assert_difference('Operatingsystem.count') do
-        post :create, { :operatingsystem => os_with_params }
+        post :create, { :operatingsystem => @os_params }
       end
     end
     assert_response :created
@@ -43,7 +44,7 @@ class Api::V2::OperatingsystemsControllerTest < ActionController::TestCase
 
   test "should not create os without version" do
     assert_difference('Operatingsystem.count', 0) do
-      post :create, { :operatingsystem => os.except(:major) }
+      post :create, { :operatingsystem => @os_params.except(:major) }
     end
     assert_response :unprocessable_entity
   end
