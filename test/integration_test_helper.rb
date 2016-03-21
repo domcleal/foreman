@@ -126,6 +126,18 @@ class IntegrationTestWithJavascript < ActionDispatch::IntegrationTest
     Capybara.current_driver = Capybara.javascript_driver
     super
   end
+
+  # Blacklist AJAX requests for graphs etc. on the host#show page
+  setup :skip_host_show_ajax
+  def skip_host_show_ajax
+    page.driver.browser.url_blacklist = [
+      '/nics',
+      '/overview',
+      '/resources',
+      '/runtime',
+      '/templates',
+    ]
+  end
 end
 
 class TestSSO < SSO::Base
