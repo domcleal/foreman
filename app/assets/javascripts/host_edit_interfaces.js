@@ -28,7 +28,7 @@ function show_interface_modal(modal_content) {
   modal_window.modal({'show': true});
 
   modal_window.find('a[rel="popover-modal"]').popover();
-  modal_window.find('select:not(.without_select2)').select2({ allowClear: true });
+  activate_select2(modal_window);
 }
 
 function save_interface_modal() {
@@ -277,7 +277,7 @@ var providerSpecificNICInfo = null;
 function nic_info(form) {
   var info = "";
   var virtual_types = ['Nic::Bond', 'Nic::Bridge']
-  if (form.find('.virtual').is(':checked') || virtual_types.indexOf(form.find('.interface_type').val()) >= 0) {
+  if (form.find('.virtual').is(':checked') || virtual_types.indexOf(form.find('select.interface_type').val()) >= 0) {
 
     // common virtual
     var attached = form.find('.attached').val();

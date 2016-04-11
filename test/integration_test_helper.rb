@@ -5,6 +5,7 @@ require 'mocha/mini_test'
 require 'capybara/rails'
 require 'factory_girl_rails'
 require 'capybara/poltergeist'
+require 'show_me_the_cookies'
 require 'database_cleaner'
 require 'active_support_test_case_helper'
 
@@ -17,8 +18,7 @@ Capybara.register_driver :poltergeist do |app|
     # :inspector => true
     :js_errors => true,
     :timeout => 60,
-    #disable animations to speed up the tests
-    :extensions => ["#{Rails.root}/test/integration/support/disable_animations.js"],
+    :extensions => ["#{Rails.root}/test/integration/support/poltergeist_onload_extensions.js"]
   }
   Capybara::Poltergeist::Driver.new(app, opts)
 end
@@ -29,6 +29,7 @@ Capybara.javascript_driver = :poltergeist
 class ActionDispatch::IntegrationTest
   # Make the Capybara DSL available in all integration tests
   include Capybara::DSL
+  include ShowMeTheCookies
 
   # Stop ActiveRecord from wrapping tests in transactions
   self.use_transactional_fixtures = false
@@ -82,7 +83,7 @@ class ActionDispatch::IntegrationTest
   end
 
   def select2(value, attrs)
-    first("#s2id_#{attrs[:from]}").click
+    find("#s2id_#{attrs[:from]}").click
     find(".select2-input").set(value)
     within ".select2-results" do
       find("span", text: value).click
@@ -101,15 +102,19 @@ class ActionDispatch::IntegrationTest
     DatabaseCleaner.clean       # Truncate the database
     Capybara.reset_sessions!    # Forget the (simulated) browser state
     Capybara.use_default_driver # Revert Capybara.current_driver to Capybara.default_driver
+    SSO.deregister_method(TestSSO)
   end
 
   private
 
   def login_admin
-    visit "/"
-    fill_in "login_login", :with => users(:admin).login
-    fill_in "login_password", :with => "secret"
-    click_button "Login"
+    SSO.register_method(TestSSO)
+    set_request_user(:admin)
+  end
+
+  def set_request_user(user)
+    user = users(user) unless user.is_a?(User)
+    create_cookie('test_user', user.login)
   end
 end
 
@@ -119,5 +124,15 @@ class IntegrationTestWithJavascript < ActionDispatch::IntegrationTest
     DatabaseCleaner.start
     Capybara.current_driver = Capybara.javascript_driver
     super
+  end
+end
+
+class TestSSO < SSO::Base
+  def available?
+    Rails.env.test? && request.cookies['test_user'].present?
+  end
+
+  def authenticated?
+    self.user = request.cookies['test_user']
   end
 end

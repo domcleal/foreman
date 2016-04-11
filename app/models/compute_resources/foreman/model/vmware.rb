@@ -9,6 +9,10 @@ module Foreman::Model
     before_create :update_public_key
     attr_accessible :pubkey_hash, :datacenter, :uuid, :server
 
+    def self.available?
+      Fog::Compute.providers.include?(:vsphere)
+    end
+
     def self.model_name
       ComputeResource.model_name
     end
@@ -394,6 +398,7 @@ module Foreman::Model
         "start" => args[:start],
         "name" => args[:name],
         "numCPUs" => args[:cpus],
+        "numCoresPerSocket" => args[:corespersocket],
         "memoryMB" => args[:memory_mb],
         "datastore" => args[:volumes].first[:datastore],
         "storage_pod" => args[:volumes].first[:storage_pod],

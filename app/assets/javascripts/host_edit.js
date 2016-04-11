@@ -68,7 +68,8 @@ function computeResourceSelected(item){
         $('#compute_resource_tab a').addClass('tab-error');
       },
       success: function(result){
-        $('#compute_resource').html(result).find('select:not(without_select2)').select2();
+        $('#compute_resource').html(result);
+        activate_select2('#compute_resource');
         if ($('#compute_resource').find('.alert-danger').length > 0) $('#compute_resource_tab a').addClass('tab-error');
         update_capabilities($('#capabilities').val());
       }
@@ -365,10 +366,9 @@ function update_provisioning_image(){
   var arch_id = $('[name$="[architecture_id]"]').val();
   var os_id = $('[name$="[operatingsystem_id]"]').val();
   if((compute_id == undefined) || (compute_id == "") || (arch_id == "") || (os_id == "")) return;
-  var term = 'operatingsystem=' + os_id + ' architecture=' + arch_id;
   var image_options = $('#image_selection select').empty();
   $.ajax({
-      data:'search=' + encodeURIComponent(term),
+      data: {'operatingsystem_id': os_id, 'architecture_id': arch_id},
       type:'get',
       url: foreman_url('/compute_resources/'+compute_id+'/images'),
       dataType: 'json',
@@ -585,7 +585,7 @@ function interface_domain_selected(element) {
         subnet_options.attr('disabled', true);
       }
       reloadOnAjaxComplete(element);
-      subnet_options.filter('select').select2({allowClear: true})
+      activate_select2(subnet_options);
     }
   });
 }
@@ -670,7 +670,7 @@ function interface_type_selected(element) {
   request.done(function() {
     password_caps_lock_hint();
     $("#interfaceModal").find('a[rel="popover-modal"]').popover();
-    $('select:not(.without_select2)').select2({ allowClear: true });
+    activate_select2('#interfaceModal');
   });
 }
 

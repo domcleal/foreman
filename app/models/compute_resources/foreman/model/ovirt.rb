@@ -12,6 +12,10 @@ module Foreman::Model
 
     delegate :clusters, :quotas, :templates, :to => :client
 
+    def self.available?
+      Fog::Compute.providers.include?(:ovirt)
+    end
+
     def self.model_name
       ComputeResource.model_name
     end
@@ -185,6 +189,20 @@ module Foreman::Model
         raise e unless e.message =~ /404/
       end
       true
+    end
+
+    def supports_vms_pagination?
+      true
+    end
+
+    def parse_vms_list_params(params)
+      max = (params['iDisplayLength'] || 10).to_i
+      {
+        :search => params['sSearch'] || '',
+        :max => max,
+        :page => (params['iDisplayStart'].to_i / max)+1,
+        :without_details => true
+      }
     end
 
     def console(uuid)

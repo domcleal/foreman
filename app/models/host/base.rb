@@ -58,6 +58,7 @@ module Host
                                            :message     => (_("Owner type needs to be one of the following: %s") % OWNER_TYPES.join(', ')) }
     validate :host_has_required_interfaces
     validate :uniq_interfaces_identifiers
+    validate :build_managed_only
 
     default_scope -> { where(taxonomy_conditions) }
 
@@ -339,7 +340,15 @@ module Host
     end
 
     def build_required_interfaces(attrs = {})
-      self.interfaces.build(attrs.merge(:primary => true, :type => 'Nic::Managed')) if self.primary_interface.nil?
+      if self.primary_interface.nil?
+        if self.interfaces.empty?
+          self.interfaces.build(attrs.merge(:primary => true, :type => 'Nic::Managed'))
+        else
+          interface = self.interfaces.first
+          interface.attributes = attrs
+          interface.primary = true
+        end
+      end
       self.primary_interface.provision = true if self.provision_interface.nil?
     end
 
@@ -467,6 +476,12 @@ module Host
 
       errors.add(:interfaces, _('some interfaces are invalid')) unless success
       success
+    end
+
+    def build_managed_only
+      if !managed? && build?
+        errors.add(:build, _('cannot be enabled for an unmanaged host'))
+      end
     end
 
     def password_base64_encrypted?

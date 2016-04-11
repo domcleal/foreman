@@ -41,7 +41,6 @@ class LookupKey < ActiveRecord::Base
       scoped_search :on => :merge_overrides, :complete_value => {:true => true, :false => false}
       scoped_search :on => :merge_default, :complete_value => {:true => true, :false => false}
       scoped_search :on => :avoid_duplicates, :complete_value => {:true => true, :false => false}
-      scoped_search :in => :lookup_values, :on => :value, :rename => :value, :complete_value => true
     end
     super
   end
@@ -104,7 +103,10 @@ class LookupKey < ActiveRecord::Base
   end
 
   def to_param
-    Parameterizable.parameterize("#{id}-#{key}")
+    # to_param is used in views to create a link to the lookup_key.
+    # If the key has whitespace in it the link will break so this replaced the whitespace.
+    search_key = key.tr(' ','_') unless key.nil?
+    Parameterizable.parameterize("#{id}-#{search_key}")
   end
 
   def to_s

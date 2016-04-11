@@ -40,6 +40,24 @@ class HostTest < ActiveSupport::TestCase
     assert_equal "#{host.shortname}.yourdomain.net", host.name
   end
 
+  test '.new should build host with primary interface' do
+    host = Host.new
+    assert host.primary_interface
+    assert_equal 1, host.interfaces.size
+  end
+
+  test '.new should mark one interfaces as primary if none was chosen explicitly' do
+    host = Host.new(:interfaces_attributes => [ {:ip => '192.168.0.1' }, { :ip => '192.168.1.2' } ])
+    assert host.primary_interface
+    assert_equal 2, host.interfaces.size
+  end
+
+  test '.new does not reset primary flag if it was set explicitly' do
+    host = Host.new(:interfaces_attributes => [ {:ip => '192.168.0.1' }, { :ip => '192.168.1.2', :primary => true } ])
+    assert_equal 2, host.interfaces.size
+    assert_equal '192.168.1.2', host.primary_interface.ip
+  end
+
   test "host should not save without primary interface" do
     host = FactoryGirl.build(:host, :managed)
     host.interfaces = []
@@ -526,6 +544,28 @@ class HostTest < ActiveSupport::TestCase
     refute_empty host.host_statuses
     assert host.get_status(HostStatus::BuildStatus).new_record? # BuildStatus was not #relevant? for unmanaged host
     refute host.get_status(HostStatus::ConfigurationStatus).new_record?
+  end
+
+  test 'host #refresh_global_status! updates global status in database' do
+    host = FactoryGirl.build(:host)
+    config_status = host.get_status(HostStatus::ConfigurationStatus)
+    config_status.status = 1
+    config_status.save!
+    config_status.stubs(:relevant?).returns(true)
+    HostStatus::ConfigurationStatus.any_instance.stubs(:error?).returns(true)
+
+    assert_equal 0, host.global_status
+    host.refresh_global_status!
+    assert_equal 2, host.reload.global_status
+  end
+
+  test 'host #refresh_statuses updates global status in database' do
+    host = FactoryGirl.build(:host)
+    host.update_attribute(:global_status, 1)
+
+    assert_equal 1, host.global_status
+    host.refresh_statuses
+    assert_equal 0, host.reload.global_status
   end
 
   test 'build status is updated on host validation' do
@@ -1030,6 +1070,21 @@ class HostTest < ActiveSupport::TestCase
       h.root_pass = "2short"
       h.valid?
       assert h.errors[:root_pass].include?("should be 8 characters or more")
+    end
+
+    test "should allow build mode for managed hosts" do
+      h = FactoryGirl.build(:host, :managed)
+      assert h.valid?
+      h.build = true
+      assert h.valid?
+    end
+
+    test "should not allow build mode for unmanaged hosts" do
+      h = FactoryGirl.build(:host)
+      assert h.valid?
+      h.build = true
+      refute h.valid?
+      assert h.errors[:build].include?("cannot be enabled for an unmanaged host")
     end
 
     test "should allow to save root pw" do
@@ -2330,7 +2385,7 @@ class HostTest < ActiveSupport::TestCase
   end
 
   test 'facts are deleted when build set to true' do
-    host = FactoryGirl.create(:host, :with_facts)
+    host = FactoryGirl.create(:host, :with_facts, :managed)
     assert host.fact_values.present?
     refute host.build?
     host.update_attributes(:build => true)
@@ -2338,7 +2393,7 @@ class HostTest < ActiveSupport::TestCase
   end
 
   test 'reports are deleted when build set to true' do
-    host = FactoryGirl.create(:host, :with_reports)
+    host = FactoryGirl.create(:host, :with_reports, :managed)
     assert host.reports.present?
     refute host.build?
     host.update_attributes(:build => true)
@@ -2346,7 +2401,7 @@ class HostTest < ActiveSupport::TestCase
   end
 
   test 'host.last_report is deleted when build set to true' do
-    host = FactoryGirl.create(:host, :with_reports)
+    host = FactoryGirl.create(:host, :with_reports, :managed)
     refute host.build?
     refute host.last_report.blank?
     host.update_attributes(:build => true)

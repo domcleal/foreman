@@ -73,13 +73,6 @@ function onContentLoad(){
      notify(item, 'success');
    });
 
-  // adds buttons classes to all links
-  $("#title_action a").addClass('btn').not('.btn-info, .btn-danger').addClass("btn-default");
-
-  $("#title_action li a").removeClass("btn btn-default").addClass("la");
-  $("#title_action span").removeClass("btn btn-default").addClass("btn-group");
-  $("#title_action a[href*='new']").removeClass('btn-default').addClass("btn-primary");
-
   if ($("input[focus_on_load=true]").length > 0) {
     $("input[focus_on_load]").first().focus();
   }
@@ -142,7 +135,7 @@ function onContentLoad(){
   $.cookie('timezone', tz.name(), { path: '/', secure: location.protocol === 'https:' });
 
   $('.full-value').SelectOnClick();
-  $('select:not(.without_select2)').not('.form_template select').select2({ allowClear: true });
+  activate_select2(':root');
 
   $('input.remove_form_templates').closest('form').submit(function(event) {
     $(this).find('.form_template').remove()
@@ -156,6 +149,19 @@ function activateDatatables() {
         "sPaginationType": "bootstrap"
       }
   );
+  $('[data-table=server]').not('.dataTable').each(function () {
+    var url = $(this).data('source');
+    $(this).dataTable(
+      {
+        "bProcessing": true,
+        "bServerSide": true,
+        "bSort": false,
+        "sAjaxSource": url,
+        "sDom": "<'row'<'col-md-6'f>r>t<'row'<'col-md-6'><'col-md-6'p>>",
+        "sPaginationType": "bootstrap"
+      }
+    );
+  });
 }
 
 function preserve_selected_options(elem) {
@@ -253,7 +259,7 @@ function template_info(div, url) {
     data: form,
     success: function(response, status, xhr) {
       $(div).html(response);
-      $('select').select2({ allowClear: true });
+      activate_select2(div);
     },
     error: function(jqXHR, textStatus, errorThrown) {
       $(div).html('<div class="alert alert-warning alert-dismissable">' +
@@ -485,7 +491,7 @@ function toggle_input_group(item) {
 function reloadOnAjaxComplete(element) {
   foreman.tools.hideSpinner()
   $('[rel="twipsy"]').tooltip();
-  $('select:not(.without_select2)').select2({ allowClear: true });
+  activate_select2(':root');
 }
 
 function set_fullscreen(element){
@@ -597,4 +603,12 @@ function icon_text(name, inner_text, icon_class) {
   var icon = '<span class="' + icon_class + " " + icon_class + "-" + name + '"/>'
   icon += typeof inner_text === "" ? "" : "<strong>" + inner_text + "</strong>";
   return icon
+}
+
+function activate_select2(container, allowClear) {
+  allowClear = typeof allowClear !== 'undefined' ? allowClear : true;
+  $(container).find('select:not(.without_select2)').
+    not('.form_template select').
+    not('#interfaceForms select').
+    select2({ 'allowClear': allowClear });
 }

@@ -28,7 +28,7 @@ module Api
       param_group :search_and_pagination, ::Api::V2::BaseController
 
       def index
-        @hosts = resource_scope_for_index.includes([ :host_statuses, :compute_resource, :hostgroup, :operatingsystem, :interfaces])
+        @hosts = resource_scope_for_index.includes([ :host_statuses, :compute_resource, :hostgroup, :operatingsystem, :interfaces, :token ])
         # SQL optimizations queries
         @last_report_ids = Report.where(:host_id => @hosts.map(&:id)).group(:host_id).maximum(:id)
         @last_reports = Report.where(:id => @last_report_ids.values)
@@ -52,7 +52,7 @@ module Api
           param :domain_id, :number, :desc => N_("required if host is managed and value is not inherited from host group")
           param :realm_id, :number
           param :puppet_proxy_id, :number
-          param :puppet_class_ids, Array
+          param :puppetclass_ids, Array
           param :operatingsystem_id, String, :desc => N_("required if host is managed and value is not inherited from host group")
           param :medium_id, String, :desc => N_("required if not imaged based provisioning and host is managed and value is not inherited from host group")
           param :ptable_id, :number, :desc => N_("required if host is managed and custom partition has not been defined")

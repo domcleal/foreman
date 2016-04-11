@@ -24,7 +24,7 @@ else
     end
     Bundler.require(*Rails.groups)
     if SETTINGS[:unattended]
-      %w[ec2 fog libvirt ovirt vmware gce].each do |group|
+      %w[ec2 fog gce libvirt openstack ovirt rackspace vmware].each do |group|
         begin
           Bundler.require(group)
         rescue LoadError
@@ -35,36 +35,9 @@ else
   end
 end
 
-# For standalone CR bundler groups, check that all dependencies are laoded
-SETTINGS[:libvirt]   = !!(defined?(::Fog::Libvirt) && defined?(::Libvirt))
-SETTINGS[:gce]       = !!(defined?(::Fog::Google) && defined?(::Google::APIClient::VERSION))
-SETTINGS[:ec2]       = !!defined?(::Fog::AWS)
-SETTINGS[:vmware]    = !!(defined?(::Fog::Vsphere))
-
-SETTINGS.merge! :openstack => false, :ovirt => false, :rackspace => false
-
 # CRs in fog core with extra dependencies will have those deps loaded, so then
 # load the corresponding bit of fog
-if defined?(::OVIRT)
-  require 'fog/ovirt'
-  SETTINGS[:ovirt] = Fog::Compute.providers.include?(:ovirt)
-end
-
-# CRs in fog core need to be loaded to find out if they're present as
-# bundler is configured not to load fog
-begin
-  require 'fog/openstack'
-  SETTINGS[:openstack] = Fog::Compute.providers.include?(:openstack)
-rescue LoadError
-  # ignore as the fog group is missing
-end
-
-begin
-  require 'fog/rackspace'
-  SETTINGS[:rackspace] = Fog::Compute.providers.include?(:rackspace)
-rescue LoadError
-  # ignore as the fog group is missing
-end
+require 'fog/ovirt' if defined?(::OVIRT)
 
 require File.expand_path('../../lib/foreman.rb', __FILE__)
 require File.expand_path('../../lib/timed_cached_store.rb', __FILE__)
@@ -98,7 +71,6 @@ module Foreman
     config.autoload_paths += Dir[ Rails.root.join('app', 'models', 'power_manager') ]
     config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
     config.autoload_paths += Dir["#{config.root}/app/services"]
-    config.autoload_paths += Dir["#{config.root}/app/observers"]
     config.autoload_paths += Dir["#{config.root}/app/mailers"]
 
     config.autoload_paths += %W(#{config.root}/app/models/auth_sources)
@@ -114,10 +86,6 @@ module Foreman
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
-
-    # Activate observers that should always be running.
-    # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
-    config.active_record.observers = :host_observer
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
@@ -215,6 +183,9 @@ module Foreman
         child.helper helpers
       end
     end
+
+    # Use the database for sessions instead of the cookie-based default
+    config.session_store :active_record_store, :secure => !!SETTINGS[:require_ssl]
   end
 
   def self.setup_console

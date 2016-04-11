@@ -2,9 +2,16 @@ module Foreman::Model
   class Libvirt < ComputeResource
     include ComputeResourceConsoleCommon
 
+    ALLOWED_DISPLAY_TYPES = %w(vnc spice)
+
     validates :url, :format => { :with => URI.regexp }
+    validates :display_type, :inclusion => { :in => ALLOWED_DISPLAY_TYPES }
 
     attr_accessible :display_type, :uuid
+
+    def self.available?
+      Fog::Compute.providers.include?(:libvirt)
+    end
 
     # Some getters/setters for the attrs Hash
     def display_type
@@ -12,7 +19,7 @@ module Foreman::Model
     end
 
     def display_type=(display)
-      self.attrs[:display] = display
+      self.attrs[:display] = display.downcase
     end
 
     def provided_attributes
@@ -151,7 +158,7 @@ module Foreman::Model
       # Listen address cannot be updated while the guest is running
       # When we update the display password, we pass the existing listen address
       vm.update_display(:password => password, :listen => vm.display[:listen], :type => vm.display[:type])
-      WsProxy.start(:host => hypervisor.hostname, :host_port => vm.display[:port], :password => password).merge(:type =>  vm.display[:type].downcase, :name=> vm.name)
+      WsProxy.start(:host => hypervisor.hostname, :host_port => vm.display[:port], :password => password).merge(:type =>  vm.display[:type], :name=> vm.name)
     rescue ::Libvirt::Error => e
       if e.message =~ /cannot change listen address/
         logger.warn e
@@ -201,7 +208,7 @@ module Foreman::Model
         :memory     => 768*Foreman::SIZE[:mega],
         :nics       => [new_nic],
         :volumes    => [new_volume],
-        :display    => { :type     => display_type.downcase,
+        :display    => { :type     => display_type,
                          :listen   => Setting[:libvirt_default_console_address],
                          :password => random_password,
                          :port     => '-1' }
