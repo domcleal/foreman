@@ -222,7 +222,7 @@ class HostJSTest < IntegrationTestWithJavascript
   describe "hosts index multiple actions" do
     test 'show action buttons' do
       visit hosts_path
-      page.find('#check_all').click
+      page.find('#check_all').trigger('click')
 
       # Ensure all hosts are checked
       assert page.find('input.host_select_boxes').checked?

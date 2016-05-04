@@ -54,11 +54,15 @@ function toggle_actions() {
 $(function() {
   for (var i = 0; i < $.foremanSelectedHosts.length; i++) {
     var cid = "host_ids_" + $.foremanSelectedHosts[i];
-    if ((boxes = $('#' + cid)) && (boxes[0]))
+    if ((boxes = $('#' + cid)) && (boxes[0])) {
+      console.log("Checking host from cookie on page load");
       boxes[0].checked = true;
+    }
   }
   toggle_actions();
+  console.log("  updating counter on page load");
   update_counter();
+  console.log("counter page load... finished");
   return false;
 });
 
@@ -72,6 +76,7 @@ function resetSelection() {
 }
 
 function cleanHostsSelection() {
+  console.log("cleanHostsSelection()");
   $('.host_select_boxes').each(function(index, box) {
     box.checked = false;
     hostChecked(box);
@@ -79,17 +84,23 @@ function cleanHostsSelection() {
   resetSelection();
   toggle_actions();
   update_counter();
+  console.log(".. cleanHostsSelection() finished");
   return false;
 }
 
 function toggleCheck() {
   var checked = $("#check_all").is(':checked');
+  console.log("toggleCheck()");
   $('.host_select_boxes').each(function(index, box) {
+    console.log("  toggleCheck(): checking " + box.id + " to " + checked);
     box.checked = checked;
     hostChecked(box);
   });
-  if(!checked)
+  if(!checked) {
+    console.log("  toggleCheck(): calling cleanHostsSelection()");
     cleanHostsSelection();
+  }
+  console.log("toggleCheck()... finished");
   return false;
 }
 
