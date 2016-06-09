@@ -11,6 +11,16 @@ require 'active_support_test_case_helper'
 
 DatabaseCleaner.strategy = :transaction
 
+class MyConsoleLogger
+  def self.write(msg)
+    @logs ||= []
+    @logs << msg.chomp
+  end
+  def self.logs
+    @logs
+  end
+end
+
 Capybara.register_driver :poltergeist do |app|
   opts = {
     # To enable debugging uncomment `:inspector => true` and
@@ -18,6 +28,7 @@ Capybara.register_driver :poltergeist do |app|
     # :inspector => true
     :js_errors => true,
     :timeout => 60,
+    :phantomjs_logger => MyConsoleLogger,
     :extensions => ["#{Rails.root}/test/integration/support/poltergeist_onload_extensions.js"]
   }
   Capybara::Poltergeist::Driver.new(app, opts)

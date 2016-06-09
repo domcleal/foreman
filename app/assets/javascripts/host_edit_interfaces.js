@@ -53,11 +53,16 @@ function save_interface_modal() {
   var interface_hidden = get_interface_hidden(interface_id);
   interface_hidden.html('');
   interface_hidden.append(modal_form);
+  console.log("save_interface_modal(): saved hidden modal");
 
   close_interface_modal();
+  console.log("save_interface_modal(): closed modal");
   sync_primary_name(false);
+  console.log("save_interface_modal(): synced primary name");
   update_interface_table();
+  console.log("save_interface_modal(): updated interface table");
   update_fqdn();
+  console.log("save_interface_modal(): updated fqdn");
 }
 
 function sync_primary_name(ovewrite_blank) {
@@ -313,10 +318,15 @@ $(document).on('change', '.virtual', function () {
 function update_fqdn() {
   var host_name = $('#host_name').val();
   var domain_name = primary_nic_form().find('.interface_domain option:selected').text();
+  console.log("update_fqdn(): " + host_name);
+  console.log("update_fqdn(): " + domain_name);
 
   var name = fqdn(host_name, domain_name)
+  console.log("update_fqdn(): " + name);
   if (name.length > 0)
     name = "| " + name
 
+  console.log("update_fqdn(): " + $('#hostFQDN'));
   $('#hostFQDN').text(name);
+  console.log("update_fqdn(): text set (" + $('#hostFQDN').text() + ")");
 }
