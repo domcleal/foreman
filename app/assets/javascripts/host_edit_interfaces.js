@@ -326,7 +326,11 @@ function update_fqdn() {
   if (name.length > 0)
     name = "| " + name
 
-  console.log("update_fqdn(): " + $('#hostFQDN'));
+  console.log("update_fqdn(): " + $('#hostFQDN') + " (" + $('#hostFQDN').attr('id') + ", " + $('#hostFQDN').text() + ")");
+  $('#hostFQDN').text(name);
+  console.log("update_fqdn(): text set (" + $('#hostFQDN').text() + ")");
+
+  console.log("update_fqdn(): " + $('#hostFQDN') + " (" + $('#hostFQDN').attr('id') + ", " + $('#hostFQDN').text() + ")");
   $('#hostFQDN').text(name);
   console.log("update_fqdn(): text set (" + $('#hostFQDN').text() + ")");
 }

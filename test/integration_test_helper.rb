@@ -14,7 +14,7 @@ DatabaseCleaner.strategy = :transaction
 class MyConsoleLogger
   def self.write(msg)
     @logs ||= []
-    @logs << msg.chomp
+    @logs << "#{Time.now}: #{msg.chomp}"
   end
   def self.logs
     @logs
