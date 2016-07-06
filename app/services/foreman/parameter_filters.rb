@@ -13,8 +13,8 @@ module Foreman
       ctx.filters.map { |f| expand_nested(f) }
     end
 
-    def filter_params(context_type, params)
-      params.require(top_level_hash).permit(filter(context_type))
+    def filter_params(params, *context_args)
+      params.require(top_level_hash).permit(filter(*context_args))
     end
 
     def permit(*args, &block)
