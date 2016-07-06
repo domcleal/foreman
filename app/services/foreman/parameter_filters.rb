@@ -16,7 +16,7 @@ module Foreman
     def permit(*args, &block)
       opts = (args.last.is_a?(Hash) && args.count >= 2) ? args.pop : {}
       opts[:api] = true if opts[:api].nil?
-      opts[:nested] = true if opts[:nested].nil?
+      opts[:nested] = false if opts[:nested].nil?
       opts[:ui] = true if opts[:ui].nil?
       attrs = args.dup
 
