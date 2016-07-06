@@ -7,10 +7,14 @@ module Foreman
       @parameter_filters = []
     end
 
-    def filter(context_type, params)
+    def filter(context_type)
       ctx = Context.new(context_type)
       @parameter_filters.each { |f| ctx.instance_eval(&f) }
-      params.require(top_level_hash).permit(*ctx.filters)
+      ctx.filters.map { |f| expand_nested(f) }
+    end
+
+    def filter_params(context_type, params)
+      params.require(top_level_hash).permit(filter(context_type))
     end
 
     def permit(*args, &block)
@@ -31,6 +35,18 @@ module Foreman
 
     private
 
+    def expand_nested(filter)
+      return filter.filter(:nested) if filter.is_a?(ParameterFilters)
+
+      if filter.is_a?(Hash)
+        Hash[filter.map { |k,v| [k, expand_nested(v)] }]
+      elsif filter.is_a?(Array)
+        filter.map { |v| expand_nested(v) }
+      else
+        filter
+      end
+    end
+
     def top_level_hash
       resource_class.name.underscore
     end
@@ -48,7 +64,7 @@ module Foreman
       end
 
       def nested?
-        false # FIXME
+        @type == :nested
       end
 
       def ui?
