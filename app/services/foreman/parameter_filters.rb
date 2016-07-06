@@ -37,7 +37,7 @@ module Foreman
       if filter.is_a?(ParameterFilters)
         filter.filter(:nested)
       elsif filter.is_a?(Hash)
-        Hash[filter.map { |k,v| [k, expand_nested(v)] }]
+        filter.transform_values { |v| expand_nested(v) }
       elsif filter.is_a?(Array)
         filter.map { |v| expand_nested(v) }
       else
