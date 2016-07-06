@@ -16,7 +16,7 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     assert_equal({'test' => 'a'}, filters.filter(:ui, params(:example => {:test => 'a', :denied => 'b'})))
   end
 
-  test "permitting second-level attributes via permit(Symbol => Array)" do
+  test "permitting second-level arrays via permit(Symbol => Array)" do
     filters.permit(:test => [])
     assert_equal({}, filters.filter(:ui, params(:example => {:test => 'a'})))
     assert_equal({'test' => ['a']}, filters.filter(:ui, params(:example => {:test => ['a']})))
