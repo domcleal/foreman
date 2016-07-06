@@ -22,6 +22,11 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     assert_equal({'test' => ['a']}, filters.filter(:ui, params(:example => {:test => ['a']})))
   end
 
+  test "permitting third-level attributes via permit(Symbol => Array[Symbol])" do
+    filters.permit(:test => [:inner])
+    assert_equal({'test' => {'inner' => 'a'}}, filters.filter(:ui, params(:example => {:test => {:inner => 'a', :denied => 'b'}})))
+  end
+
   test "blocks second-level attributes for UI when :ui => false" do
     filters.permit(:test, :ui => false)
     assert_equal({}, filters.filter(:ui, params(:example => {:test => 'a'})))
