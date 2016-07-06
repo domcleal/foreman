@@ -18,10 +18,8 @@ module Foreman
     end
 
     def permit(*args, &block)
-      opts = (args.last.is_a?(Hash) && args.count >= 2) ? args.pop : {}
-      opts[:api] = true if opts[:api].nil?
-      opts[:nested] = false if opts[:nested].nil?
-      opts[:ui] = true if opts[:ui].nil?
+      opts = {:api => true, :nested => false, :ui => true}
+      opts.merge!(args.pop) if args.last.is_a?(Hash) && args.count >= 2
       attrs = args.dup
 
       new_filter = if block_given?
