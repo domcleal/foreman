@@ -14,17 +14,16 @@ module Foreman
     end
 
     def permit(*args, &block)
-      opts = args.last.is_a?(Hash) ? args.pop : {:api => true, :ui => true, :nested => false} # FIXME: use these
+      opts = (args.last.is_a?(Hash) && args.count >= 2) ? args.pop : {}
+      opts[:api] = true if opts[:api].nil?
+      opts[:nested] = true if opts[:nested].nil?
+      opts[:ui] = true if opts[:ui].nil?
       attrs = args.dup
 
       new_filter = if block_given?
                      block
                    else
-                     ->(context) {
-                       unless context.nested?
-                         context.permit(*attrs)
-                       end
-                     }
+                     ->(context) { context.permit(*attrs) if opts[context.type] }
                    end
 
       @parameter_filters << new_filter
@@ -37,7 +36,7 @@ module Foreman
     end
 
     class Context
-      attr_reader :filters
+      attr_reader :filters, :type
 
       def initialize(type)
         @type = type
