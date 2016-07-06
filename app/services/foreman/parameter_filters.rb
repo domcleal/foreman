@@ -36,9 +36,9 @@ module Foreman
     private
 
     def expand_nested(filter)
-      return filter.filter(:nested) if filter.is_a?(ParameterFilters)
-
-      if filter.is_a?(Hash)
+      if filter.is_a?(ParameterFilters)
+        filter.filter(:nested)
+      elsif filter.is_a?(Hash)
         Hash[filter.map { |k,v| [k, expand_nested(v)] }]
       elsif filter.is_a?(Array)
         filter.map { |v| expand_nested(v) }
