@@ -7,8 +7,8 @@ module Foreman
       @parameter_filters = []
     end
 
-    def filter(params)
-      ctx = Context.new(:ui) # FIXME
+    def filter(context_type, params)
+      ctx = Context.new(context_type)
       @parameter_filters.each { |f| ctx.instance_eval(&f) }
       params.require(top_level_hash).permit(*ctx.filters)
     end

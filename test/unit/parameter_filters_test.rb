@@ -8,23 +8,23 @@ class ParameterFiltersTest < ActiveSupport::TestCase
 
   test "permitting second-level attributes via permit(Symbol)" do
     filters.permit(:test)
-    assert_equal({'test' => 'a'}, filters.filter(params(:example => {:test => 'a', :denied => 'b'})))
+    assert_equal({'test' => 'a'}, filters.filter(:ui, params(:example => {:test => 'a', :denied => 'b'})))
   end
 
   test "permitting second-level attributes via block" do
     filters.permit { |ctx| ctx.permit(:test) }
-    assert_equal({'test' => 'a'}, filters.filter(params(:example => {:test => 'a', :denied => 'b'})))
+    assert_equal({'test' => 'a'}, filters.filter(:ui, params(:example => {:test => 'a', :denied => 'b'})))
   end
 
   test "permitting second-level attributes via permit(Symbol => Array)" do
     filters.permit(:test => [])
-    assert_equal({}, filters.filter(params(:example => {:test => 'a'})))
-    assert_equal({'test' => ['a']}, filters.filter(params(:example => {:test => ['a']})))
+    assert_equal({}, filters.filter(:ui, params(:example => {:test => 'a'})))
+    assert_equal({'test' => ['a']}, filters.filter(:ui, params(:example => {:test => ['a']})))
   end
 
   test "blocks second-level attributes for UI when :ui => false" do
     filters.permit(:test, :ui => false)
-    assert_equal({}, filters.filter(params(:example => {:test => 'a'})))
+    assert_equal({}, filters.filter(:ui, params(:example => {:test => 'a'})))
   end
 
   private
