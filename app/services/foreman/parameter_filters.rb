@@ -1,3 +1,10 @@
+# Stores permitted parameters for a given resource/AR model for use in
+# controllers to filter input parameters.
+#
+# Allows the permitted parameters to be set up once model and re-used in
+# multiple contexts, e.g. API controllers, UI controllers and nested UI
+# attributes, by applying different rules.
+#
 module Foreman
   class ParameterFilters
     attr_reader :resource_class
@@ -7,16 +14,25 @@ module Foreman
       @parameter_filters = []
     end
 
+    # Return a list of permitted parameters that may be passed into #permit
     def filter(context_type)
       ctx = Context.new(context_type)
       @parameter_filters.each { |f| ctx.instance_eval(&f) }
       ctx.filters.map { |f| expand_nested(f) }
     end
 
+    # Runs permitted parameter whitelist against supplied parameters
     def filter_params(params, *context_args)
       params.require(top_level_hash).permit(filter(*context_args))
     end
 
+    # Registers new whitelisted parameter(s) in the same form as
+    # ActionController::Parameters#permit, plus can accept a ParametersFilter
+    # instance for nested models which is expanded.
+    #
+    # Last argument of a hash determines which contexts the parameter may be
+    # used in, or a block can be passed to determine it dynamically from the
+    # Context class.
     def permit(*args, &block)
       opts = {:api => true, :nested => false, :ui => true}
       opts.merge!(args.pop) if args.last.is_a?(Hash) && args.count >= 2
@@ -49,6 +65,8 @@ module Foreman
       resource_class.name.underscore
     end
 
+    # Public API for blocks passed into #permit, allowing them to inspect the
+    # context of the request and permit/deny different parameters
     class Context
       attr_reader :filters, :type
 
@@ -69,6 +87,8 @@ module Foreman
         @type == :ui
       end
 
+      # Accepts same arguments as ActionController::Parameters#permit, plus can
+      # accept a ParametersFilter instance for nested models which is expanded
       def permit(*args)
         @filters.push(*args)
       end
