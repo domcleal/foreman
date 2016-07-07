@@ -48,13 +48,7 @@ module Foreman
     # dynamically from the Context class, else it defaults to API and UI only,
     # but not nested.
     def permit(*args, &block)
-      opts = {:api => true, :nested => false, :ui => true}
-      new_filter = if block_given?
-                     block
-                   else
-                     ->(context) { context.permit(*args) if opts[context.type] }
-                   end
-
+      new_filter = block_given? ? block : ->(ctx) { ctx.permit(*args) unless ctx.nested? }
       @parameter_filters << new_filter
     end
 
