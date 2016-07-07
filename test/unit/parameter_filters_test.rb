@@ -2,7 +2,10 @@ require 'test_helper'
 
 class ParameterFiltersTest < ActiveSupport::TestCase
   let(:klass) do
-    mock('Example').tap { |k| k.stubs(:name).returns('Example') }
+    mock('Example').tap do |k|
+      k.stubs(:name).returns('Example')
+      k.stubs(:legacy_accessible_attributes).returns([])
+    end
   end
   let(:filters) { Foreman::ParameterFilters.new(klass) }
 
@@ -34,7 +37,10 @@ class ParameterFiltersTest < ActiveSupport::TestCase
 
   context "with nested object" do
     let(:klass2) do
-      mock('Example').tap { |k| k.stubs(:name).returns('Example') }
+      mock('Example').tap do |k|
+        k.stubs(:name).returns('Example')
+        k.stubs(:legacy_accessible_attributes).returns([])
+      end
     end
     let(:filters2) { Foreman::ParameterFilters.new(klass2) }
 
