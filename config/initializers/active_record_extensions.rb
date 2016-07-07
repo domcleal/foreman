@@ -12,7 +12,7 @@ class ActiveRecord::Base
                              end
 
     if uses_strong_parameters
-      Foreman::Deprecation.deprecation_warning('1.15', "#{name} model has been converted to strong parameters, extend that instead of using attr_accessible")
+      Foreman::Deprecation.deprecation_warning('1.15', "#{name} model has been converted to strong parameters, use the `parameter_filter` plugin API that instead of attr_accessible")
       @legacy_accessible_attributes ||= []
       @legacy_accessible_attributes.push(*args)
     elsif defined?(super)
