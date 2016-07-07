@@ -9,7 +9,7 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     end
   end
   let(:filters) { Foreman::ParameterFilters.new(klass) }
-  let(:ui_context) { Foreman::ParameterFilters::Context.new(:ui) }
+  let(:ui_context) { Foreman::ParameterFilters::Context.new(:ui, 'examples', 'create') }
 
   test "permitting second-level attributes via permit(Symbol)" do
     filters.permit(:test)
@@ -19,6 +19,14 @@ class ParameterFiltersTest < ActiveSupport::TestCase
   test "permitting second-level attributes via block" do
     filters.permit { |ctx| ctx.permit(:test) }
     assert_equal({'test' => 'a'}, filters.filter_params(params(:example => {:test => 'a', :denied => 'b'}), ui_context))
+  end
+
+  test "block contains controller/action names" do
+    filters.permit do |ctx|
+      ctx.controller_name == 'examples' or raise 'controller is not "examples"'
+      ctx.action == 'create' or raise 'action is not "create"'
+    end
+    filters.filter_params(params(:example => {:test => 'a'}), ui_context)
   end
 
   test "permitting second-level arrays via permit(Symbol => Array)" do
@@ -52,6 +60,15 @@ class ParameterFiltersTest < ActiveSupport::TestCase
       filters.permit(:test, {:nested => [filters2]}, {}) # FIXME, third parameter!
       assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), ui_context))
       assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filters.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), ui_context))
+    end
+
+    test "second filter block has access to original controller/action" do
+      filters2.permit do |ctx|
+        ctx.controller_name == 'examples' or raise 'controller is not "examples"'
+        ctx.action == 'create' or raise 'action is not "create"'
+      end
+      filters.permit(:test, {:nested => [filters2]}, {}) # FIXME, third parameter!
+      filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b'}]}), ui_context)
     end
   end
 

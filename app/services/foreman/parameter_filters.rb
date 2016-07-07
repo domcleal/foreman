@@ -32,7 +32,7 @@ module Foreman
     # Return a list of permitted parameters that may be passed into #permit
     def filter(context)
       @parameter_filters.each { |f| context.instance_eval(&f) }
-      context.filters.map { |f| expand_nested(f) }
+      context.filters.map { |f| expand_nested(f, context) }
     end
 
     # Runs permitted parameter whitelist against supplied parameters
@@ -63,13 +63,13 @@ module Foreman
 
     private
 
-    def expand_nested(filter)
+    def expand_nested(filter, context)
       if filter.is_a?(ParameterFilters)
-        filter.filter(Context.new(:nested))
+        filter.filter(Context.new(:nested, context.controller_name, context.action))
       elsif filter.is_a?(Hash)
-        filter.transform_values { |v| expand_nested(v) }
+        filter.transform_values { |v| expand_nested(v, context) }
       elsif filter.is_a?(Array)
-        filter.map { |v| expand_nested(v) }
+        filter.map { |v| expand_nested(v, context) }
       else
         filter
       end
@@ -82,11 +82,13 @@ module Foreman
     # Public API for blocks passed into #permit, allowing them to inspect the
     # context of the request and permit/deny different parameters
     class Context
-      attr_reader :filters, :type
+      attr_reader :filters, :type, :controller_name, :action
 
-      def initialize(type)
+      def initialize(type, controller_name, action)
         @type = type
         @filters = []
+        @controller_name = controller_name
+        @action = action
       end
 
       def api?
