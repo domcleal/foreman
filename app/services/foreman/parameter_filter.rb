@@ -6,7 +6,7 @@
 # attributes, by applying different rules.
 #
 module Foreman
-  class ParameterFilters
+  class ParameterFilter
     attr_reader :resource_class
 
     def initialize(resource_class)
@@ -32,7 +32,7 @@ module Foreman
     # Return a list of permitted parameters that may be passed into #permit
     def filter(context)
       @parameter_filters.each { |f| context.instance_eval(&f) }
-      context.filters.map { |f| expand_nested(f, context) }
+      context.permitted.map { |f| expand_nested(f, context) }
     end
 
     # Runs permitted parameter whitelist against supplied parameters
@@ -64,7 +64,7 @@ module Foreman
     private
 
     def expand_nested(filter, context)
-      if filter.is_a?(ParameterFilters)
+      if filter.is_a?(ParameterFilter)
         filter.filter(Context.new(:nested, context.controller_name, context.action))
       elsif filter.is_a?(Hash)
         filter.transform_values { |v| expand_nested(v, context) }
@@ -82,11 +82,11 @@ module Foreman
     # Public API for blocks passed into #permit, allowing them to inspect the
     # context of the request and permit/deny different parameters
     class Context
-      attr_reader :filters, :type, :controller_name, :action
+      attr_reader :permitted, :type, :controller_name, :action
 
       def initialize(type, controller_name, action)
         @type = type
-        @filters = []
+        @permitted = []
         @controller_name = controller_name
         @action = action
       end
@@ -106,7 +106,7 @@ module Foreman
       # Accepts same arguments as ActionController::Parameters#permit, plus can
       # accept a ParametersFilter instance for nested models which is expanded
       def permit(*args)
-        @filters.push(*args)
+        @permitted.push(*args)
       end
     end
   end
