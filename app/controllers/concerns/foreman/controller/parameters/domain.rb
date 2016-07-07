@@ -2,9 +2,9 @@ module Foreman::Controller::Parameters::Domain
   include Foreman::Controller::Parameters::DomainParameter
 
   def domain_param_filter
-    filters = Foreman::ParameterFilters.new(::Domain)
-    filters.permit(:name, :fullname, :dns_id, {:domain_parameters_attributes => [domain_parameter_param_filter]}, {}) # FIXME: opts parameter!
-    filters
+    Foreman::ParameterFilters.new(::Domain).tap do |filter|
+      filter.permit(:name, :fullname, :dns_id, {:domain_parameters_attributes => [domain_parameter_param_filter]}, {}) # FIXME: opts parameter!
+    end
   end
 
   def domain_params

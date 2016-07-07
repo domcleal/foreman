@@ -1,8 +1,8 @@
 module Foreman::Controller::Parameters::DomainParameter
   def domain_parameter_param_filter
-    filters = Foreman::ParameterFilters.new(::DomainParameter)
-    filters.permit(:id, :name, :hidden_value, :value, :_destroy, :nested, :reference_id, :nested => true)
-    filters
+    Foreman::ParameterFilters.new(::DomainParameter).tap do |filter|
+      filter.permit(:id, :name, :hidden_value, :value, :_destroy, :nested, :reference_id, :nested => true)
+    end
   end
 
   def domain_parameter_params
