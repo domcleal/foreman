@@ -3,6 +3,10 @@ class ActiveRecord::Base
   include HasManyCommon
   include StripWhitespace
   include Parameterizable::ById
+
+  def self.attr_accessible(*args)
+    Foreman::Deprecation.deprecation_warning('1.15', 'FIXME')
+  end
 end
 
 # Permit safemode template rendering to have basic read-only access over
