@@ -390,7 +390,7 @@ class ApplicationController < ActionController::Base
     raise ::Foreman::Exception.new(N_("Invalid authenticity token"))
   end
 
-  def filter_controller_type
-    :ui
+  def parameter_filter_context
+    Foreman::ParameterFilters::Context.new(:ui)
   end
 end

@@ -351,8 +351,8 @@ module Api
       session[:user].present?
     end
 
-    def filter_controller_type
-      :api
+    def parameter_filter_context
+      Foreman::ParameterFilters::Context.new(:api)
     end
   end
 end

@@ -9,31 +9,32 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     end
   end
   let(:filters) { Foreman::ParameterFilters.new(klass) }
+  let(:ui_context) { Foreman::ParameterFilters::Context.new(:ui) }
 
   test "permitting second-level attributes via permit(Symbol)" do
     filters.permit(:test)
-    assert_equal({'test' => 'a'}, filters.filter_params(params(:example => {:test => 'a', :denied => 'b'}), :ui))
+    assert_equal({'test' => 'a'}, filters.filter_params(params(:example => {:test => 'a', :denied => 'b'}), ui_context))
   end
 
   test "permitting second-level attributes via block" do
     filters.permit { |ctx| ctx.permit(:test) }
-    assert_equal({'test' => 'a'}, filters.filter_params(params(:example => {:test => 'a', :denied => 'b'}), :ui))
+    assert_equal({'test' => 'a'}, filters.filter_params(params(:example => {:test => 'a', :denied => 'b'}), ui_context))
   end
 
   test "permitting second-level arrays via permit(Symbol => Array)" do
     filters.permit(:test => [])
-    assert_equal({}, filters.filter_params(params(:example => {:test => 'a'}), :ui))
-    assert_equal({'test' => ['a']}, filters.filter_params(params(:example => {:test => ['a']}), :ui))
+    assert_equal({}, filters.filter_params(params(:example => {:test => 'a'}), ui_context))
+    assert_equal({'test' => ['a']}, filters.filter_params(params(:example => {:test => ['a']}), ui_context))
   end
 
   test "permitting third-level attributes via permit(Symbol => Array[Symbol])" do
     filters.permit(:test => [:inner])
-    assert_equal({'test' => {'inner' => 'a'}}, filters.filter_params(params(:example => {:test => {:inner => 'a', :denied => 'b'}}), :ui))
+    assert_equal({'test' => {'inner' => 'a'}}, filters.filter_params(params(:example => {:test => {:inner => 'a', :denied => 'b'}}), ui_context))
   end
 
   test "blocks second-level attributes for UI when :ui => false" do
     filters.permit(:test, :ui => false)
-    assert_equal({}, filters.filter_params(params(:example => {:test => 'a'}), :ui))
+    assert_equal({}, filters.filter_params(params(:example => {:test => 'a'}), ui_context))
   end
 
   context "with nested object" do
@@ -49,8 +50,8 @@ class ParameterFiltersTest < ActiveSupport::TestCase
       filters2.permit(:inner, :nested => true)
       filters2.permit(:ui_only)
       filters.permit(:test, {:nested => [filters2]}, {}) # FIXME, third parameter!
-      assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), :ui))
-      assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filters.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), :ui))
+      assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), ui_context))
+      assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filters.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), ui_context))
     end
   end
 
@@ -58,11 +59,11 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     let(:legacy_accessible_attributes) { [:legacy] }
 
     test "permits legacy attribute" do
-      assert_equal({'legacy' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :legacy => 'b'}), :ui))
+      assert_equal({'legacy' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :legacy => 'b'}), ui_context))
     end
 
     test "permits legacy attribute with an array" do
-      assert_equal({'legacy' => ['b']}, filters.filter_params(params(:example => {:test => 'a', :legacy => ['b']}), :ui))
+      assert_equal({'legacy' => ['b']}, filters.filter_params(params(:example => {:test => 'a', :legacy => ['b']}), ui_context))
     end
   end
 
@@ -71,14 +72,14 @@ class ParameterFiltersTest < ActiveSupport::TestCase
       plugin = mock('plugin')
       plugin.expects(:parameter_filters).with(klass).returns([[:plugin_ext, :ui =>true]])
       Foreman::Plugin.expects(:all).returns([plugin])
-      assert_equal({'plugin_ext' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), :ui))
+      assert_equal({'plugin_ext' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), ui_context))
     end
 
     test "permits plugin-added attributes from blocks" do
       plugin = mock('plugin')
       plugin.expects(:parameter_filters).with(klass).returns([[Proc.new { |ctx| ctx.permit(:plugin_ext) }]])
       Foreman::Plugin.expects(:all).returns([plugin])
-      assert_equal({'plugin_ext' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), :ui))
+      assert_equal({'plugin_ext' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), ui_context))
     end
   end
 

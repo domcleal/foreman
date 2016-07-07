@@ -30,10 +30,9 @@ module Foreman
     end
 
     # Return a list of permitted parameters that may be passed into #permit
-    def filter(context_type)
-      ctx = Context.new(context_type)
-      @parameter_filters.each { |f| ctx.instance_eval(&f) }
-      ctx.filters.map { |f| expand_nested(f) }
+    def filter(context)
+      @parameter_filters.each { |f| context.instance_eval(&f) }
+      context.filters.map { |f| expand_nested(f) }
     end
 
     # Runs permitted parameter whitelist against supplied parameters
@@ -66,7 +65,7 @@ module Foreman
 
     def expand_nested(filter)
       if filter.is_a?(ParameterFilters)
-        filter.filter(:nested)
+        filter.filter(Context.new(:nested))
       elsif filter.is_a?(Hash)
         filter.transform_values { |v| expand_nested(v) }
       elsif filter.is_a?(Array)

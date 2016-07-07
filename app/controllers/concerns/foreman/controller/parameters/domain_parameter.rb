@@ -6,6 +6,6 @@ module Foreman::Controller::Parameters::DomainParameter
   end
 
   def domain_parameter_params
-    domain_parameter_param_filter.filter_params(params, filter_controller_type)
+    domain_parameter_param_filter.filter_params(params, parameter_filter_context)
   end
 end
