@@ -12,6 +12,9 @@ module Foreman
     def initialize(resource_class)
       @resource_class = resource_class
       @parameter_filters = []
+
+      # Permit all attributes using deprecated attr_accessible
+      permit(resource_class.legacy_accessible_attributes, :nested => true)
     end
 
     # Return a list of permitted parameters that may be passed into #permit
