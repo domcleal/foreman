@@ -7,7 +7,6 @@ class Domain < ActiveRecord::Base
   include Taxonomix
   include StripLeadingAndTrailingDot
   include Parameterizable::ByIdName
-  include ActiveModel::ForbiddenAttributesProtection
 
   audited :allow_mass_assignment => true, :except => [:total_hosts, :hostgroups_count]
 
