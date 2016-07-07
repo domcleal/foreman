@@ -14,7 +14,14 @@ module Foreman
       @parameter_filters = []
 
       Foreman::Plugin.all.each do |plugin|
-        plugin.parameter_filters(resource_class).each { |filter| permit(*filter) }
+        plugin.parameter_filters(resource_class).each do |filter|
+          if filter.last.is_a?(Proc)
+            filter_block = filter.pop
+            permit(*filter, &filter_block)
+          else
+            permit(*filter)
+          end
+        end
       end
 
       # Permit all attributes using deprecated attr_accessible, both as scalar or array

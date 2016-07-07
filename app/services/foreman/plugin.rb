@@ -342,9 +342,9 @@ module Foreman #:nodoc:
       @template_labels
     end
 
-    def parameter_filter(klass, *args)
+    def parameter_filter(klass, *args, &block)
       @parameter_filters[klass] ||= []
-      @parameter_filters[klass] << args
+      @parameter_filters[klass] << (block_given? ? args + [block] : args)
     end
 
     def parameter_filters(klass)
