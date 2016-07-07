@@ -66,6 +66,15 @@ class ParameterFiltersTest < ActiveSupport::TestCase
     end
   end
 
+  context "with plugin registered filters" do
+    test "permits plugin-added attribute" do
+      plugin = mock('plugin')
+      plugin.expects(:parameter_filters).with(klass).returns([:plugin_ext, :ui =>true])
+      Foreman::Plugin.expects(:all).returns([plugin])
+      assert_equal({'plugin_ext' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), :ui))
+    end
+  end
+
   private
 
   def params(p)

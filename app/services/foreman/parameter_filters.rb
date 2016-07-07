@@ -13,6 +13,10 @@ module Foreman
       @resource_class = resource_class
       @parameter_filters = []
 
+      Foreman::Plugin.all.each do |plugin|
+        plugin.parameter_filters(resource_class).each { |filter| permit(*filter) }
+      end
+
       # Permit all attributes using deprecated attr_accessible, both as scalar or array
       permit(resource_class.legacy_accessible_attributes, :nested => true)
       permit(Hash[resource_class.legacy_accessible_attributes.map { |a| [a,[]] }], :nested => true)

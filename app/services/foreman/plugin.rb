@@ -102,6 +102,7 @@ module Foreman #:nodoc:
       @compute_resources = []
       @to_prepare_callbacks = []
       @template_labels = {}
+      @parameter_filters = {}
     end
 
     def after_initialize
@@ -339,6 +340,15 @@ module Foreman #:nodoc:
 
     def get_template_labels
       @template_labels
+    end
+
+    def parameter_filter(klass, *args)
+      @parameter_filters[klass] ||= []
+      @parameter_filters[klass] << args
+    end
+
+    def parameter_filters(klass)
+      @parameter_filters.fetch(klass, [])
     end
 
     private
