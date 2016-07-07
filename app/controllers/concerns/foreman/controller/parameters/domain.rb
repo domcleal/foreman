@@ -1,5 +1,5 @@
 module Foreman::Controller::Parameters::Domain
-  include DomainParameter
+  include Foreman::Controller::Parameters::DomainParameter
 
   def domain_param_filter
     filters = Foreman::ParameterFilters.new(::Domain)
