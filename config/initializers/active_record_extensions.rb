@@ -14,9 +14,7 @@ class ActiveRecord::Base
     if uses_strong_parameters
       Foreman::Deprecation.deprecation_warning('1.15', "#{name} model has been converted to strong parameters, extend that instead of using attr_accessible")
       @legacy_accessible_attributes ||= []
-      # Permit both scalar and array values since the type isn't specified
       @legacy_accessible_attributes.push(*args)
-      @legacy_accessible_attributes.push(Hash[args.map { |a| [a,[]] }])
     elsif defined?(super)
       super # protected_attributes exists
     else

@@ -1,10 +1,11 @@
 require 'test_helper'
 
 class ParameterFiltersTest < ActiveSupport::TestCase
+  let(:legacy_accessible_attributes) { [] }
   let(:klass) do
     mock('Example').tap do |k|
       k.stubs(:name).returns('Example')
-      k.stubs(:legacy_accessible_attributes).returns([])
+      k.stubs(:legacy_accessible_attributes).returns(legacy_accessible_attributes)
     end
   end
   let(:filters) { Foreman::ParameterFilters.new(klass) }
@@ -50,6 +51,18 @@ class ParameterFiltersTest < ActiveSupport::TestCase
       filters.permit(:test, {:nested => [filters2]}, {}) # FIXME, third parameter!
       assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), :ui))
       assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filters.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), :ui))
+    end
+  end
+
+  context "with legacy accessible attributes" do
+    let(:legacy_accessible_attributes) { [:legacy] }
+
+    test "permits legacy attribute" do
+      assert_equal({'legacy' => 'b'}, filters.filter_params(params(:example => {:test => 'a', :legacy => 'b'}), :ui))
+    end
+
+    test "permits legacy attribute with an array" do
+      assert_equal({'legacy' => ['b']}, filters.filter_params(params(:example => {:test => 'a', :legacy => ['b']}), :ui))
     end
   end
 
