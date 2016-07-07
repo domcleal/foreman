@@ -50,7 +50,6 @@ Foreman::Application.configure do
   config.active_support.deprecation = :stderr
 
   # Raise exception on mass assignment protection for Active Record models
-  #config.active_record.mass_assignment_sanitizer = :strict
   config.action_controller.action_on_unpermitted_parameters = :strict
 
   # Use separate cache stores for parallel_tests
