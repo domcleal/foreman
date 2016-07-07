@@ -5,7 +5,20 @@ class ActiveRecord::Base
   include Parameterizable::ById
 
   def self.attr_accessible(*args)
-    Foreman::Deprecation.deprecation_warning('1.15', 'FIXME')
+    uses_strong_parameters = begin
+                               Foreman::Controller::Parameters.const_get(name, false)
+                             rescue NameError
+                               false
+                             end
+
+    if uses_strong_parameters
+      Foreman::Deprecation.deprecation_warning('1.15', "#{name} model has been converted to strong parameters, extend that instead of using attr_accessible")
+      # FIXME: add a legacy attr_accessible registration here
+    elsif defined?(super)
+      super # protected_attributes exists
+    else
+      raise "#{name} is using attr_accessible so must either be converted to strong parameters, or add the protected_attributes gem"
+    end
   end
 end
 
