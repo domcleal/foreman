@@ -350,5 +350,9 @@ module Api
     def protect_api_from_forgery?
       session[:user].present?
     end
+
+    def filter_controller_type
+      :api
+    end
   end
 end
