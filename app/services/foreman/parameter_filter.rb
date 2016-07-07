@@ -25,8 +25,10 @@ module Foreman
       end
 
       # Permit all attributes using deprecated attr_accessible, both as scalar or array
-      permit(resource_class.legacy_accessible_attributes, :nested => true)
-      permit(Hash[resource_class.legacy_accessible_attributes.map { |a| [a,[]] }], :nested => true)
+      permit do |ctx|
+        ctx.permit resource_class.legacy_accessible_attributes
+        ctx.permit Hash[resource_class.legacy_accessible_attributes.map { |a| [a,[]] }]
+      end
     end
 
     # Return a list of permitted parameters that may be passed into #permit
