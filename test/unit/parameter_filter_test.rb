@@ -41,7 +41,7 @@ class ParameterFilterTest < ActiveSupport::TestCase
   end
 
   test "blocks second-level attributes for UI when :ui => false" do
-    filter.permit(:test, :ui => false)
+    filter.permit_by_context(:test, :ui => false)
     assert_equal({}, filter.filter_params(params(:example => {:test => 'a'}), ui_context))
   end
 
@@ -55,9 +55,9 @@ class ParameterFilterTest < ActiveSupport::TestCase
     let(:filter2) { Foreman::ParameterFilter.new(klass2) }
 
     test "permits nested attribute through second filter" do
-      filter2.permit(:inner, :nested => true)
+      filter2.permit_by_context(:inner, :nested => true)
       filter2.permit(:ui_only)
-      filter.permit(:test, {:nested => [filter2]}, {}) # FIXME, third parameter!
+      filter.permit(:test, :nested => [filter2])
       assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filter.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), ui_context))
       assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filter.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), ui_context))
     end
@@ -67,7 +67,7 @@ class ParameterFilterTest < ActiveSupport::TestCase
         ctx.controller_name == 'examples' or raise 'controller is not "examples"'
         ctx.action == 'create' or raise 'action is not "create"'
       end
-      filter.permit(:test, {:nested => [filter2]}, {}) # FIXME, third parameter!
+      filter.permit(:test, :nested => [filter2])
       filter.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b'}]}), ui_context)
     end
   end
@@ -87,7 +87,7 @@ class ParameterFilterTest < ActiveSupport::TestCase
   context "with plugin registered filters" do
     test "permits plugin-added attribute" do
       plugin = mock('plugin')
-      plugin.expects(:parameter_filters).with(klass).returns([[:plugin_ext, :ui =>true]])
+      plugin.expects(:parameter_filters).with(klass).returns([[:plugin_ext, :another]])
       Foreman::Plugin.expects(:all).returns([plugin])
       assert_equal({'plugin_ext' => 'b'}, filter.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), ui_context))
     end

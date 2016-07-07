@@ -44,21 +44,25 @@ module Foreman
     # ActionController::Parameters#permit, plus can accept a ParametersFilter
     # instance for nested models which is expanded.
     #
-    # Last argument of a hash determines which contexts the parameter may be
-    # used in, or a block can be passed to determine it dynamically from the
-    # Context class.
+    # A block can be passed to determine when the parameter is permitted
+    # dynamically from the Context class, else it defaults to API and UI only,
+    # but not nested.
     def permit(*args, &block)
       opts = {:api => true, :nested => false, :ui => true}
-      opts.merge!(args.pop) if args.last.is_a?(Hash) && args.count >= 2
-      attrs = args.dup
-
       new_filter = if block_given?
                      block
                    else
-                     ->(context) { context.permit(*attrs) if opts[context.type] }
+                     ->(context) { context.permit(*args) if opts[context.type] }
                    end
 
       @parameter_filters << new_filter
+    end
+
+    # Last argument of a hash determines which contexts the parameter may be
+    # used in, defaulting to API and UI only.
+    def permit_by_context(*args, opts)
+      opts = {:api => true, :nested => false, :ui => true}.merge(opts)
+      @parameter_filters << ->(context) { context.permit(*args) if opts[context.type] }
     end
 
     private
