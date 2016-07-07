@@ -49,6 +49,7 @@ class ParameterFiltersTest < ActiveSupport::TestCase
       filters2.permit(:ui_only)
       filters.permit(:test, {:nested => [filters2]}, {}) # FIXME, third parameter!
       assert_equal({'test' => 'a', 'nested' => [{'inner' => 'b'}]}, filters.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b', :ui_only => 'b'}]}), :ui))
+      assert_equal({'test' => 'a', 'nested' => {'123' => {'inner' => 'b'}}}, filters.filter_params(params(:example => {:test => 'a', :nested => {'123' => {:inner => 'b', :ui_only => 'b'}}}), :ui))
     end
   end
 
