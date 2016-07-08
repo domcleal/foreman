@@ -6,6 +6,7 @@ module Api
       include Api::Version2
       include Api::TaxonomyScope
       include Foreman::Controller::SmartProxyAuth
+      include Foreman::Controller::Parameters::Host
 
       include Api::CompatibilityChecker
       before_filter :check_create_host_nested, :only => [:create, :update]
@@ -95,7 +96,7 @@ module Api
       param_group :host, :as => :create
 
       def create
-        @host = Host.new(host_attributes(params[:host]))
+        @host = Host.new(host_attributes(host_params))
         @host.managed = true if (params[:host] && params[:host][:managed].nil?)
         apply_compute_profile(@host)
 
@@ -110,7 +111,7 @@ module Api
       param_group :host
 
       def update
-        @host.attributes = host_attributes(params[:host], @host)
+        @host.attributes = host_attributes(host_params, @host)
         apply_compute_profile(@host)
 
         process_response @host.save

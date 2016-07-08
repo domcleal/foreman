@@ -7,10 +7,11 @@
 #
 module Foreman
   class ParameterFilter
-    attr_reader :resource_class
+    attr_reader :resource_class, :opts
 
-    def initialize(resource_class)
+    def initialize(resource_class, opts = {})
       @resource_class = resource_class
+      @opts = opts
       @parameter_filters = []
 
       Foreman::Plugin.all.each do |plugin|
@@ -76,7 +77,7 @@ module Foreman
     end
 
     def top_level_hash
-      resource_class.name.underscore
+      opts.fetch(:top_level_hash, resource_class.name.underscore)
     end
 
     # Public API for blocks passed into #permit, allowing them to inspect the
