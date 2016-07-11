@@ -598,8 +598,11 @@ class Host::Managed < Host::Base
 
   def hash_clone(value)
     if value.is_a? Hash
-      hash_type = value.class
-      return hash_type[value.map{ |k, v| [k, hash_clone(v)] }]
+      # Prefer dup to constructing a new object to perserve permitted state
+      # when `value` is an ActionController::Parameters instance
+      new_hash = value.dup
+      new_hash.each { |k, v| new_hash[k] = hash_clone(v) }
+      return new_hash
     end
 
     value
