@@ -24,7 +24,6 @@ module Api
         @compute_attribute = ComputeAttribute.new(compute_attribute_params.merge(
           :compute_profile_id => params[:compute_profile_id],
           :compute_resource_id => params[:compute_resource_id]))
-        @compute_attribute.vm_attrs = params[:compute_attribute][:vm_attrs] if params[:compute_attribute].has_key?(:vm_attrs)
         process_response @compute_attribute.save
       end
 
@@ -40,9 +39,7 @@ module Api
       param_group :compute_attribute
 
       def update
-        @compute_attribute.attributes = compute_attribute_params
-        @compute_attribute.vm_attrs = params[:compute_attribute][:vm_attrs] if params[:compute_attribute].has_key?(:vm_attrs)
-        process_response @compute_attribute.save
+        process_response @compute_attribute.update_attributes(compute_attribute_params)
       end
     end
   end

@@ -8,7 +8,6 @@ class ComputeAttributesController < ApplicationController
 
   def create
     @set = ComputeAttribute.new(compute_attribute_params)
-    @set.vm_attrs = params[:compute_attribute][:vm_attrs] if params[:compute_attribute].has_key?(:vm_attrs)
     if @set.save
       process_success :success_redirect => request.referer || compute_profile_path(@set.compute_profile)
     else
@@ -22,9 +21,7 @@ class ComputeAttributesController < ApplicationController
 
   def update
     @set = ComputeAttribute.find(params[:id])
-    @set.attributes = compute_attribute_params
-    @set.vm_attrs = params[:compute_attribute][:vm_attrs] if params[:compute_attribute].has_key?(:vm_attrs)
-    if @set.save
+    if @set.update_attributes(compute_attribute_params)
       process_success :success_redirect => request.referer || compute_profile_path(@set.compute_profile)
     else
       process_error :object => @set
