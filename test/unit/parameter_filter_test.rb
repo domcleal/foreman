@@ -40,6 +40,11 @@ class ParameterFilterTest < ActiveSupport::TestCase
     assert_equal({'test' => {'inner' => 'a'}}, filter.filter_params(params(:example => {:test => {:inner => 'a', :denied => 'b'}}), ui_context))
   end
 
+  test "constructs permit() args for second-level attribute" do
+    filter.permit(:test)
+    assert_equal [:test], filter.filter(ui_context)
+  end
+
   test "blocks second-level attributes for UI when :ui => false" do
     filter.permit_by_context(:test, :ui => false)
     assert_equal({}, filter.filter_params(params(:example => {:test => 'a'}), ui_context))
@@ -53,6 +58,13 @@ class ParameterFilterTest < ActiveSupport::TestCase
       end
     end
     let(:filter2) { Foreman::ParameterFilter.new(klass2) }
+
+    test "constructs permit() args for nested attribute through second filter" do
+      filter2.permit_by_context(:inner, :nested => true)
+      filter2.permit(:ui_only)
+      filter.permit(:test, :nested => [filter2])
+      assert_equal [:test, {:nested => [[:inner]]}], filter.filter(ui_context)
+    end
 
     test "permits nested attribute through second filter" do
       filter2.permit_by_context(:inner, :nested => true)

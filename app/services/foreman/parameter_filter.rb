@@ -26,9 +26,11 @@ module Foreman
       end
 
       # Permit all attributes using deprecated attr_accessible, both as scalar or array
-      permit do |ctx|
-        ctx.permit resource_class.legacy_accessible_attributes
-        ctx.permit Hash[resource_class.legacy_accessible_attributes.map { |a| [a,[]] }]
+      if resource_class.legacy_accessible_attributes.present?
+        permit do |ctx|
+          ctx.permit resource_class.legacy_accessible_attributes
+          ctx.permit Hash[resource_class.legacy_accessible_attributes.map { |a| [a,[]] }]
+        end
       end
     end
 
