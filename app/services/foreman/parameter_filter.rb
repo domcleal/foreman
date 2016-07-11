@@ -40,7 +40,7 @@ module Foreman
 
     # Runs permitted parameter whitelist against supplied parameters
     def filter_params(params, *context_args)
-      params.require(top_level_hash).permit(filter(*context_args))
+      params.permit(top_level_hash => filter(*context_args))[top_level_hash]
     end
 
     # Registers new whitelisted parameter(s) in the same form as
