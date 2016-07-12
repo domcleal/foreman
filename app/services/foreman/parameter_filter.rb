@@ -85,7 +85,7 @@ module Foreman
     end
 
     def top_level_hash
-      opts.fetch(:top_level_hash, resource_class.name.underscore)
+      opts[:top_level_hash].present? ? opts[:top_level_hash] : resource_class.name.underscore
     end
 
     # Public API for blocks passed into #permit, allowing them to inspect the
