@@ -1,24 +1,27 @@
 module Foreman::Controller::Parameters::Host
+  extend ActiveSupport::Concern
   include Foreman::Controller::Parameters::HostBase
   include Foreman::Controller::Parameters::HostCommon
   include Foreman::Controller::Parameters::KeepParam
 
-  def host_params_filter
-    Foreman::ParameterFilter.new(::Host::Managed, :top_level_hash => 'host').tap do |filter|
-      filter.permit :build, :certname, :disk, :global_status,
-        :installed_at, :last_report, :otp, :provision_method, :uuid,
-        :compute_profile_id, :compute_profile_name,
-        :compute_resource, :compute_resource_id, :compute_resource_name,
-        :owner, :owner_id, :owner_name, :owner_type
+  class_methods do
+    def host_params_filter
+      Foreman::ParameterFilter.new(::Host::Managed, :top_level_hash => 'host').tap do |filter|
+        filter.permit :build, :certname, :disk, :global_status,
+          :installed_at, :last_report, :otp, :provision_method, :uuid,
+          :compute_profile_id, :compute_profile_name,
+          :compute_resource, :compute_resource_id, :compute_resource_name,
+          :owner, :owner_id, :owner_name, :owner_type
 
-      add_host_base_params_filter(filter)
-      add_host_common_params_filter(filter)
+        add_host_base_params_filter(filter)
+        add_host_common_params_filter(filter)
+      end
     end
   end
 
   def host_params
     keep_param(params, 'host', :compute_attributes) do
-      host_params_filter.filter_params(params, parameter_filter_context)
+      self.class.host_params_filter.filter_params(params, parameter_filter_context)
     end
   end
 end

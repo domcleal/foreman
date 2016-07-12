@@ -393,4 +393,8 @@ class ApplicationController < ActionController::Base
   def parameter_filter_context
     Foreman::ParameterFilter::Context.new(:ui, controller_name, params[:action])
   end
+
+  def self.parameter_filter_context
+    Foreman::ParameterFilter::Context.new(:ui, controller_name, nil)
+  end
 end

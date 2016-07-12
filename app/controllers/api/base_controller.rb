@@ -354,5 +354,9 @@ module Api
     def parameter_filter_context
       Foreman::ParameterFilter::Context.new(:api, controller_name, params[:action])
     end
+
+    def self.parameter_filter_context
+      Foreman::ParameterFilter::Context.new(:api, controller_name, nil)
+    end
   end
 end

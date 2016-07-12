@@ -1,17 +1,11 @@
 module Api
   module V2
     class ComputeResourcesController < V2::BaseController
-      wrap_parameters ComputeResource, :include => (ComputeResource.accessible_attributes +
-                                                    ['tenant', 'image_id', 'managed_ip', 'provider',
-                                                     'template', 'templates', 'set_console_password',
-                                                     'project', 'key_path', 'email', 'zone',
-                                                     'display_type', 'ovirt_quota', 'public_key',
-                                                     'region', 'server', 'datacenter', 'pubkey_hash',
-                                                     'nics_attributes', 'volumes_attributes', 'memory'])
-
       include Api::Version2
       include Api::TaxonomyScope
       include Foreman::Controller::Parameters::ComputeResource
+
+      wrap_parameters ComputeResource, :include => compute_resource_params_filter.accessible_attributes(parameter_filter_context)
 
       before_filter :find_resource, :only => [:show, :update, :destroy, :available_images, :associate,
                                               :available_clusters, :available_flavors, :available_folders,

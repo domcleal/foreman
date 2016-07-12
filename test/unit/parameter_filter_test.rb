@@ -50,6 +50,11 @@ class ParameterFilterTest < ActiveSupport::TestCase
     assert_equal({}, filter.filter_params(params(:example => {:test => 'a'}), ui_context))
   end
 
+  test "#accessible_attributes returns list of known attributes" do
+    filter.permit(:test, :hash => [:inner])
+    assert_equal ['test', 'hash'], filter.accessible_attributes(ui_context)
+  end
+
   context "with nested object" do
     let(:klass2) do
       mock('Example').tap do |k|

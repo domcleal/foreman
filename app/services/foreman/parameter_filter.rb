@@ -64,6 +64,12 @@ module Foreman
       @parameter_filters << ->(context) { context.permit(*args) if opts[context.type] }
     end
 
+    def accessible_attributes(context)
+      filter(context).map do |f|
+        f.is_a?(Hash) ? f.keys : f
+      end.flatten.map(&:to_s)
+    end
+
     private
 
     def expand_nested(filter, context)

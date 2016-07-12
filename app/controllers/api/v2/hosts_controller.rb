@@ -1,14 +1,14 @@
 module Api
   module V2
     class HostsController < V2::BaseController
-      wrap_parameters :host, :include => Host::Managed.accessible_attributes
-
-      include Api::Version2
+      include Api::CompatibilityChecker
       include Api::TaxonomyScope
+      include Api::Version2
       include Foreman::Controller::SmartProxyAuth
       include Foreman::Controller::Parameters::Host
 
-      include Api::CompatibilityChecker
+      wrap_parameters :host, :include => host_params_filter.accessible_attributes(parameter_filter_context) + ['compute_attributes']
+
       before_filter :check_create_host_nested, :only => [:create, :update]
 
       before_filter :find_optional_nested_object, :except => [:facts]
