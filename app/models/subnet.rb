@@ -17,13 +17,6 @@ class Subnet < ActiveRecord::Base
   attr_exportable :name, :network, :mask, :gateway, :dns_primary, :dns_secondary, :from, :to, :boot_mode,
     :ipam, :vlanid, :network_type
 
-  # This casts Subnet to Subnet::Ipv4 if no type is set
-  def self.new(*attributes, &block)
-    type = attributes.first.with_indifferent_access.delete(:type) if attributes.first.is_a?(Hash)
-    return Subnet::Ipv4.new_without_cast(*attributes, &block) if self == Subnet && type.nil?
-    super
-  end
-
   # This sets the rails model name of all child classes to the
   # model name of the parent class, i.e. Subnet.
   # This is necessary for all STI classes to share the same
@@ -269,6 +262,14 @@ class Subnet < ActiveRecord::Base
       ip = IPAddr.new(ip)
       Subnet.all.detect {|s| s.family == ip.family && s.contains?(ip)}
     end
+
+    # This casts Subnet to Subnet::Ipv4 if no type is set
+    def new_with_default_type(*attributes, &block)
+      type = attributes.first.with_indifferent_access.delete(:type) if attributes.first.is_a?(Hash)
+      return Subnet::Ipv4.new_without_cast(*attributes, &block) if self == Subnet && type.nil?
+      new_without_default_type(*attributes, &block)
+    end
+    alias_method_chain :new, :default_type
 
     # allows to create a specific subnet class based on the network_type.
     # network_type is more user friendly than the class names
