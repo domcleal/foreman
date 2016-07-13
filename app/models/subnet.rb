@@ -14,10 +14,6 @@ class Subnet < ActiveRecord::Base
   include Parameterizable::ByIdName
   include Exportable
 
-  attr_accessible :name, :type, :network, :mask, :gateway, :dns_primary, :dns_secondary, :ipam, :from,
-    :to, :vlanid, :boot_mode, :dhcp_id, :dhcp, :tftp_id, :tftp, :dns_id, :dns, :domain_ids, :domain_names,
-    :subnet_parameters_attributes, :cidr, :network_type
-
   attr_exportable :name, :network, :mask, :gateway, :dns_primary, :dns_secondary, :from, :to, :boot_mode,
     :ipam, :vlanid, :network_type
 
