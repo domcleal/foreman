@@ -5,9 +5,12 @@ module Foreman::Controller::Parameters::PuppetclassLookupKey
   class_methods do
     def puppetclass_lookup_key_params_filter(top_level_hash = nil)
       Foreman::ParameterFilter.new(::PuppetclassLookupKey, :top_level_hash => top_level_hash).tap do |filter|
-        filter.permit :required, :environments => [], :environment_ids => [], :environment_names => [],
+        filter.permit :environments => [], :environment_ids => [], :environment_names => [],
           :environment_classes => [], :environment_classes_ids => [], :environment_classes_names => [],
           :param_classes => [], :param_classes_ids => [], :param_classes_names => []
+        filter.permit_by_context :required, :nested => true
+        filter.permit_by_context :id, :ui => false, :api => false, :nested => true
+
         add_lookup_key_params_filter(filter)
       end
     end
