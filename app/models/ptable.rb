@@ -32,9 +32,6 @@ class Ptable < Template
   scoped_search :on => :os_family, :rename => 'family', :complete_value => :true
 
   alias_attribute :layout, :template
-  attr_accessible :layout, :name, :default, :snippet, :os_family,
-    :audit_comment, :operatingsystem_ids, :operatingsystem_names, :host_ids,
-    :host_names, :hostgroup_names, :hostgroup_ids
 
   # with proc support, default_scope can no longer be chained
   # include all default scoping here
