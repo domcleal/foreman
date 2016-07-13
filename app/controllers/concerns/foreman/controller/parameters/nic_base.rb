@@ -6,7 +6,7 @@ module Foreman::Controller::Parameters::NicBase
       filter.permit_by_context :attached_to, :bond_options, # FIXME: bond_opts is array/hash?
         :compute_attributes, :host_id, :host, :identifier, :ip, :ip6, :link, :mac,
         :managed, :mode, :name, :password, :primary, :provider, :provision, :type,
-        :tag, :username, :virtual, :attached_devices => [], :nested => true
+        :tag, :username, :virtual, {:attached_devices => []}, :nested => true
       filter.permit_by_context :id, :_destroy, :ui => false, :api => false, :nested => true
     end
   end

@@ -50,6 +50,10 @@ class ParameterFilterTest < ActiveSupport::TestCase
     assert_equal({}, filter.filter_params(params(:example => {:test => 'a'}), ui_context))
   end
 
+  test "#permit_by_context raises error for unknown context types" do
+    assert_raises(ArgumentError) { filter.permit_by_context(:test, :example => false) }
+  end
+
   test "#accessible_attributes returns list of known attributes" do
     filter.permit(:test, :hash => [:inner])
     assert_equal ['test', 'hash'], filter.accessible_attributes(ui_context)

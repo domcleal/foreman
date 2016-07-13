@@ -60,6 +60,9 @@ module Foreman
     # Last argument of a hash determines which contexts the parameter may be
     # used in, defaulting to API and UI only.
     def permit_by_context(*args, opts)
+      unknown_keys = opts.keys - [:api, :nested, :ui]
+      raise ArgumentError, "unknown parameter context: #{unknown_keys.join(', ')}" if unknown_keys.present?
+
       opts = {:api => true, :nested => false, :ui => true}.merge(opts)
       @parameter_filters << ->(context) { context.permit(*args) if opts[context.type] }
     end

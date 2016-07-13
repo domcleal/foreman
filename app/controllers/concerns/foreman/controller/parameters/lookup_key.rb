@@ -14,9 +14,9 @@ module Foreman::Controller::Parameters::LookupKey
         :use_puppet_default,
         :validator_type, :validator_rule,
         :variable, :variable_type,
-        :lookup_values_attributes => [lookup_value_params_filter],
+        {:lookup_values_attributes => [lookup_value_params_filter],
         :lookup_values => [lookup_value_params_filter], :lookup_value_ids => [],
-        :override_values => [lookup_value_params_filter], :override_value_ids => [],
+        :override_values => [lookup_value_params_filter], :override_value_ids => []},
         :nested => true
     end
   end
