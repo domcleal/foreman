@@ -26,8 +26,6 @@ class Role < ActiveRecord::Base
   BUILTIN_DEFAULT_ROLE = 2
   audited :allow_mass_assignment => true
 
-  attr_accessible :name, :permissions
-
   scope :givable, -> { where(:builtin => 0).order(:name) }
   scope :for_current_user, -> { User.current.admin? ? where('0 = 0') : where(:id => User.current.role_ids) }
   scope :builtin, lambda { |*args|
