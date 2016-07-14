@@ -4,8 +4,9 @@ module Foreman::Controller::Parameters::ExternalUsergroup
   class_methods do
     def external_usergroup_params_filter
       Foreman::ParameterFilter.new(::ExternalUsergroup).tap do |filter|
-        filter.permit :usergroup, :usergroup_id, :usergroup_name, :name, :auth_source_id,
-          :auth_source_name
+        filter.permit :usergroup, :usergroup_id, :usergroup_name
+        filter.permit_by_context :name, :auth_source_id, :auth_source_name, :nested => true
+        filter.permit_by_context :id, :_destroy, :ui => false, :api => false, :nested => true
       end
     end
   end
