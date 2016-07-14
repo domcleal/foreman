@@ -46,7 +46,8 @@ class TrendsControllerTest < ActionController::TestCase
   end
 
   test 'should update trend' do
-    put :edit, { :id => FactoryGirl.create(:trend_os).id, :trend => { :name => 'test2'} },
+    trend = FactoryGirl.create(:trend_os)
+    put :edit, { :id => trend.id, :trend => { :name => 'test2'} },
       set_session_user
     assert_response :success
   end

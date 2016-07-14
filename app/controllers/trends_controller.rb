@@ -26,7 +26,7 @@ class TrendsController < ApplicationController
   end
 
   def update
-    filter = self.class.trend_params_filter
+    filter = self.class.trend_params_filter(:none)
     trend_attrs = params[:trend].values.map { |t| filter.filter_params(ActionController::Parameters.new(t), parameter_filter_context) }
     @trends = Trend.update(params[:trend].keys, trend_attrs).reject { |p| p.errors.empty? }
     if @trends.empty?

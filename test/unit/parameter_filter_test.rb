@@ -8,7 +8,8 @@ class ParameterFilterTest < ActiveSupport::TestCase
       k.stubs(:legacy_accessible_attributes).returns(legacy_accessible_attributes)
     end
   end
-  let(:filter) { Foreman::ParameterFilter.new(klass) }
+  let(:opts) { {} }
+  let(:filter) { Foreman::ParameterFilter.new(klass, opts) }
   let(:ui_context) { Foreman::ParameterFilter::Context.new(:ui, 'examples', 'create') }
 
   test "permitting second-level attributes via permit(Symbol)" do
@@ -118,6 +119,24 @@ class ParameterFilterTest < ActiveSupport::TestCase
       plugin.expects(:parameter_filters).with(klass).returns([[Proc.new { |ctx| ctx.permit(:plugin_ext) }]])
       Foreman::Plugin.expects(:all).returns([plugin])
       assert_equal({'plugin_ext' => 'b'}, filter.filter_params(params(:example => {:test => 'a', :plugin_ext => 'b'}), ui_context))
+    end
+  end
+
+  context "with top_level_hash" do
+    let(:opts) { {:top_level_hash => :changed } }
+
+    test "applies filters without top-level hash" do
+      filter.permit(:test)
+      assert_equal({'test' => 'a'}, filter.filter_params(params(:changed => {:test => 'a', :denied => 'b'}), ui_context))
+    end
+  end
+
+  context "with top_level_hash => :none" do
+    let(:opts) { {:top_level_hash => :none} }
+
+    test "applies filters without top-level hash" do
+      filter.permit(:test)
+      assert_equal({'test' => 'a'}, filter.filter_params(params(:test => 'a', :denied => 'b'), ui_context))
     end
   end
 
