@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserTest < ActiveSupport::TestCase
+class UserParametersTest < ActiveSupport::TestCase
   include Foreman::Controller::Parameters::User
 
   let(:context) { Foreman::Controller::Parameters::User::Context.new(:api, 'user', 'update', editing_self) }
