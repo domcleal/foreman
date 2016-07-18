@@ -101,7 +101,7 @@ module Taxonomix
         conditions.merge!(:taxonomy_id => taxonomy_ids)
       end
 
-      TaxableTaxonomy.where(conditions).uniq.pluck(:taxable_id).compact
+      TaxableTaxonomy.where(conditions).distinct.pluck(:taxable_id).compact
     end
 
     def admin_ids
@@ -216,7 +216,7 @@ module Taxonomix
 
   def used_taxonomy_ids(type)
     return [] if new_record? || !self.respond_to?(:hosts)
-    Host::Base.where(taxonomy_foreign_key_conditions).uniq.pluck(type).compact
+    Host::Base.where(taxonomy_foreign_key_conditions).distinct.pluck(type).compact
   end
 
   def children_of_selected_taxonomy_ids(assoc)

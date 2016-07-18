@@ -51,13 +51,13 @@ class ProvisioningTemplate < Template
   }
 
   def self.template_ids_for(hosts)
-    hosts = hosts.with_os.uniq
+    hosts = hosts.with_os.distinct
     oses = hosts.pluck(:operatingsystem_id)
     hostgroups = hosts.pluck(:hostgroup_id) | [nil]
     environments = hosts.pluck(:environment_id) | [nil]
     templates = ProvisioningTemplate.reorder(nil).joins(:operatingsystems, :template_kind).where('operatingsystems.id' => oses, 'template_kinds.name' => 'provision')
-    ids = templates.joins(:template_combinations).where("template_combinations.hostgroup_id" => hostgroups, "template_combinations.environment_id" => environments).uniq.pluck(:id)
-    ids += templates.joins(:os_default_templates).where("os_default_templates.operatingsystem_id" => oses).uniq.pluck(:id)
+    ids = templates.joins(:template_combinations).where("template_combinations.hostgroup_id" => hostgroups, "template_combinations.environment_id" => environments).distinct.pluck(:id)
+    ids += templates.joins(:os_default_templates).where("os_default_templates.operatingsystem_id" => oses).distinct.pluck(:id)
     ids.uniq
   end
 

@@ -224,7 +224,7 @@ class Hostgroup < ActiveRecord::Base
   # overwrite method in taxonomix, since hostgroup has ancestry
   def used_taxonomy_ids(type)
     return [] if new_record? && parent_id.blank?
-    Host::Base.where(:hostgroup_id => self.path_ids).uniq.pluck(type).compact
+    Host::Base.where(:hostgroup_id => self.path_ids).distinct.pluck(type).compact
   end
 
   def password_base64_encrypted?
