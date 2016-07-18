@@ -189,7 +189,7 @@ module Foreman
     config.log_level = Foreman::Logging.logger_level('app').to_sym
     config.active_record.logger = Foreman::Logging.logger('sql')
 
-    if config.serve_static_files
+    if config.public_file_server.enabled
       ::Rails::Engine.subclasses.map(&:instance).each do |engine|
         if File.exist?("#{engine.root}/public/assets")
           config.middleware.use ::ActionDispatch::Static, "#{engine.root}/public"
