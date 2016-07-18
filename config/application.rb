@@ -157,7 +157,7 @@ module Foreman
     config.assets.quiet = true
 
     # Catching Invalid JSON Parse Errors with Rack Middleware
-    config.middleware.insert_before ActionDispatch::ParamsParser, Middleware::CatchJsonParseErrors
+    config.middleware.use Middleware::CatchJsonParseErrors
 
     # Record request ID in logging MDC storage
     config.middleware.insert_before Rails::Rack::Logger, Middleware::TaggedLogging
