@@ -130,7 +130,6 @@
 - message: before_filter is deprecated and will be removed in Rails 5.1. Use before_action
     instead.
   callstack: config/environment.rb:5:in `<top (required)>'
-- message: uniq is deprecated and will be removed from Rails 5.1 (use distinct instead)
 
 # Not a "true" deprecation, no action required, it's being used correctly.
 - message: "#table_exists? currently checks both tables and views. This behavior is
