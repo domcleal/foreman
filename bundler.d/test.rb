@@ -14,4 +14,5 @@ group :test do
   gem "poltergeist", :require => false
   gem 'shoulda-matchers', '~> 3.0'
   gem 'shoulda-context', '~> 1.2'
+  gem 'rails-controller-testing', '~> 0.1'
 end
