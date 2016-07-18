@@ -58,8 +58,5 @@ Foreman::Application.configure do
   # Enable automatic creation/migration of the test DB when running tests
   config.active_record.maintain_test_schema = true
 
-  # Randomize the order test cases are executed.
-  config.active_support.test_order = :random
-
   config.webpack.dev_server.enabled = false
 end
