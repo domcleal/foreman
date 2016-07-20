@@ -41,11 +41,12 @@ module Foreman
     end
 
     # Runs permitted parameter whitelist against supplied parameters
-    def filter_params(params, *context_args)
-      if top_level_hash == :none
-        params.permit(*filter(*context_args))
+    def filter_params(params, context)
+      hash_name = opts[:top_level_hash].present? ? opts[:top_level_hash] : context.controller_name.singularize
+      if hash_name == :none
+        params.permit(*filter(context))
       else
-        params.permit(top_level_hash => filter(*context_args)).fetch(top_level_hash, {})
+        params.permit(hash_name => filter(context)).fetch(hash_name, {})
       end
     end
 
@@ -89,10 +90,6 @@ module Foreman
       else
         filter
       end
-    end
-
-    def top_level_hash
-      opts[:top_level_hash].present? ? opts[:top_level_hash] : resource_class.name.underscore
     end
 
     # Public API for blocks passed into #permit, allowing them to inspect the
