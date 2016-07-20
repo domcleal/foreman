@@ -14,58 +14,6 @@
     Use model.errors.add(:os_parameters, "Please ensure the following parameters name
     are unique") instead.
   callstack: app/models/concerns/parameter_validators.rb:21:in `validate_parameters_names'
-- message: 'Method each_value is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/models/concerns/host_common.rb:47:in `lookup_values_attributes='
-- message: 'Method except! is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/controllers/api/v2/base_controller.rb:123:in `block in append_array_of_ids'
-- message: 'Method except! is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/controllers/puppetclasses_controller.rb:78:in `get_host_or_hostgroup'
-- message: 'Method find is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/controllers/api/base_controller.rb:324:in `parent_resource_details'
-- message: 'Method first is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/controllers/interfaces_controller.rb:14:in `new'
-- message: 'Method partition is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/controllers/lookup_keys_controller.rb:34:in `sanitize_attrs'
-- message: 'Method to_hash is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: app/models/compute_resources/foreman/model/libvirt.rb:125:in `new_vm'
-- message: 'Method to_param is deprecated and will be removed in Rails 5.1, as `ActionController::Parameters`
-    no longer inherits from hash. Using this deprecated behavior exposes potential
-    security problems. If you continue to use this method you may be creating a security
-    vulnerability in your app that can be exploited. Instead, consider using one of'
-  callstack: config/initializers/routing_hash_for.rb:11:in `block (2 levels) in define_url_helper'
-- message: 'Method with_indifferent_access is deprecated and will be removed in Rails
-    5.1, as `ActionController::Parameters` no longer inherits from hash. Using this
-    deprecated behavior exposes potential security problems. If you continue to use
-    this method you may be creating a security vulnerability in your app that can
-    be exploited. Instead, consider using one of these documented methods which are'
-  callstack: app/models/host/base.rb:119:in `import_facts'
-- message: 'Method with_indifferent_access is deprecated and will be removed in Rails
-    5.1, as `ActionController::Parameters` no longer inherits from hash. Using this
-    deprecated behavior exposes potential security problems. If you continue to use
-    this method you may be creating a security vulnerability in your app that can
-    be exploited. Instead, consider using one of these documented methods which are'
-  callstack: app/models/report.rb:50:in `metrics'
 - message: Passing a class as a value in an Active Record query is deprecated and
     will be removed. Pass a string instead.
   callstack: app/controllers/templates_controller.rb:124:in `load_history'
