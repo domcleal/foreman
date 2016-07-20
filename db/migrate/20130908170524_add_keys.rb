@@ -1,4 +1,4 @@
-class AddKeys < ActiveRecord::Migration
+class AddKeys < ActiveRecord::Migration[4.2]
   def change
     # turn off Foreign Key checks
     if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
