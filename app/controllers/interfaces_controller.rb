@@ -11,7 +11,7 @@ class InterfacesController < ApplicationController
     @host = Host.new(safe_params)
 
     attributes = safe_params.fetch(:interfaces_attributes, {})
-    @key, attributes = attributes.first
+    @key, attributes = attributes.to_h.first
     raise Foreman::Exception, 'Missing attributes for interface' if @key.blank?
 
     if attributes.present?
