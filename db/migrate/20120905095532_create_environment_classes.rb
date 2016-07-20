@@ -1,4 +1,4 @@
-class CreateEnvironmentClasses < ActiveRecord::Migration
+class CreateEnvironmentClasses < ActiveRecord::Migration[4.2]
   class EnvironmentClass < ActiveRecord::Base; end
 
   def up

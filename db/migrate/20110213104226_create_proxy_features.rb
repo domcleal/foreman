@@ -1,4 +1,4 @@
-class CreateProxyFeatures < ActiveRecord::Migration
+class CreateProxyFeatures < ActiveRecord::Migration[4.2]
   class Feature < ActiveRecord::Base; end
 
   def up

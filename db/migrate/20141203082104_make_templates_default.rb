@@ -1,4 +1,4 @@
-class MakeTemplatesDefault < ActiveRecord::Migration
+class MakeTemplatesDefault < ActiveRecord::Migration[4.2]
   class FakeConfigTemplate < ActiveRecord::Base
     self.table_name = 'config_templates'
   end

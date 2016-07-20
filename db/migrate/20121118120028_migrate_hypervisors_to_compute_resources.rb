@@ -1,4 +1,4 @@
-class MigrateHypervisorsToComputeResources < ActiveRecord::Migration
+class MigrateHypervisorsToComputeResources < ActiveRecord::Migration[4.2]
   class Hypervisor < ActiveRecord::Base; end
 
   def up

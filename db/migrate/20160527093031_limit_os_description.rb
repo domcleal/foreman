@@ -1,4 +1,4 @@
-class LimitOsDescription < ActiveRecord::Migration
+class LimitOsDescription < ActiveRecord::Migration[4.2]
   class FakeOperatingSystem < ActiveRecord::Base
     self.table_name = 'operatingsystems'
   end
