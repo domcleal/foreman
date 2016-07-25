@@ -7,11 +7,19 @@ module Foreman::Controller::Parameters::Host
   class_methods do
     def host_params_filter
       Foreman::ParameterFilter.new(::Host::Managed).tap do |filter|
-        filter.permit :build, :certname, :disk, :global_status,
-          :installed_at, :last_report, :otp, :provision_method, :uuid,
+        filter.permit :build,
+          :certname,
+          :disk,
+          :global_status,
+          :installed_at,
+          :last_report,
+          :otp,
+          :provision_method,
+          :uuid,
           :compute_profile_id, :compute_profile_name,
           :compute_resource, :compute_resource_id, :compute_resource_name,
-          :owner, :owner_id, :owner_name, :owner_type
+          :owner, :owner_id, :owner_name,
+          :owner_type
 
         add_host_base_params_filter(filter)
         add_host_common_params_filter(filter)

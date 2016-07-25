@@ -6,8 +6,23 @@ module Foreman::Controller::Parameters::Subnet
   class_methods do
     def subnet_params_filter
       Foreman::ParameterFilter.new(::Subnet).tap do |filter|
-        filter.permit :name, :type, :network, :mask, :gateway, :dns_primary, :dns_secondary, :ipam, :from,
-          :to, :vlanid, :boot_mode, :dhcp_id, :dhcp, :tftp_id, :tftp, :dns_id, :dns, :cidr, :network_type,
+        filter.permit :boot_mode,
+          :cidr,
+          :dhcp, :dhcp_id,
+          :dns, :dns_id,
+          :dns_primary,
+          :dns_secondary,
+          :from,
+          :gateway,
+          :ipam,
+          :mask,
+          :name,
+          :network,
+          :network_type,
+          :tftp, :tftp_id,
+          :to,
+          :type,
+          :vlanid,
           :domain_ids => [], :domain_names => [],
           :subnet_parameters_attributes => [parameter_params_filter(::SubnetParameter)]
         add_taxonomix_params_filter(filter)

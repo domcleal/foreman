@@ -4,9 +4,23 @@ module Foreman::Controller::Parameters::AuthSourceLdap
   class_methods do
     def auth_source_ldap_params_filter
       Foreman::ParameterFilter.new(::AuthSourceLdap).tap do |filter|
-        filter.permit :name, :onthefly_register, :account_password, :usergroup_sync,
-          :base_dn, :groups_base, :ldap_filter,:attr_login, :attr_firstname, :attr_lastname,
-          :attr_mail, :attr_photo, :host, :tls, :port, :server_type, :account
+        filter.permit :account,
+          :account_password,
+          :attr_firstname,
+          :attr_lastname,
+          :attr_login,
+          :attr_mail,
+          :attr_photo,
+          :base_dn,
+          :groups_base,
+          :host,
+          :ldap_filter,
+          :name,
+          :onthefly_register,
+          :port,
+          :server_type,
+          :tls,
+          :usergroup_sync
       end
     end
   end

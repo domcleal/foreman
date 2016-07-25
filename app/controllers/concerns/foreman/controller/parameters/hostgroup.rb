@@ -8,7 +8,11 @@ module Foreman::Controller::Parameters::Hostgroup
   class_methods do
     def hostgroup_params_filter
       Foreman::ParameterFilter.new(::Hostgroup).tap do |filter|
-        filter.permit :name, :vm_defaults, :title, :root_pass,
+        filter.permit :name,
+          :root_pass,
+          :title,
+          :vm_defaults,
+          # Relations in alphabetical order
           :arch, :arch_id, :arch_name,
           :architecture_id, :architecture_name,
           :domain_id, :domain_name,

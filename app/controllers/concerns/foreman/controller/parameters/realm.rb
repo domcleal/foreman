@@ -5,7 +5,9 @@ module Foreman::Controller::Parameters::Realm
   class_methods do
     def realm_params_filter
       Foreman::ParameterFilter.new(::Realm).tap do |filter|
-        filter.permit :name, :realm_type, :realm_proxy_id, :realm_proxy
+        filter.permit :name,
+          :realm_type,
+          :realm_proxy, :realm_proxy_id, :realm_proxy_name
         add_taxonomix_params_filter(filter)
       end
     end

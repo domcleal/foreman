@@ -6,10 +6,12 @@ module Foreman::Controller::Parameters::Ptable
   class_methods do
     def ptable_params_filter
       Foreman::ParameterFilter.new(::Ptable).tap do |filter|
-        filter.permit :layout, :os_family, :audit_comment,
-          :operatingsystem_ids => [], :operatingsystem_names => [],
+        filter.permit :audit_comment,
+          :layout,
+          :os_family,
           :host_ids => [], :host_names => [],
-          :hostgroup_names => [], :hostgroup_ids => []
+          :hostgroup_names => [], :hostgroup_ids => [],
+          :operatingsystem_ids => [], :operatingsystem_names => []
         add_taxonomix_params_filter(filter)
         add_template_params_filter(filter)
       end

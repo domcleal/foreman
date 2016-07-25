@@ -6,7 +6,9 @@ module Foreman::Controller::Parameters::Domain
   class_methods do
     def domain_params_filter
       Foreman::ParameterFilter.new(::Domain).tap do |filter|
-        filter.permit :name, :fullname, :dns_id,
+        filter.permit :dns_id, :dns_name,
+          :fullname,
+          :name,
           :domain_parameters_attributes => [parameter_params_filter(DomainParameter)]
         add_taxonomix_params_filter(filter)
       end

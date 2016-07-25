@@ -4,7 +4,10 @@ module Foreman::Controller::Parameters::Bookmark
   class_methods do
     def bookmark_params_filter
       Foreman::ParameterFilter.new(::Bookmark).tap do |filter|
-        filter.permit :name, :query, :public, :controller
+        filter.permit :controller,
+          :name,
+          :public,
+          :query
       end
     end
   end

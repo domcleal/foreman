@@ -3,8 +3,14 @@ module Foreman::Controller::Parameters::Template
 
   class_methods do
     def add_template_params_filter(filter)
-      filter.permit :name, :default, :template, :audit_comment, :snippet, :locked,
-        :template_kind, :template_kind_name, :template_kind_id, :vendor
+      filter.permit :audit_comment,
+        :default,
+        :locked,
+        :name,
+        :snippet,
+        :template,
+        :template_kind, :template_kind_id, :template_kind_name,
+        :vendor
     end
   end
 end

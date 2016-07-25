@@ -6,8 +6,11 @@ module Foreman::Controller::Parameters::NicInterface
   class_methods do
     def nic_interface_params_filter
       Foreman::ParameterFilter.new(::Nic::Interface).tap do |filter|
-        filter.permit_by_context :name, :subnet_id, :subnet, :subnet6_id, :subnet6,
-          :domain_id, :domain, :nested => true
+        filter.permit_by_context :domain, :domain_id,
+          :name,
+          :subnet, :subnet_id,
+          :subnet6, :subnet6_id,
+          :nested => true
         add_nic_base_params_filter(filter)
       end
     end

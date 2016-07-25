@@ -4,9 +4,10 @@ module Foreman::Controller::Parameters::Trend
   class_methods do
     def trend_params_filter
       Foreman::ParameterFilter.new(::Trend).tap do |filter|
-        filter.permit :name, :type,
-          :fact_value, :fact_name,
-          :trendable_type, :trendable_id
+        filter.permit :fact_value, :fact_name,
+          :name,
+          :trendable_type, :trendable_id,
+          :type
       end
     end
   end

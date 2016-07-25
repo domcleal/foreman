@@ -4,9 +4,15 @@ module Foreman::Controller::Parameters::Image
   class_methods do
     def image_params_filter
       Foreman::ParameterFilter.new(::Image).tap do |filter|
-        filter.permit :name, :compute_resource_id, :compute_resource_name, :operatingsystem_id,
-          :operatingsystem_name, :architecture_id, :architecture_name, :username, :password, :uuid,
-          :user_data, :iam_role
+        filter.permit :architecture_id, :architecture_name,
+          :compute_resource_id, :compute_resource_name,
+          :iam_role,
+          :name,
+          :operatingsystem_id, :operatingsystem_name,
+          :password,
+          :user_data,
+          :username,
+          :uuid
       end
     end
   end

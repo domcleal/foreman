@@ -4,8 +4,16 @@ module Foreman::Controller::Parameters::Parameter
   class_methods do
     def parameter_params_filter(type)
       Foreman::ParameterFilter.new(type).tap do |filter|
-        filter.permit_by_context :name, :hidden_value, :value, :nested, :reference_id, :nested => true
-        filter.permit_by_context :id, :_destroy, :ui => false, :api => false, :nested => true
+        filter.permit_by_context :hidden_value,
+          :name,
+          :nested,
+          :reference_id,
+          :value,
+          :nested => true
+
+        filter.permit_by_context :id,
+          :_destroy,
+          :ui => false, :api => false, :nested => true
       end
     end
   end

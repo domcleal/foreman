@@ -4,7 +4,10 @@ module Foreman::Controller::Parameters::Model
   class_methods do
     def model_params_filter
       Foreman::ParameterFilter.new(::Model).tap do |filter|
-        filter.permit :name, :hardware_model, :vendor_class, :info
+        filter.permit :hardware_model,
+          :info,
+          :name,
+          :vendor_class
       end
     end
   end

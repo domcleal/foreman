@@ -6,9 +6,16 @@ module Foreman::Controller::Parameters::User
   class_methods do
     def user_params_filter
       Foreman::ParameterFilter.new(::User).tap do |filter|
-        filter.permit :password, :password_confirmation, :firstname, :lastname,
-          :mail, :locale, :mail_enabled, :timezone,
-          :default_location_id, :default_organization_id,
+        filter.permit :default_location_id,
+          :default_organization_id,
+          :firstname,
+          :lastname,
+          :locale,
+          :mail,
+          :mail_enabled,
+          :password,
+          :password_confirmation,
+          :timezone,
           :user_mail_notifications_attributes => [user_mail_notification_params_filter]
 
         filter.permit do |ctx|
@@ -16,8 +23,11 @@ module Foreman::Controller::Parameters::User
         end
 
         filter.permit do |ctx|
-          ctx.permit :login, :auth_source_name, :auth_source, :auth_source_id,
-            :roles => [], :role_ids => [], :role_names => [] if !ctx.editing_self? && (ctx.ui? || ctx.api?)
+          if !ctx.editing_self? && (ctx.ui? || ctx.api?)
+            ctx.permit :auth_source, :auth_source_id, :auth_source_name,
+              :login,
+              :roles => [], :role_ids => [], :role_names => []
+          end
         end
 
         add_taxonomix_params_filter(filter)

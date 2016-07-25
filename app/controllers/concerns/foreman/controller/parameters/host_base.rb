@@ -5,9 +5,21 @@ module Foreman::Controller::Parameters::HostBase
 
   class_methods do
     def add_host_base_params_filter(filter)
-      filter.permit :name, :managed, :type, :start, :mac, :ip, :ip6, :root_pass,
-        :is_owned_by, :enabled, :comment,
-        :overwrite, :capabilities, :provider, :last_compile,
+      filter.permit :capabilities,
+        :comment,
+        :enabled,
+        :ip,
+        :ip6,
+        :is_owned_by,
+        :last_compile,
+        :mac,
+        :managed,
+        :name,
+        :overwrite,
+        :provider,
+        :root_pass,
+        :start,
+        :type,
         # Model relations sorted in alphabetical order
         :architecture, :architecture_id, :architecture_name,
         :domain, :domain_id, :domain_name,

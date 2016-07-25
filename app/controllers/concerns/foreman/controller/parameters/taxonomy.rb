@@ -4,12 +4,15 @@ module Foreman::Controller::Parameters::Taxonomy
 
   class_methods do
     def add_taxonomy_params_filter(filter)
-      filter.permit :name, :title, :description, :ignore_types => [],
+      filter.permit :description,
+        :name,
+        :title,
         :config_template_ids => [], :config_template_names => [],
         :compute_resource_ids => [], :compute_resource_names => [],
         :domain_ids => [], :domain_names => [],
         :environment_ids => [], :environment_names => [],
         :hostgroup_ids => [], :hostgroup_names => [],
+        :ignore_types => [],
         :location_ids => [], :location_names => [],
         :medium_ids => [], :medium_names => [],
         :organization_ids => [], :organization_names => [],

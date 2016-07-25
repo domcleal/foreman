@@ -5,7 +5,8 @@ module Foreman::Controller::Parameters::ComputeAttribute
   class_methods do
     def compute_attribute_params_filter
       Foreman::ParameterFilter.new(::ComputeAttribute).tap do |filter|
-        filter.permit :compute_profile_id, :compute_resource_id
+        filter.permit :compute_profile_id,
+          :compute_resource_id
       end
     end
   end

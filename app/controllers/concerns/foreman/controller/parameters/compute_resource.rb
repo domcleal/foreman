@@ -5,29 +5,49 @@ module Foreman::Controller::Parameters::ComputeResource
   class_methods do
     def compute_resource_params_filter
       Foreman::ParameterFilter.new(::ComputeResource).tap do |filter|
-        filter.permit :name, :provider, :description, :url, :set_console_password,
-          :user, :password, :display_type
+        filter.permit :description,
+          :display_type,
+          :name,
+          :password,
+          :provider,
+          :set_console_password,
+          :url,
+          :user
 
         # ec2
-        filter.permit :access_key, :region
+        filter.permit :access_key,
+          :region
 
         # gce
-        filter.permit :key_pair, :key_path, :project, :email, :zone
+        filter.permit :email,
+          :key_pair,
+          :key_path,
+          :project,
+          :zone
 
         # libvirt
-        filter.permit :display_type, :uuid
+        filter.permit :display_type,
+          :uuid
 
         # openstack
-        filter.permit :key_pair, :tenant, :allow_external_network
+        filter.permit :allow_external_network,
+          :key_pair,
+          :tenant
 
         # ovirt
-        filter.permit :datacenter, :ovirt_quota, :public_key, :uuid
+        filter.permit :datacenter,
+          :ovirt_quota,
+          :public_key,
+          :uuid
 
         # rackspace
         filter.permit :region
 
         # vmware
-        filter.permit :pubkey_hash, :datacenter, :uuid, :server
+        filter.permit :datacenter,
+          :pubkey_hash,
+          :server,
+          :uuid
 
         add_taxonomix_params_filter(filter)
       end
