@@ -30,9 +30,9 @@ module Foreman::Controller::Parameters::Host
     end
   end
 
-  def host_params
-    keep_param(params, controller_name.singularize, :compute_attributes) do
-      self.class.host_params_filter.filter_params(params, parameter_filter_context)
+  def host_params(top_level_hash = controller_name.singularize)
+    keep_param(params, top_level_hash, :compute_attributes) do
+      self.class.host_params_filter.filter_params(params, parameter_filter_context, top_level_hash)
     end
   end
 end
