@@ -4,6 +4,7 @@ class NicInterfaceParametersTest < ActiveSupport::TestCase
   include Foreman::Controller::Parameters::NicInterface
 
   let(:context) { Foreman::ParameterFilter::Context.new(:api, 'interface', 'create') }
+  let(:controller_name) { 'interfaces' }
 
   test "passes through :compute_attributes hash untouched" do
     inner_params = {:name => 'test.example.com', :compute_attributes => {:foo => 'bar', :memory => 2}}

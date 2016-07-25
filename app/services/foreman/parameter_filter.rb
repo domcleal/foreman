@@ -7,11 +7,10 @@
 #
 module Foreman
   class ParameterFilter
-    attr_reader :resource_class, :opts
+    attr_reader :resource_class
 
-    def initialize(resource_class, opts = {})
+    def initialize(resource_class)
       @resource_class = resource_class
-      @opts = opts
       @parameter_filters = []
 
       Foreman::Plugin.all.each do |plugin|
@@ -41,12 +40,16 @@ module Foreman
     end
 
     # Runs permitted parameter whitelist against supplied parameters
-    def filter_params(params, context)
-      hash_name = opts[:top_level_hash].present? ? opts[:top_level_hash] : context.controller_name.singularize
-      if hash_name == :none
+    #
+    # top_level_hash may be set to the name of the first-level hash when
+    # filtering rather than defaulting to the controller name, or :none to
+    # filter first-level parameters.
+    def filter_params(params, context, top_level_hash = nil)
+      top_level_hash ||= context.controller_name.singularize
+      if top_level_hash == :none
         params.permit(*filter(context))
       else
-        params.permit(hash_name => filter(context)).fetch(hash_name, {})
+        params.permit(top_level_hash => filter(context)).fetch(top_level_hash, {})
       end
     end
 

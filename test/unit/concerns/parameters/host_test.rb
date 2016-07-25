@@ -4,6 +4,7 @@ class HostParametersTest < ActiveSupport::TestCase
   include Foreman::Controller::Parameters::Host
 
   let(:context) { Foreman::ParameterFilter::Context.new(:api, 'host', 'create') }
+  let(:controller_name) { 'hosts' }
 
   test "passes through :compute_attributes hash untouched" do
     inner_params = {:name => 'test.example.com', :compute_attributes => {:foo => 'bar', :memory => 2}}

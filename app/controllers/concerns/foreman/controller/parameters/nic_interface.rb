@@ -5,7 +5,7 @@ module Foreman::Controller::Parameters::NicInterface
 
   class_methods do
     def nic_interface_params_filter
-      Foreman::ParameterFilter.new(::Nic::Interface, :top_level_hash => 'interface').tap do |filter|
+      Foreman::ParameterFilter.new(::Nic::Interface).tap do |filter|
         filter.permit_by_context :name, :subnet_id, :subnet, :subnet6_id, :subnet6,
           :domain_id, :domain, :nested => true
         add_nic_base_params_filter(filter)
@@ -14,7 +14,7 @@ module Foreman::Controller::Parameters::NicInterface
   end
 
   def nic_interface_params
-    keep_param(params, 'interface', :compute_attributes) do
+    keep_param(params, controller_name.singularize, :compute_attributes) do
       self.class.nic_interface_params_filter.filter_params(params, parameter_filter_context)
     end
   end

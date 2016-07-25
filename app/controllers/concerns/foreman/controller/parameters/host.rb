@@ -6,7 +6,7 @@ module Foreman::Controller::Parameters::Host
 
   class_methods do
     def host_params_filter
-      Foreman::ParameterFilter.new(::Host::Managed, :top_level_hash => 'host').tap do |filter|
+      Foreman::ParameterFilter.new(::Host::Managed).tap do |filter|
         filter.permit :build, :certname, :disk, :global_status,
           :installed_at, :last_report, :otp, :provision_method, :uuid,
           :compute_profile_id, :compute_profile_name,
@@ -23,7 +23,7 @@ module Foreman::Controller::Parameters::Host
   end
 
   def host_params
-    keep_param(params, 'host', :compute_attributes) do
+    keep_param(params, controller_name.singularize, :compute_attributes) do
       self.class.host_params_filter.filter_params(params, parameter_filter_context)
     end
   end

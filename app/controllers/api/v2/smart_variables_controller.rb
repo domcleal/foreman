@@ -46,8 +46,8 @@ module Api
       param_group :smart_variable, :as => :create
 
       def create
-        @smart_variable   = VariableLookupKey.new(variable_lookup_key_params(:smart_variable)) unless @puppetclass
-        @smart_variable ||= @puppetclass.lookup_keys.build(variable_lookup_key_params(:smart_variable))
+        @smart_variable   = VariableLookupKey.new(variable_lookup_key_params) unless @puppetclass
+        @smart_variable ||= @puppetclass.lookup_keys.build(variable_lookup_key_params)
         process_response @smart_variable.save
       end
 
@@ -56,7 +56,7 @@ module Api
       param_group :smart_variable
 
       def update
-        @smart_variable.update_attributes!(variable_lookup_key_params(:smart_variable))
+        @smart_variable.update_attributes!(variable_lookup_key_params)
         render 'api/v2/smart_variables/show'
       end
 

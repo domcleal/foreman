@@ -36,7 +36,7 @@ module Api
       end
 
       def create
-        @lookup_key = LookupKey.new(variable_lookup_key_params(:lookup_key))
+        @lookup_key = LookupKey.new(variable_lookup_key_params)
         process_response @lookup_key.save
       end
 
@@ -51,7 +51,7 @@ module Api
       end
 
       def update
-        lk_params = @lookup_key.is_a?(PuppetclassLookupKey) ? puppetclass_lookup_key_params(:lookup_key) : variable_lookup_key_params(:lookup_key)
+        lk_params = @lookup_key.is_a?(PuppetclassLookupKey) ? puppetclass_lookup_key_params : variable_lookup_key_params
         process_response @lookup_key.update_attributes(lk_params)
       end
 

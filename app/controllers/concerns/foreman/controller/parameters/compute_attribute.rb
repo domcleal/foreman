@@ -11,7 +11,7 @@ module Foreman::Controller::Parameters::ComputeAttribute
   end
 
   def compute_attribute_params
-    keep_param(params, :compute_attribute, :vm_attrs) do
+    keep_param(params, controller_name.singularize, :vm_attrs) do
       self.class.compute_attribute_params_filter.filter_params(params, parameter_filter_context)
     end
   end
