@@ -8,8 +8,7 @@ class ParameterFilterTest < ActiveSupport::TestCase
       k.stubs(:legacy_accessible_attributes).returns(legacy_accessible_attributes)
     end
   end
-  let(:opts) { {} }
-  let(:filter) { Foreman::ParameterFilter.new(klass, opts) }
+  let(:filter) { Foreman::ParameterFilter.new(klass) }
   let(:ui_context) { Foreman::ParameterFilter::Context.new(:ui, 'examples', 'create') }
 
   test "permitting second-level attributes via permit(Symbol)" do
@@ -24,8 +23,8 @@ class ParameterFilterTest < ActiveSupport::TestCase
 
   test "block contains controller/action names" do
     filter.permit do |ctx|
-      ctx.controller_name == 'examples' or raise 'controller is not "examples"'
-      ctx.action == 'create' or raise 'action is not "create"'
+      ctx.controller_name == 'examples' || raise('controller is not "examples"')
+      ctx.action == 'create' || raise('action is not "create"')
     end
     filter.filter_params(params(:example => {:test => 'a'}), ui_context)
   end
@@ -86,8 +85,8 @@ class ParameterFilterTest < ActiveSupport::TestCase
 
     test "second filter block has access to original controller/action" do
       filter2.permit do |ctx|
-        ctx.controller_name == 'examples' or raise 'controller is not "examples"'
-        ctx.action == 'create' or raise 'action is not "create"'
+        ctx.controller_name == 'examples' || raise('controller is not "examples"')
+        ctx.action == 'create' || raise('action is not "create"')
       end
       filter.permit(:test, :nested => [filter2])
       filter.filter_params(params(:example => {:test => 'a', :nested => [{:inner => 'b'}]}), ui_context)
@@ -123,20 +122,16 @@ class ParameterFilterTest < ActiveSupport::TestCase
   end
 
   context "with top_level_hash" do
-    let(:opts) { {:top_level_hash => :changed } }
-
     test "applies filters without top-level hash" do
       filter.permit(:test)
-      assert_equal({'test' => 'a'}, filter.filter_params(params(:changed => {:test => 'a', :denied => 'b'}), ui_context))
+      assert_equal({'test' => 'a'}, filter.filter_params(params(:changed => {:test => 'a', :denied => 'b'}), ui_context, :changed))
     end
   end
 
   context "with top_level_hash => :none" do
-    let(:opts) { {:top_level_hash => :none} }
-
     test "applies filters without top-level hash" do
       filter.permit(:test)
-      assert_equal({'test' => 'a'}, filter.filter_params(params(:test => 'a', :denied => 'b'), ui_context))
+      assert_equal({'test' => 'a'}, filter.filter_params(params(:test => 'a', :denied => 'b'), ui_context, :none))
     end
   end
 
