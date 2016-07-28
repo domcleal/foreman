@@ -174,6 +174,7 @@ module Foreman
       :app => {:enabled => true},
       :ldap => {:enabled => false},
       :permissions => {:enabled => false},
+      :proxy => {:enabled => false},
       :sql => {:enabled => false}
     ))
 
