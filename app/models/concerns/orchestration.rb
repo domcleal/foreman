@@ -210,4 +210,12 @@ module Orchestration
   def update_cache
     Rails.cache.write(progress_report_id, (queue.all + post_queue.all).to_json, :expires_in => 5.minutes)
   end
+
+  def progress_report_id
+    @progress_report_id ||= Foreman.uuid
+  end
+
+  def progress_report_id=(value)
+    @progress_report_id = value
+  end
 end
