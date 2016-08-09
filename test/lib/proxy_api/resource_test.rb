@@ -9,12 +9,23 @@ class ProxyApiResourceTest < ActiveSupport::TestCase
     assert ProxyAPI::Resource.new({}).send(:connect_params)[:headers][:x_request_id].present?
   end
 
-  test "connect_params sets x_request_id to logger session ID" do
+  test "connect_params sets x_request_id to logger orchestration ID" do
     begin
-      ::Logging.mdc['session'] = 'test'
+      ::Logging.mdc['orchestration'] = 'orchid'
+      ::Logging.mdc['session_safe'] = 'test'
+      assert_equal 'orchid', ProxyAPI::Resource.new({}).send(:connect_params)[:headers][:x_request_id]
+    ensure
+      ::Logging.mdc.delete('orchestration')
+      ::Logging.mdc.delete('session_safe')
+    end
+  end
+
+  test "connect_params sets x_request_id to logger session safe ID" do
+    begin
+      ::Logging.mdc['session_safe'] = 'test'
       assert_equal 'test', ProxyAPI::Resource.new({}).send(:connect_params)[:headers][:x_request_id]
     ensure
-      ::Logging.mdc.delete('session')
+      ::Logging.mdc.delete('session_safe')
     end
   end
 

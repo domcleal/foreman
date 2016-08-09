@@ -7,8 +7,11 @@ module ProxyAPI
     def initialize(args)
       raise("Must provide a protocol and host when initialising a smart-proxy connection") unless (url =~ /^http/)
 
+      x_request_id = request_id
+      logger.debug "#{self.class.name} requests using X-Request-ID: #{x_request_id}"
+
       @connect_params = {:timeout => Setting[:proxy_request_timeout], :open_timeout => 10,
-                         :headers => { :accept => :json, :x_request_id => request_id },
+                         :headers => { :accept => :json, :x_request_id => x_request_id },
                          :user => args[:user], :password => args[:password]}
 
       # We authenticate only if we are using SSL
