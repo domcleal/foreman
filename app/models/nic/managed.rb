@@ -18,7 +18,7 @@ module Nic
 
     # Interface normally are not executed by them self, so we use the host queue and related methods.
     # this ensures our orchestration works on both a host and a managed interface
-    delegate :progress_report_id, :capabilities, :compute_resource,
+    delegate :capabilities, :compute_resource,
              :operatingsystem, :provisioning_template, :jumpstart?, :build, :build?, :os, :arch,
              :image_build?, :pxe_build?, :pxe_build?, :token, :to_ip_address, :model, :to => :host
     delegate :operatingsystem_id, :hostgroup_id, :environment_id,
@@ -41,6 +41,15 @@ module Nic
       end
     end
     alias_method_chain :queue, :host
+
+    def progress_report_id_with_host
+      if host && host.respond_to?(:progress_report_id)
+        host.progress_report_id
+      else
+        progress_report_id_without_host
+      end
+    end
+    alias_method_chain :progress_report_id, :host
 
     def hostname
       if domain.present? && name.present?
