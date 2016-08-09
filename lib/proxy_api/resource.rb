@@ -98,7 +98,7 @@ module ProxyAPI
     end
 
     def request_id
-      ::Logging.mdc['session'] || SecureRandom.uuid
+      ::Logging.mdc['orchestration'] || ::Logging.mdc['session_safe'] || SecureRandom.uuid
     end
 
     def ssl_auth_params

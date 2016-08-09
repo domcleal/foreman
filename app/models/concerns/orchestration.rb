@@ -113,6 +113,8 @@ module Orchestration
   # if any of them fail, it rollbacks all completed tasks
   # in order not to keep any left overs in our proxies.
   def process(queue_name)
+    ::Logging.mdc['orchestration'] = progress_report_id
+
     return true if skip_orchestration?
 
     # queue is empty - nothing to do.
@@ -147,9 +149,13 @@ module Orchestration
     fail_queue(q)
 
     rollback
+  ensure
+    ::Logging.mdc.delete('orchestration')
   end
 
   def fail_queue(q)
+    ::Logging.mdc['orchestration'] = progress_report_id
+
     q.pending.each{ |task| task.status = "canceled" }
 
     # handle errors
@@ -164,6 +170,8 @@ module Orchestration
         failure _("Failed to perform rollback on %{task} - %{e}") % { :task => task.name, :e => e }, e
       end
     end
+  ensure
+    ::Logging.mdc.delete('orchestration')
   end
 
   def add_conflict(e)
