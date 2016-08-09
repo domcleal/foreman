@@ -32,23 +32,27 @@ module Orchestration
   protected
 
   def around_save_orchestration
-    process :queue
+    with_orchestration_log_context do
+      process :queue
 
-    begin
-      yield
-    rescue ActiveRecord::ActiveRecordError => e
-      Foreman::Logging.exception "Rolling back due to exception during save", e
-      fail_queue queue
-      raise e
+      begin
+        yield
+      rescue ActiveRecord::ActiveRecordError => e
+        Foreman::Logging.exception "Rolling back due to exception during save", e
+        fail_queue queue
+        raise e
+      end
     end
   end
 
   def post_commit
-    process :post_queue
+    with_orchestration_log_context { process(:post_queue) }
   end
 
   def on_destroy
-    errors.empty? ? process(:queue) : rollback
+    with_orchestration_log_context do
+      errors.empty? ? process(:queue) : rollback
+    end
   end
 
   def rollback
@@ -121,8 +125,6 @@ module Orchestration
   # if any of them fail, it rollbacks all completed tasks
   # in order not to keep any left overs in our proxies.
   def process(queue_name)
-    ::Logging.mdc['orchestration'] = progress_report_id
-
     return true if skip_orchestration?
 
     # queue is empty - nothing to do.
@@ -157,13 +159,9 @@ module Orchestration
     fail_queue(q)
 
     rollback
-  ensure
-    ::Logging.mdc.delete('orchestration')
   end
 
   def fail_queue(q)
-    ::Logging.mdc['orchestration'] = progress_report_id
-
     q.pending.each{ |task| task.status = "canceled" }
 
     # handle errors
@@ -178,8 +176,6 @@ module Orchestration
         failure _("Failed to perform rollback on %{task} - %{e}") % { :task => task.name, :e => e }, e
       end
     end
-  ensure
-    ::Logging.mdc.delete('orchestration')
   end
 
   def add_conflict(e)
@@ -217,5 +213,13 @@ module Orchestration
 
   def update_cache
     Rails.cache.write(progress_report_id, (queue.all + post_queue.all).to_json, :expires_in => 5.minutes)
+  end
+
+  def with_orchestration_log_context
+    old_value = ::Logging.mdc['orchestration']
+    ::Logging.mdc['orchestration'] = progress_report_id
+    yield
+  ensure
+    ::Logging.mdc['orchestration'] = old_value
   end
 end
