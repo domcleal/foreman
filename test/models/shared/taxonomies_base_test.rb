@@ -71,7 +71,7 @@ module TaxonomiesBaseTest
                          :operatingsystem  => operatingsystems(:centos5_3),
                          :template_kind    => TemplateKind.find_by_name('provision'))
       # run used_ids method
-      used_ids = taxonomy.used_ids
+      used_ids = taxonomy_class.find_by_id(taxonomy.id).used_ids
       # get results from Host object
       environment_ids = Host.where(:"#{taxonomy_name}_id" => taxonomy.id).distinct.pluck(:environment_id).compact
       hostgroup_ids = Host.where(:"#{taxonomy_name}_id" => taxonomy.id).distinct.pluck(:hostgroup_id).compact
