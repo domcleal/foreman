@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class HashForTest < ActionView::TestCase
+  helper Rails.application.routes.url_helpers
+
   test "hash_for_*_path returns expected elements" do
     assert_equal({:controller => 'hosts', :action => 'new', :use_route => 'new_host'}, hash_for_new_host_path)
   end

@@ -9,6 +9,7 @@ class HostGroupsHelperTest < ActionView::TestCase
 
   test "should have the full string of the parent class if the child is a substring" do
     test_group = Hostgroup.create(:name => "test/st")
+    stubs(:hash_for_edit_hostgroup_path).returns(controller: 'hostgroups', action: 'edit')
     stubs(:url_for).returns('/some/url')
     assert_match /test\/st/, label_with_link(test_group)
     refute_match /te\/st/, label_with_link(test_group)

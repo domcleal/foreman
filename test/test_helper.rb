@@ -29,10 +29,6 @@ if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
   ActiveRecord::Migration.execute "SET CONSTRAINTS ALL DEFERRED;"
 end
 
-class ActionView::TestCase
-  helper Rails.application.routes.url_helpers
-end
-
 ::Rails::Engine.subclasses.map(&:instance).each do |engine|
   support_file = "#{engine.root}/test/support/foreman_test_helper_additions.rb"
   require support_file if File.exist?(support_file)
