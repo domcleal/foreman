@@ -21,7 +21,7 @@ class StructuredFactImporter < FactImporter
 
   def preload_fact_names
     # Also fetch compose values, generating {NAME => [ID, COMPOSE]}, avoiding loading the entire model
-    Hash[fact_name_class.where(:type => fact_name_class).reorder('').pluck(:name, :id, :compose).map { |fact| [fact.shift, fact] }]
+    Hash[fact_name_class.where(:type => fact_name_class.name).reorder('').pluck(:name, :id, :compose).map { |fact| [fact.shift, fact] }]
   end
 
   def find_or_create_fact_name(name, value = nil)

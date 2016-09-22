@@ -183,7 +183,7 @@ module Host
 
       ipmi = parser.ipmi_interface
       if ipmi.present?
-        existing = self.interfaces.where(:mac => ipmi[:macaddress], :type => Nic::BMC).first
+        existing = self.interfaces.where(:mac => ipmi[:macaddress], :type => 'Nic::BMC').first
         iface = existing || Nic::BMC.new(:managed => false)
         iface.provider ||= 'IPMI'
         set_interface(ipmi, 'ipmi', iface)

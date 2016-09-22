@@ -78,7 +78,7 @@ class FactImporter
 
   # value is used in structured importer to identify leaf nodes
   def find_or_create_fact_name(name, value = nil)
-    fact_name_class.where(:name => name, :type => fact_name_class).first_or_create!
+    fact_name_class.where(:name => name, :type => fact_name_class.name).first_or_create!
   end
 
   def add_new_facts
