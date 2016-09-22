@@ -146,14 +146,13 @@ class FactValueTest < ActiveSupport::TestCase
                      "hostgroup_id = #{target_host.hostgroup_id}")
 
           as_admin do
+            target_host.hostgroup.organizations = [@orgs.last]
+            target_host.hostgroup.locations = [@locs.last]
+            target_host.hostgroup.save
+
             target_host.location = @locs.last
             target_host.organization = @orgs.last
             target_host.save
-
-            hostgroup = Hostgroup.find(target_host.hostgroup_id)
-            hostgroup.organizations = [@orgs.last]
-            hostgroup.locations = [@locs.last]
-            hostgroup.save
           end
         end
 
