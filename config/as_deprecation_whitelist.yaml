@@ -7,13 +7,6 @@
     to `Mime[:text]`.
   callstack: app/controllers/application_controller.rb:87:in `block (2 levels) in
     require_mail'
-- message: ActiveModel::Errors#[]= is deprecated and will be removed in Rails 5.1.
-    Use model.errors.add(:name, "has already been taken") instead.
-  callstack: app/models/concerns/parameter_validators.rb:15:in `block in validate_parameters_names'
-- message: ActiveModel::Errors#[]= is deprecated and will be removed in Rails 5.1.
-    Use model.errors.add(:os_parameters, "Please ensure the following parameters name
-    are unique") instead.
-  callstack: app/models/concerns/parameter_validators.rb:21:in `validate_parameters_names'
 - message: Passing a class as a value in an Active Record query is deprecated and
     will be removed. Pass a string instead.
   callstack: app/controllers/templates_controller.rb:124:in `load_history'
