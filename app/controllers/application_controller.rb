@@ -315,7 +315,7 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_back_or_to(url)
-    redirect_to request.referer.empty? ? url : :back
+    redirect_back(fallback_location: url)
   end
 
   def saved_redirect_url_or(default)
