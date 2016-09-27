@@ -4,7 +4,8 @@ class Location < Taxonomy
   include Foreman::ThreadSession::LocationModel
   include Parameterizable::ByIdName
 
-  has_and_belongs_to_many :organizations, :join_table => 'locations_organizations'
+  has_many :location_organizations
+  has_many :organizations, :through => :location_organizations, :dependent => :destroy
   has_many_hosts :dependent => :nullify
   before_destroy EnsureNotUsedBy.new(:hosts)
 

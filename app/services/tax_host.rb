@@ -93,10 +93,13 @@ class TaxHost
 
   def import_missing_ids
     missing_ids.each do |row|
-      # no object for table locations_organizations, so use method *_ids = [array id's] to create relationship
-      if %w[Location Organization].include?(row[:taxable_type])
-        if (tax = Taxonomy.find_by_id(row[:taxonomy_id]))
-          tax.send("#{opposite_taxonomy_type}_ids=".to_sym, [row[:taxable_id]] + tax.send("#{opposite_taxonomy_type}_ids"))
+      if row[:taxable_type] == 'Location'
+        if (org = Taxonomy.find_by_id(row[:taxonomy_id]))
+          LocationOrganization.create!(:location_id => row[:taxable_id], :organization => org)
+        end
+      elsif row[:taxable_type] == 'Organization'
+        if (loc = Taxonomy.find_by_id(row[:taxonomy_id]))
+          LocationOrganization.create!(:organization_id => row[:taxable_id], :location => loc)
         end
       else
         TaxableTaxonomy.create!(row)
