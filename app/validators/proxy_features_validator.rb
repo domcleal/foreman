@@ -6,7 +6,7 @@ class ProxyFeaturesValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
     if value && !value.has_feature?(@options[:feature])
-      record.errors["#{attribute}_id"] << _(@options[:message])
+      record.errors["#{attribute}_id"] << _('does not have the %s feature') % @options[:feature]
     end
   end
 end

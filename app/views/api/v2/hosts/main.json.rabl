@@ -45,3 +45,9 @@ end
     partial(definition.api_list_view, :object => @object) if definition.api_list_view
   end
 end
+
+@object.smart_proxies.keys.each do |proxy|
+  child proxy => proxy do
+    extends "api/v2/smart_proxies/base"
+  end
+end
