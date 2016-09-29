@@ -255,6 +255,18 @@ class TestableResourcesControllerTest < ActionController::TestCase
       assert_template :partial => false
     end
   end
+
+  context 'logged in user is deleted' do
+    it 'redirects to login page on page refresh or navigation by deleted user' do
+      sample_user = users(:admin)
+      get :index, {}, set_session_user.merge(:user => sample_user.id)
+      sample_user.destroy
+      get :index, {}, set_session_user.merge(:user => sample_user.id)
+      assert_response :redirect
+      assert_redirected_to login_users_url
+      assert_equal('Your session has expired, please login again', flash[:warning])
+    end
+  end
 end
 
 class Testscope::TestableResourcesControllerTest < ActionController::TestCase
