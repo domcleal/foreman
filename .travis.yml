@@ -1,9 +1,21 @@
-language: node_js
-node_js:
-  #- "0.10" # EL6, Trusty, Jessie - sadly, jest does not work with 0.10
-  - "4.2" # Xenial
-  - "4.6" # Fedora 24
-  - "6.9" # EL 7
+sudo: true
+language: ruby
+rvm:
+  - 2.4.0
+  - 2.3.1
+  - 2.2.6
 before_install:
-  npm install -g npm@'>=3.0.0'
-script: ./script/travis_run_js_tests.sh
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libvirt-dev
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+  - cp config/settings.yaml.example config/settings.yaml
+  - cp config/database.yml.example config/database.yml
+bundler_args: --without development,mysql2,postgresql
+script:
+  - . $HOME/.nvm/nvm.sh
+  - nvm use stable
+  - rake db:migrate RAILS_ENV=development
+  - rake jenkins:unit jenkins:integration
