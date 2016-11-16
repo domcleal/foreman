@@ -2,6 +2,10 @@ class Xenserver < Operatingsystem
   PXEFILES = {:kernel => "boot/vmlinuz", :initrd => "install.img", :xen => "boot/xen.gz"}
   MBOOT = "boot/pxelinux/mboot.c32"
 
+  class << self
+    delegate :model_name, :to => :superclass
+  end
+
   def mediumpath(host)
     medium_uri(host).to_s
   end
@@ -24,10 +28,6 @@ class Xenserver < Operatingsystem
 
   def display_family
     "XenServer"
-  end
-
-  def self.model_name
-    superclass.model_name
   end
 
   def bootfile(arch, type)

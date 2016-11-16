@@ -1,6 +1,10 @@
 class Debian < Operatingsystem
   PXEFILES = {:kernel => "linux", :initrd => "initrd.gz"}
 
+  class << self
+    delegate :model_name, :to => :superclass
+  end
+
   def pxedir
     'dists/$release/main/installer-$arch/current/images/netboot/' + guess_os + '-installer/$arch'
   end
@@ -42,10 +46,6 @@ class Debian < Operatingsystem
     s.squeeze! " "
     s.strip!
     s.blank? ? description : s
-  end
-
-  def self.model_name
-    superclass.model_name
   end
 
   private

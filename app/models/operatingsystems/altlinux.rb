@@ -1,8 +1,8 @@
 class Altlinux < Operatingsystem
   PXEFILES = {:kernel => "vmlinuz", :initrd => "full.cz" }
 
-  def class
-    Operatingsystem
+  class << self
+    delegate :model_name, :to => :superclass
   end
 
   def boot_files_uri(medium, architecture)

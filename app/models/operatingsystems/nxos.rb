@@ -2,13 +2,13 @@ class NXOS < Operatingsystem
   # We don't fetch any files here.
   PXEFILES = {}
 
+  class << self
+    delegate :model_name, :to => :superclass
+  end
+
   # Simple output of the media url
   def mediumpath(host)
     medium_uri(host).to_s
-  end
-
-  def class
-    Operatingsystem
   end
 
   def template_kinds
