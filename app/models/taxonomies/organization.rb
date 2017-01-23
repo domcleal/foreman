@@ -4,8 +4,7 @@ class Organization < Taxonomy
   include Foreman::ThreadSession::OrganizationModel
   include Parameterizable::ByIdName
 
-  has_many :location_organizations
-  has_many :locations, :through => :location_organizations, :dependent => :destroy
+  has_and_belongs_to_many :locations, :join_table => 'locations_organizations'
   has_many_hosts :dependent => :nullify
   before_destroy EnsureNotUsedBy.new(:hosts)
 
