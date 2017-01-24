@@ -647,7 +647,7 @@ class HostsControllerTest < ActionController::TestCase
     host = Host.first
     get :show, {:id => host.to_param, :format => 'json'}
     assert_response 401
-    get :show, {:id => host.to_param, :format => 'html'}
+    get :show, {:id => host.to_param}
     assert_response :success
   end
 
@@ -660,7 +660,7 @@ class HostsControllerTest < ActionController::TestCase
     host = Host.first
     get :show, {:id => host.to_param, :format => 'json'}
     assert_response 401
-    get :show, {:id => host.to_param, :format => 'html'}
+    get :show, {:id => host.to_param}
     assert_redirected_to "/users/login"
   end
 
