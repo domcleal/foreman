@@ -17,4 +17,5 @@ script:
   - . $HOME/.nvm/nvm.sh
   - nvm use stable
   - rake db:migrate
-  - rake test
+  - rake webpack:compile
+  - bin/rails test
