@@ -91,6 +91,8 @@ module Foreman #:nodoc:
       end
     end
 
+    prepend Foreman::Plugin::Assets
+
     def_field :name, :description, :url, :author, :author_url, :version, :path
     attr_reader :id, :logging, :default_roles, :provision_methods, :compute_resources, :to_prepare_callbacks,
                 :permissions, :facets
