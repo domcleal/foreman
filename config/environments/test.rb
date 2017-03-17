@@ -76,6 +76,6 @@ Foreman::Application.configure do
         ASDeprecationTracker.whitelist.add(engine: plugin.id.to_s.gsub('-', '_'))
       end
     end
-    ASDeprecationTracker.resume!
+    #ASDeprecationTracker.resume!
   end
 end
