@@ -4,12 +4,24 @@ class UnattendedController < ApplicationController
   layout false
 
   # We dont require any of these methods for provisioning
-  FILTERS = [:require_login, :session_expiry, :update_activity_time, :set_taxonomy, :authorize]
-  FILTERS.each do |f|
-    define_method("#{f}_with_unattended") do
-      send("#{f}_without_unattended") if preview?
-    end
-    alias_method_chain f, :unattended
+  def require_login
+    super if preview?
+  end
+
+  def session_expiry
+    super if preview?
+  end
+
+  def update_activity_time
+    super if preview?
+  end
+
+  def set_taxonomy
+    super if preview?
+  end
+
+  def authorize
+    super if preview?
   end
 
   before_action :set_admin_user, :unless => Proc.new { preview? }

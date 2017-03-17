@@ -14,14 +14,20 @@ module Foreman::Controller::SmartProxyAuth
       before_action(:only => actions) { require_smart_proxy_or_login(options[:features]) }
       attr_reader :detected_proxy
 
-      define_method(:require_ssl_with_smart_proxy_filters?) do
-        if [actions].flatten.map(&:to_s).include?(self.action_name)
-          false
-        else
-          require_ssl_without_smart_proxy_filters?
+      cattr_accessor :smart_proxy_filter_actions
+      self.smart_proxy_filter_actions ||= []
+      self.smart_proxy_filter_actions.push(*actions)
+
+      extension = Module.new do
+        def require_ssl?
+          if [self.smart_proxy_filter_actions].flatten.map(&:to_s).include?(self.action_name)
+            false
+          else
+            super
+          end
         end
       end
-      alias_method_chain :require_ssl?, :smart_proxy_filters
+      prepend extension
     end
   end
 
