@@ -6,11 +6,10 @@ require_relative 'config/boot_settings'
 source 'https://rubygems.org'
 
 case SETTINGS[:rails]
-when '4.2'
-  gem 'rails', '4.2.8'
 when '5.0'
   gem 'rails', '5.0.2'
-  gem 'record_tag_helper', '~> 1.0'
+when '5.1'
+  gem 'rails', '~> 5.1.0', github: 'rails', branch: '5-1-stable'
 else
   raise "Unsupported Ruby on Rails version configured in settings.yaml: #{SETTINGS[:rails]}"
 end
@@ -50,6 +49,7 @@ gem 'webpack-rails', '~> 0.9.8'
 gem 'mail', '~> 2.6'
 gem 'nokogiri', '< 1.7' if RUBY_VERSION.start_with? '2.0.'
 gem 'sshkey', '~> 1.9'
+gem 'record_tag_helper', '~> 1.0'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))
