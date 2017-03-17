@@ -31,7 +31,7 @@ gem 'safemode', '~> 1.2', '>= 1.2.4'
 gem 'fast_gettext', '>= 0.8', '< 1.2.0'
 gem 'gettext_i18n_rails', '~> 1.0', '< 1.8.0'
 gem 'rails-i18n', (SETTINGS[:rails] == '4.2' ? '~> 4.0.0' : '~> 5.0.0')
-gem 'turbolinks', '~> 2.5'
+gem 'turbolinks', '~> 2.5', github: 'dobtco/turbolinks-classic', branch: 'fix-deprecations' # PR 671
 gem 'logging', '>= 1.8.0', '< 3.0.0'
 gem 'fog-core', '1.42.0'
 gem 'net-scp'
