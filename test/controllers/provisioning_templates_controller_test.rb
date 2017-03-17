@@ -2,35 +2,35 @@ require 'test_helper'
 
 class ProvisioningTemplatesControllerTest < ActionController::TestCase
   test "index" do
-    get :index, {}, set_session_user
+    get :index, session: set_session_user
     assert_template 'index'
   end
 
   test "new" do
-    get :new, {}, set_session_user
+    get :new, session: set_session_user
     assert_template 'new'
   end
 
   test "create invalid" do
     ProvisioningTemplate.any_instance.stubs(:valid?).returns(false)
-    post :create, {:provisioning_template => {:name => "123"}}, set_session_user
+    post :create, params: { :provisioning_template => {:name => "123"} }, session: set_session_user
     assert_template 'new'
   end
 
   test "create valid" do
     ProvisioningTemplate.any_instance.stubs(:valid?).returns(true)
-    post :create, {:provisioning_template => {:name => "123"}}, set_session_user
+    post :create, params: { :provisioning_template => {:name => "123"} }, session: set_session_user
     assert_redirected_to provisioning_templates_url
   end
 
   test "edit" do
-    get :edit, {:id => templates(:pxekickstart).to_param}, set_session_user
+    get :edit, params: { :id => templates(:pxekickstart).to_param }, session: set_session_user
     assert_template 'edit'
   end
 
   test "edit page contains help information" do
     Setting[:safemode_render] = true
-    get :edit, {:id => templates(:pxekickstart).to_param}, set_session_user
+    get :edit, params: { :id => templates(:pxekickstart).to_param }, session: set_session_user
     assert_includes @response.body, Foreman::Renderer::ALLOWED_HELPERS.first.to_s
     assert_includes @response.body, Foreman::Renderer::ALLOWED_VARIABLES.first.to_s
     assert_includes @response.body, 'foreman_server_fqdn'
@@ -38,25 +38,25 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
 
   test "lock" do
     @request.env['HTTP_REFERER'] = provisioning_templates_path
-    get :lock, {:id => templates(:pxekickstart).to_param }, set_session_user
+    get :lock, params: { :id => templates(:pxekickstart).to_param }, session: set_session_user
     assert_redirected_to provisioning_templates_path
     assert_equal ProvisioningTemplate.unscoped.find(templates(:pxekickstart).id).locked, true
   end
 
   test "unlock" do
     @request.env['HTTP_REFERER'] = provisioning_templates_path
-    get :unlock, {:id => templates(:locked).to_param }, set_session_user
+    get :unlock, params: { :id => templates(:locked).to_param }, session: set_session_user
     assert_redirected_to provisioning_templates_path
     assert_equal ProvisioningTemplate.unscoped.find(templates(:locked).id).locked, false
   end
 
   test "clone" do
-    get :clone_template, {:id => templates(:pxekickstart).to_param }, set_session_user
+    get :clone_template, params: { :id => templates(:pxekickstart).to_param }, session: set_session_user
     assert_template 'new'
   end
 
   test "export" do
-    get :export, { :id => templates(:pxekickstart).to_param }, set_session_user
+    get :export, params: { :id => templates(:pxekickstart).to_param }, session: set_session_user
     assert_response :success
     assert_equal 'text/plain', response.content_type
     assert_equal templates(:pxekickstart).to_erb, response.body
@@ -65,19 +65,19 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
 
   test "update invalid" do
     ProvisioningTemplate.any_instance.stubs(:valid?).returns(false)
-    put :update, {:id => templates(:pxekickstart).to_param, :provisioning_template => {:name => "123"} }, set_session_user
+    put :update, params: { :id => templates(:pxekickstart).to_param, :provisioning_template => {:name => "123"} }, session: set_session_user
     assert_template 'edit'
   end
 
   test "update valid" do
     ProvisioningTemplate.any_instance.stubs(:valid?).returns(true)
-    put :update, {:id => templates(:pxekickstart).to_param, :provisioning_template => {:name => "123"} }, set_session_user
+    put :update, params: { :id => templates(:pxekickstart).to_param, :provisioning_template => {:name => "123"} }, session: set_session_user
     assert_redirected_to provisioning_templates_url
   end
 
   test "destroy should fail with assoicated hosts" do
     config_template = templates(:pxekickstart)
-    delete :destroy, {:id => config_template.to_param }, set_session_user
+    delete :destroy, params: { :id => config_template.to_param }, session: set_session_user
     assert_redirected_to provisioning_templates_url
     assert ProvisioningTemplate.unscoped.exists?(config_template.id)
   end
@@ -85,7 +85,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
   test "destroy" do
     config_template = templates(:pxekickstart)
     config_template.os_default_templates.clear
-    delete :destroy, {:id => config_template.to_param }, set_session_user
+    delete :destroy, params: { :id => config_template.to_param }, session: set_session_user
     assert_redirected_to provisioning_templates_url
     assert !ProvisioningTemplate.unscoped.exists?(config_template.id)
   end
@@ -93,7 +93,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
   test "audit comment" do
     ProvisioningTemplate.auditing_enabled = true
     ProvisioningTemplate.any_instance.stubs(:valid?).returns(true)
-    put :update, {:id => templates(:pxekickstart).to_param, :provisioning_template => {:audit_comment => "aha", :template => "tmp" } }, set_session_user
+    put :update, params: { :id => templates(:pxekickstart).to_param, :provisioning_template => {:audit_comment => "aha", :template => "tmp" } }, session: set_session_user
     assert_redirected_to provisioning_templates_url
     assert_equal "aha", templates(:pxekickstart).audits.last.comment
   end
@@ -106,7 +106,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
     template.template = template.template.upcase
     assert template.save
     assert_equal template.audits.count, 1
-    get :edit, {:id => template.to_param }, set_session_user
+    get :edit, params: { :id => template.to_param }, session: set_session_user
 
     assert @response.body.match('audit-content')
   end
@@ -129,13 +129,13 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
 
     test "build menu" do
       ProxyAPI::TFTP.any_instance.expects(:create_default).with(regexp_matches(/^PXE.*/), has_entry(:menu, regexp_matches(/ks=http:\/\/foreman.unattended.url\/unattended\/template/))).returns(true).times(3)
-      get :build_pxe_default, {}, set_session_user
+      get :build_pxe_default, session: set_session_user
       assert_redirected_to provisioning_templates_path
     end
 
     test "build menu should return with error code if no TFTP defined" do
       SmartProxy.stubs(:with_features).with('TFTP').returns([])
-      get :build_pxe_default, {}, set_session_user
+      get :build_pxe_default, session: set_session_user
       assert flash[:error].present?
     end
 
@@ -147,7 +147,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
       t1.save
       t2.save
       ProxyAPI::TFTP.any_instance.expects(:create_default).with(regexp_matches(/^PXE.*/), has_entry(:menu, regexp_matches(/#{hostgroups(:common).name}.*#{hostgroups(:db).name}/m))).returns(true).times(3)
-      get :build_pxe_default, {}, set_session_user
+      get :build_pxe_default, session: set_session_user
       assert_redirected_to provisioning_templates_path
     end
 
@@ -156,7 +156,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
       t1.provisioning_template = templates(:mystring2)
       t1.save
       ProxyAPI::TFTP.any_instance.expects(:create_default).with(regexp_matches(/^PXE.*/), has_entry(:menu, regexp_matches(/ks=http:\/\/foreman.unattended.url\/unattended\/template\/MyString2\/Parent\/inherited/))).returns(true).times(3)
-      get :build_pxe_default, {}, set_session_user
+      get :build_pxe_default, session: set_session_user
       assert_redirected_to provisioning_templates_path
     end
 
@@ -166,7 +166,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
       FactoryGirl.create(:template_combination, :provisioning_template => templates(:mystring2), :hostgroup => second)
       FactoryGirl.create(:template_combination, :provisioning_template => templates(:mystring2), :hostgroup => first)
       ProxyAPI::TFTP.any_instance.expects(:create_default).with(regexp_matches(/^PXE.*/), has_entry(:menu, regexp_matches(/#{first.name}.*#{second.name}/m))).returns(true).times(3)
-      get :build_pxe_default, {}, set_session_user
+      get :build_pxe_default, session: set_session_user
       assert_redirected_to provisioning_templates_path
     end
   end
@@ -176,17 +176,17 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
     template = FactoryGirl.create(:provisioning_template)
 
     # works for given host
-    post :preview, { :preview_host_id => host.id, :template => '<%= @host.name -%>', :id => template }, set_session_user
+    post :preview, params: { :preview_host_id => host.id, :template => '<%= @host.name -%>', :id => template }, session: set_session_user
     assert_equal (host.hostname).to_s, @response.body
 
     # without host specified it uses first one
-    post :preview, { :template => '<%= 1+1 -%>', :id => template }, set_session_user
+    post :preview, params: { :template => '<%= 1+1 -%>', :id => template }, session: set_session_user
     assert_equal '2', @response.body
 
-    post :preview, { :template => '<%= 1+1 -%>'}, set_session_user
+    post :preview, params: { :template => '<%= 1+1 -%>' }, session: set_session_user
     assert_equal '2', @response.body
 
-    post :preview, { :template => '<%= 1+ -%>', :id => template }, set_session_user
+    post :preview, params: { :template => '<%= 1+ -%>', :id => template }, session: set_session_user
     assert_includes @response.body, 'parse error on value'
   end
 
@@ -202,9 +202,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
       }
       assert_difference('TemplateCombination.unscoped.count', 1) do
         assert_difference('ProvisioningTemplate.unscoped.count', 1) do
-          post :create, {
-            :provisioning_template => provisioning_template
-          }, set_session_user
+          post :create, params: { :provisioning_template => provisioning_template }, session: set_session_user
         end
       end
     end
@@ -218,9 +216,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
         template = @template_combination.provisioning_template
         new_environment = FactoryGirl.create(:environment)
         assert_not_equal new_environment, @template_combination.environment
-        put :update, {
-          :id => template.to_param,
-          :provisioning_template => {
+        put :update, params: { :id => template.to_param, :provisioning_template => {
             :template_combinations_attributes => {
               '0' => {
                 :id => @template_combination.id,
@@ -228,8 +224,7 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
                 :hostgroup_id => @template_combination.hostgroup.id
               }
             }
-          }
-        }, set_session_user
+          } }, session: set_session_user
         assert_response :found
         as_admin do
           @template_combination.reload
@@ -239,17 +234,14 @@ class ProvisioningTemplatesControllerTest < ActionController::TestCase
 
       test 'can be destroyed' do
         assert_difference('TemplateCombination.count', -1) do
-          put :update, {
-            :id => @template_combination.provisioning_template.to_param,
-            :provisioning_template => {
+          put :update, params: { :id => @template_combination.provisioning_template.to_param, :provisioning_template => {
               :template_combinations_attributes => {
                 '0' => {
                   :id => @template_combination.id,
                   :_destroy => 1
                 }
               }
-            }
-          }, set_session_user
+            } }, session: set_session_user
         end
         assert_response :found
       end

@@ -78,7 +78,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   end
 
   test "should get index" do
-    get :index, { }
+    get :index
     assert_response :success
     assert_not_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
@@ -94,7 +94,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
       scope_accessed = true
       base_scope
     end
-    get :index, { }
+    get :index
     assert_response :success
     assert_not_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
@@ -107,7 +107,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
   test "should get attributes in ordered index" do
     last_record.update(ip: "127.13.0.1")
-    get :index, order: "mac"
+    get :index, params: { order: "mac" }
     assert_response :success
     assert_not_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
@@ -118,7 +118,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
   test "should get parameters from index" do
     last_record.parameters = [HostParameter.new(name: 'foo', value: 'bar')]
-    get :index, include: ['parameters']
+    get :index, params: { include: ['parameters'] }
     assert_response :success
     assert_not_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
@@ -133,7 +133,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     hostgroup.group_parameters = [GroupParameter.new(name: 'foobar', value: 'baz')]
     last_record.parameters = [HostParameter.new(name: 'foo', value: 'bar')]
     last_record.update_attribute(:hostgroup_id, hostgroup.id)
-    get :index, include: ['all_parameters']
+    get :index, params: { include: ['all_parameters'] }
     assert_response :success
     assert_not_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
@@ -146,7 +146,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   end
 
   test "should show individual record" do
-    get :show, { :id => @host.to_param }
+    get :show, params: { :id => @host.to_param }
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
@@ -155,7 +155,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test 'should show host with model name' do
     model = FactoryGirl.create(:model)
     @host.update_attribute(:model_id, model.id)
-    get :show, { :id => @host.to_param }
+    get :show, params: { :id => @host.to_param }
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert_equal model.id, show_response['model_id']
@@ -165,7 +165,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test "should create host" do
     disable_orchestration
     assert_difference('Host.count') do
-      post :create, { :host => valid_attrs }
+      post :create, params: { :host => valid_attrs }
     end
     assert_response :created
   end
@@ -175,7 +175,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Foreman::Deprecation.expects(:api_deprecation_warning).with('Field host_parameters_attributes.nested ignored')
     assert_difference('Host.count') do
       attrs = [{"name" => "compute_resource_id", "value" => "1", "nested" => "true"}]
-      post :create, { :host => valid_attrs.merge(:host_parameters_attributes => attrs) }
+      post :create, params: { :host => valid_attrs.merge(:host_parameters_attributes => attrs) }
     end
     assert_response :created
   end
@@ -185,7 +185,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Foreman::Deprecation.expects(:api_deprecation_warning).with('Field host_parameters_attributes.nested ignored')
     assert_difference('Host.count') do
       attrs = {"0" => {"name" => "compute_resource_id", "value" => "1", "nested" => "true"}}
-      post :create, { :host => valid_attrs.merge(:host_parameters_attributes => attrs) }
+      post :create, params: { :host => valid_attrs.merge(:host_parameters_attributes => attrs) }
     end
     assert_response :created
   end
@@ -193,7 +193,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test "should create interfaces" do
     disable_orchestration
 
-    post :create, { :host => basic_attrs.merge!(:interfaces_attributes => nics_attrs) }
+    post :create, params: { :host => basic_attrs.merge!(:interfaces_attributes => nics_attrs) }
     assert_response :created
     assert_equal 2, last_record.interfaces.count
 
@@ -208,7 +208,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
       hash.update((hash.count + 1).to_s => item)
     end
 
-    post :create, { :host => basic_attrs.merge!(:interfaces_attributes => hash_nics_attrs) }
+    post :create, params: { :host => basic_attrs.merge!(:interfaces_attributes => hash_nics_attrs) }
     assert_response :created
     assert_equal 2, last_record.interfaces.count
 
@@ -223,7 +223,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     attrs = basic_attrs.merge!(:interfaces_attributes => nics_attrs)
     attrs[:interfaces_attributes][0][:type] = "unknown"
 
-    post :create, { :host => attrs }
+    post :create, params: { :host => attrs }
     assert_response :unprocessable_entity
     assert_match /Unknown interface type/, JSON.parse(response.body)['error']['message']
   end
@@ -232,7 +232,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     disable_orchestration
 
     compute_attrs = compute_attributes(:with_interfaces)
-    post :create, { :host => basic_attrs_with_profile(compute_attrs).merge(:interfaces_attributes =>  nics_attrs) }
+    post :create, params: { :host => basic_attrs_with_profile(compute_attrs).merge(:interfaces_attributes =>  nics_attrs) }
     assert_response :created
 
     as_admin do
@@ -247,7 +247,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
   test "should create host with managed is false if parameter is passed" do
     disable_orchestration
-    post :create, { :host => valid_attrs.merge!(:managed => false) }
+    post :create, params: { :host => valid_attrs.merge!(:managed => false) }
     assert_response :created
     assert_equal false, last_record.managed?
   end
@@ -256,24 +256,24 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     disable_orchestration
     expect_attribute_modifier(ComputeAttributeMerge, [])
     expect_attribute_modifier(InterfaceMerge, [{:merge_compute_attributes => true}])
-    post :create, { :host => valid_attrs }
+    post :create, params: { :host => valid_attrs }
   end
 
   test "update applies attribute modifiers on the host" do
     disable_orchestration
     expect_attribute_modifier(ComputeAttributeMerge, [])
     expect_attribute_modifier(InterfaceMerge, [{:merge_compute_attributes => true}])
-    put :update, { :id => @host.to_param, :host => valid_attrs }
+    put :update, params: { :id => @host.to_param, :host => valid_attrs }
   end
 
   test "should update host" do
-    put :update, { :id => @host.to_param, :host => valid_attrs }
+    put :update, params: { :id => @host.to_param, :host => valid_attrs }
     assert_response :success
   end
 
   test "should update hostgroup_id of host" do
     @host = FactoryGirl.create(:host, basic_attrs_with_hg)
-    put :update, { :id => @host.to_param, :hostgroup_id => Hostgroup.last.id }
+    put :update, params: { :id => @host.to_param, :hostgroup_id => Hostgroup.last.id }
     assert_response :success
   end
 
@@ -282,7 +282,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
     compute_attrs = compute_attributes(:with_interfaces)
 
-    put :update, { :id => @host.to_param, :host => basic_attrs_with_profile(compute_attrs) }
+    put :update, params: { :id => @host.to_param, :host => basic_attrs_with_profile(compute_attrs) }
     assert_response :success
 
     as_admin do
@@ -294,7 +294,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   end
 
   test "should update host without :host root node and rails wraps it correctly" do
-    put :update, { :id => @host.to_param, :name => 'newhostname' }
+    put :update, params: { :id => @host.to_param, :name => 'newhostname' }
     request_parameters = @request.env['action_dispatch.request.request_parameters']
     assert request_parameters[:host]
     assert_equal 'newhostname', request_parameters[:host][:name]
@@ -303,26 +303,26 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
   test "should destroy hosts" do
     assert_difference('Host.count', -1) do
-      delete :destroy, { :id => @host.to_param }
+      delete :destroy, params: { :id => @host.to_param }
     end
     assert_response :success
   end
 
   test "should show status hosts" do
     Foreman::Deprecation.expects(:api_deprecation_warning).with(regexp_matches(%r{/status route is deprecated}))
-    get :status, { :id => @host.to_param }
+    get :status, params: { :id => @host.to_param }
     assert_response :success
   end
 
   test "should show specific status hosts" do
-    get :get_status, { :id => @host.to_param, :type => 'global' }
+    get :get_status, params: { :id => @host.to_param, :type => 'global' }
     assert_response :success
   end
 
   test "should be able to create hosts even when restricted" do
     disable_orchestration
     assert_difference('Host.count') do
-      post :create, { :host => valid_attrs }
+      post :create, params: { :host => valid_attrs }
     end
     assert_response :success
   end
@@ -330,7 +330,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test "should allow access to restricted user who owns the host" do
     host = FactoryGirl.create(:host, :owner => users(:scoped), :organization => taxonomies(:organization1), :location => taxonomies(:location1))
     setup_user 'view', 'hosts', "owner_type = User and owner_id = #{users(:scoped).id}", :scoped
-    get :show, { :id => host.to_param }
+    get :show, params: { :id => host.to_param }
     assert_response :success
   end
 
@@ -338,7 +338,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     disable_orchestration
     host = FactoryGirl.create(:host, :owner => users(:scoped), :organization => taxonomies(:organization1), :location => taxonomies(:location1))
     setup_user 'edit', 'hosts', "owner_type = User and owner_id = #{users(:scoped).id}", :scoped
-    put :update, { :id => host.to_param, :host => valid_attrs }
+    put :update, params: { :id => host.to_param, :host => valid_attrs }
     assert_response :success
   end
 
@@ -346,7 +346,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     host = FactoryGirl.create(:host, :owner => users(:scoped), :organization => taxonomies(:organization1), :location => taxonomies(:location1))
     assert_difference('Host.count', -1) do
       setup_user 'destroy', 'hosts', "owner_type = User and owner_id = #{users(:scoped).id}", :scoped
-      delete :destroy, { :id => host.to_param }
+      delete :destroy, params: { :id => host.to_param }
     end
     assert_response :success
   end
@@ -355,20 +355,20 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Foreman::Deprecation.expects(:api_deprecation_warning).with(regexp_matches(%r{/status route is deprecated}))
     host = FactoryGirl.create(:host, :owner => users(:scoped), :organization => taxonomies(:organization1), :location => taxonomies(:location1))
     setup_user 'view', 'hosts', "owner_type = User and owner_id = #{users(:scoped).id}", :scoped
-    get :status, { :id => host.to_param }
+    get :status, params: { :id => host.to_param }
     assert_response :success
   end
 
   test "should not allow access to a host out of users hosts scope" do
     setup_user 'view', 'hosts', "owner_type = User and owner_id = #{users(:restricted).id}", :restricted
-    get :show, { :id => @host.to_param }
+    get :show, params: { :id => @host.to_param }
     assert_response :not_found
   end
 
   test "should not list a host out of users hosts scope" do
     host = FactoryGirl.create(:host, :owner => users(:scoped), :organization => taxonomies(:organization1), :location => taxonomies(:location1))
     setup_user 'view', 'hosts', "owner_type = User and owner_id = #{users(:scoped).id}", :scoped
-    get :index, {}
+    get :index
     assert_response :success
     hosts = ActiveSupport::JSON.decode(@response.body)
     ids = hosts['results'].map { |hash| hash['id'] }
@@ -378,26 +378,26 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
   test "should not update host out of users hosts scope" do
     setup_user 'edit', 'hosts', "owner_type = User and owner_id = #{users(:restricted).id}", :restricted
-    put :update, { :id => @host.to_param }
+    put :update, params: { :id => @host.to_param }
     assert_response :not_found
   end
 
   test "should not delete hosts out of users hosts scope" do
     setup_user 'destroy', 'hosts', "owner_type = User and owner_id = #{users(:restricted).id}", :restricted
-    delete :destroy, { :id => @host.to_param }
+    delete :destroy, params: { :id => @host.to_param }
     assert_response :not_found
   end
 
   test "should not show status of hosts out of users hosts scope" do
     setup_user 'view', 'hosts', "owner_type = User and owner_id = #{users(:restricted).id}", :restricted
-    get :status, { :id => @host.to_param }
+    get :status, params: { :id => @host.to_param }
     assert_response :not_found
   end
 
   test "should show hosts vm attributes" do
     host = FactoryGirl.create(:host, :compute_resource => compute_resources(:one))
     ComputeResource.any_instance.stubs(:vm_compute_attributes_for).returns(:cpus => 4)
-    get :vm_compute_attributes, { :id => host.to_param }
+    get :vm_compute_attributes, params: { :id => host.to_param }
     assert_response :success
     data = JSON.parse(@response.body)
     assert_equal data, "cpus" => 4, "memory" => nil
@@ -415,16 +415,16 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     set_remote_user_to users(:admin)
     User.current = nil # User.current is admin at this point (from initialize_host)
     host = Host.first
-    get :show, {:id => host.to_param, :format => 'json'}
+    get :show, params: { :id => host.to_param, :format => 'json' }
     assert_response :success
-    get :show, {:id => host.to_param}
+    get :show, params: { :id => host.to_param }
     assert_response :success
   end
 
   test "should disassociate host" do
     host = FactoryGirl.create(:host, :on_compute_resource)
     assert host.compute?
-    put :disassociate, { :id => host.to_param }
+    put :disassociate, params: { :id => host.to_param }
     assert_response :success
     refute host.reload.compute?
   end
@@ -437,28 +437,28 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     as_admin { @phost = FactoryGirl.create(:host, :with_puppet) }
     User.current=nil
     ProxyAPI::Puppet.any_instance.stubs(:run).returns(true)
-    put :puppetrun, { :id => @phost.to_param }
+    put :puppetrun, params: { :id => @phost.to_param }
     assert_response :success
   end
 
   def test_rebuild_config_optimistic
     Host.any_instance.expects(:recreate_config).returns({ "TFTP" => true, "DNS" => true, "DHCP" => true })
     host = FactoryGirl.create(:host)
-    post :rebuild_config, { :id => host.to_param }, set_session_user
+    post :rebuild_config, params: { :id => host.to_param }, session: set_session_user
     assert_response :success
   end
 
   def test_rebuild_config_pessimistic
     Host.any_instance.expects(:recreate_config).returns({ "TFTP" => false, "DNS" => false, "DHCP" => false })
     host = FactoryGirl.create(:host)
-    post :rebuild_config, { :id => host.to_param }, set_session_user
+    post :rebuild_config, params: { :id => host.to_param }, session: set_session_user
     assert_response 422
   end
 
   def test_rebuild_tftp_config
     Host.any_instance.expects(:recreate_config).returns({ "TFTP" => true })
     host = FactoryGirl.create(:host)
-    post :rebuild_config, { :id => host.to_param, :only => ['TFTP'] }, set_session_user
+    post :rebuild_config, params: { :id => host.to_param, :only => ['TFTP'] }, session: set_session_user
     assert_response :success
   end
 
@@ -466,7 +466,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     User.current=nil
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}, set_session_user
+    post :facts, params: { :name => hostname, :facts => facts }, session: set_session_user
     assert_response :success
   end
 
@@ -475,7 +475,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     hostname = fact_json['name']
     certname = fact_json['certname']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :certname => certname, :facts => facts}, set_session_user
+    post :facts, params: { :name => hostname, :certname => certname, :facts => facts }, session: set_session_user
     assert_response :success
   end
 
@@ -483,7 +483,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     User.current=nil
     hostname = fact_json['name']
     facts    = fact_json['facts'].except('operatingsystem')
-    post :facts, {:name => hostname, :facts => facts}, set_session_user
+    post :facts, params: { :name => hostname, :facts => facts }, session: set_session_user
     assert_response :unprocessable_entity
   end
 
@@ -493,7 +493,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     hostname = fact_json['name']
     facts    = fact_json['facts']
     facts['foreman_hostgroup'] = hostgroup.title
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :success
     assert_equal hostgroup.id, Host.find_by(:name => hostname).hostgroup_id
   end
@@ -504,7 +504,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     hostname = fact_json['name']
     facts    = fact_json['facts']
     facts['foreman_hostgroup'] = hostgroup.title
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :success
     assert_equal hostgroup.root_pass, Host.find_by(:name => hostname).root_pass
   end
@@ -517,7 +517,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Resolv.any_instance.stubs(:getnames).returns(['else.where'])
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_nil @controller.detected_proxy
     assert_response :success
   end
@@ -533,7 +533,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Resolv.any_instance.stubs(:getnames).returns([host])
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_equal proxy, @controller.detected_proxy
     assert_response :success
   end
@@ -546,7 +546,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Resolv.any_instance.stubs(:getnames).returns(['another.host'])
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :forbidden
   end
 
@@ -560,7 +560,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     @request.env['SSL_CLIENT_VERIFY'] = 'SUCCESS'
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :success
   end
 
@@ -574,7 +574,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     @request.env['SSL_CLIENT_VERIFY'] = 'SUCCESS'
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :forbidden
   end
 
@@ -588,7 +588,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     @request.env['SSL_CLIENT_VERIFY'] = 'FAILED'
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :forbidden
   end
 
@@ -601,7 +601,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Resolv.any_instance.stubs(:getnames).returns(['else.where'])
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :forbidden
   end
 
@@ -615,7 +615,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     Resolv.any_instance.stubs(:getnames).returns(['else.where'])
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}
+    post :facts, params: { :name => hostname, :facts => facts }
     assert_response :success
   end
 
@@ -623,7 +623,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     User.current=nil
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts, :type => "Host::Invalid"}, set_session_user
+    post :facts, params: { :name => hostname, :facts => facts, :type => "Host::Invalid" }, session: set_session_user
     assert_response :unprocessable_entity
     assert JSON.parse(response.body)['message'] =~ /ERF42-3624/
   end
@@ -637,7 +637,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     User.current=nil
     hostname = fact_json['name']
     facts    = fact_json['facts']
-    post :facts, {:name => hostname, :facts => facts}, set_session_user
+    post :facts, params: { :name => hostname, :facts => facts }, session: set_session_user
     assert_response :unprocessable_entity
     assert_equal 'A stub failure', JSON.parse(response.body)['error']['errors']['foo'].first
   end
@@ -651,7 +651,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     api_user = FactoryGirl.create(:user)
     api_user.update_attribute :roles, [role]
     as_user(api_user) do
-      put :power, { :id => @bmchost.to_param, :power_action => 'status' }
+      put :power, params: { :id => @bmchost.to_param, :power_action => 'status' }
     end
     assert_response :success
     assert @response.body =~ /on/
@@ -668,13 +668,13 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
     test "power call to interface" do
       ProxyAPI::BMC.any_instance.stubs(:power).with(:action => 'status').returns("on")
-      put :power, { :id => @bmchost.to_param, :power_action => 'status' }
+      put :power, params: { :id => @bmchost.to_param, :power_action => 'status' }
       assert_response :success
       assert @response.body =~ /on/
     end
 
     test "wrong power call fails gracefully" do
-      put :power, { :id => @bmchost.to_param, :power_action => 'wrongmethod' }
+      put :power, params: { :id => @bmchost.to_param, :power_action => 'wrongmethod' }
       assert_response 422
       assert @response.body =~ /available methods are/
     end
@@ -682,13 +682,13 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     test "boot call to interface" do
       ProxyAPI::BMC.any_instance.stubs(:boot).with(:function => 'bootdevice', :device => 'bios').
                                               returns({ "action" => "bios", "result" => true } .to_json)
-      put :boot, { :id => @bmchost.to_param, :device => 'bios' }
+      put :boot, params: { :id => @bmchost.to_param, :device => 'bios' }
       assert_response :success
       assert @response.body =~ /true/
     end
 
     test "wrong boot call to interface fails gracefully" do
-      put :boot, { :id => @bmchost.to_param, :device => 'wrongbootdevice' }
+      put :boot, params: { :id => @bmchost.to_param, :device => 'wrongbootdevice' }
       assert_response 422
       assert @response.body =~ /available devices are/
     end
@@ -700,8 +700,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
       end
 
       test 'returns error for non-admin user if BMC is not available' do
-        put :boot, { :id => @host.to_param, :device => 'bios'},
-          set_session_user.merge(:user => @one.id)
+        put :boot, params: { :id => @host.to_param, :device => 'bios' }, session: set_session_user.merge(:user => @one.id)
         assert_match(/No BMC NIC available/, response.body)
         assert_response :unprocessable_entity
       end
@@ -710,15 +709,14 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
         ProxyAPI::BMC.any_instance.stubs(:boot).
           with(:function => 'bootdevice', :device => 'bios').
           returns({ "action" => "bios", "result" => true } .to_json)
-        put :boot, { :id => @bmchost.to_param, :device => 'bios'},
-          set_session_user.merge(:user => @one.id)
+        put :boot, params: { :id => @bmchost.to_param, :device => 'bios' }, session: set_session_user.merge(:user => @one.id)
         assert_response :success
       end
     end
 
     test "should return correct total and subtotal metadata if search param is passed" do
       FactoryGirl.create_list(:host, 8)
-      get :index, {:search => @bmchost.name }
+      get :index, params: { :search => @bmchost.name }
       assert_response :success
       response = ActiveSupport::JSON.decode(@response.body)
       assert_equal 10, response['total'] # one from setup, one from bmc setup, 8 here
@@ -730,7 +728,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test 'template should return rendered template' do
     managed_host = FactoryGirl.create(:host, :managed)
     Host::Managed.any_instance.stubs(:provisioning_template).with({:kind => 'provision'}).returns(FactoryGirl.create(:provisioning_template))
-    get :template, { :id => managed_host.to_param, :kind => 'provision' }
+    get :template, params: { :id => managed_host.to_param, :kind => 'provision' }
     assert_response :success
     assert @response.body =~ /template content/
   end
@@ -738,7 +736,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test 'wrong template name should return not found' do
     managed_host = FactoryGirl.create(:host, :managed)
     Host::Managed.any_instance.stubs(:provisioning_template).with({:kind => 'provitamin'}).returns(nil)
-    get :template, { :id => managed_host.to_param, :kind => 'provitamin' }
+    get :template, params: { :id => managed_host.to_param, :kind => 'provitamin' }
     assert_response :not_found
   end
 
@@ -749,12 +747,12 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     end
 
     test "should search host by hostgroup name" do
-      get :index, { :search => "hostgroup_name = #{@hostgroup.name}" }
+      get :index, params: { :search => "hostgroup_name = #{@hostgroup.name}" }
       assert_equal [@managed_host], assigns(:hosts)
     end
 
     test "should search host by hostgroup title" do
-      get :index, { :search => "hostgroup_title = #{@hostgroup.title}" }
+      get :index, params: { :search => "hostgroup_title = #{@hostgroup.title}" }
       assert_equal [@managed_host], assigns(:hosts)
     end
   end
@@ -762,7 +760,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test "user without view_params permission can't see host parameters" do
     setup_user "view", "hosts"
     host_with_parameter = FactoryGirl.create(:host, :with_parameter)
-    get :show, {:id => host_with_parameter.to_param, :format => 'json'}
+    get :show, params: { :id => host_with_parameter.to_param, :format => 'json' }
     assert_empty JSON.parse(response.body)['parameters']
   end
 
@@ -770,13 +768,13 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     setup_user "view", "hosts"
     setup_user "view", "params"
     host_with_parameter = FactoryGirl.create(:host, :with_parameter)
-    get :show, {:id => host_with_parameter.to_param, :format => 'json'}
+    get :show, params: { :id => host_with_parameter.to_param, :format => 'json' }
     assert_not_empty JSON.parse(response.body)['parameters']
   end
 
   test "should get ENC values of host" do
     host = FactoryGirl.create(:host, :with_puppetclass)
-    get :enc, { :id => host.to_param }
+    get :enc, params: { :id => host.to_param }
     assert_response :success
     response = ActiveSupport::JSON.decode(@response.body)
     puppet_class = response['data']['classes'].first rescue nil
@@ -787,7 +785,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     test "should show a host parameter as hidden unless show_hidden_parameters is true" do
       host = FactoryGirl.create(:host)
       host.host_parameters.create!(:name => "foo", :value => "bar", :hidden_value => true)
-      get :show, { :id => host.id }
+      get :show, params: { :id => host.id }
       show_response = ActiveSupport::JSON.decode(@response.body)
       assert_equal '*****', show_response['parameters'].first['value']
     end
@@ -795,7 +793,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     test "should show a host parameter as unhidden when show_hidden_parameters is true" do
       host = FactoryGirl.create(:host)
       host.host_parameters.create!(:name => "foo", :value => "bar", :hidden_value => true)
-      get :show, { :id => host.id, :show_hidden_parameters => 'true' }
+      get :show, params: { :id => host.id, :show_hidden_parameters => 'true' }
       show_response = ActiveSupport::JSON.decode(@response.body)
       assert_equal 'bar', show_response['parameters'].first['value']
     end
@@ -811,7 +809,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   test "should update existing host parameters using array format" do
     host = FactoryGirl.create(:host, :with_parameter)
     host_param = host.parameters.first
-    put :update, { :id => host.id, :host => { :host_parameters_attributes => [{ :name => host_param.name, :value => "new_value" }] } }
+    put :update, params: { :id => host.id, :host => { :host_parameters_attributes => [{ :name => host_param.name, :value => "new_value" }] } }
     assert_response :success
   end
 
@@ -848,7 +846,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     test 'should create a host' do
       assert domain
       assert_difference('Host.count') do
-        post :create, { :host => host_attrs }
+        post :create, params: { :host => host_attrs }
       end
       assert_response :created
       body = ActiveSupport::JSON.decode(@response.body)
@@ -864,7 +862,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
 
     test 'should not import if associated host exists' do
       FactoryGirl.create(:host, :on_compute_resource, :uuid => uuid, :compute_resource => compute_resource)
-      post :create, { :host => host_attrs }
+      post :create, params: { :host => host_attrs }
       assert_response :unprocessable_entity
       body = ActiveSupport::JSON.decode(@response.body)
       assert_includes body['error']['errors'].keys, 'uuid'
@@ -888,7 +886,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
                                  :ipam => IPAM::MODES[:db], :location_ids => [ basic_attrs[:location_id] ],
                                  :organization_ids => [ basic_attrs[:organization_id] ])
     assert_difference('Host.count') do
-      post :create, { :host => basic_attrs.merge!(:interfaces_attributes => [{ :primary => true, :mac => '00:11:22:33:44:00',
+      post :create, params: { :host => basic_attrs.merge!(:interfaces_attributes => [{ :primary => true, :mac => '00:11:22:33:44:00',
                       :subnet_id => subnet1.id}, { :primary => false, :mac => '00:11:22:33:44:01', :subnet_id => subnet2.id}]) }
     end
     assert_response :created
