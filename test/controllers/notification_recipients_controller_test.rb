@@ -26,8 +26,7 @@ class NotificationRecipientsControllerTest < ActionController::TestCase
   test "should be able to update seen flag" do
     add_notification
     get :index, params: { :format=>'json' }, session: set_session_user
-    put :update, { :format => 'json', :id => first_notification,
-                   :notification_recipient => {:seen => true} }, set_session_user
+    put :update, params: { :format => 'json', :id => first_notification, :notification_recipient => {:seen => true} }, session: set_session_user
     assert_response :success
     assert response['seen']
   end
@@ -37,7 +36,7 @@ class NotificationRecipientsControllerTest < ActionController::TestCase
     get :index, params: { :format=>'json' }, session: set_session_user
     notice_id = first_notification
     assert NotificationRecipient.find(notice_id)
-    delete :destroy, { :id => notice_id }
+    delete :destroy, params: { :id => notice_id }
     refute NotificationRecipient.find_by_id(notice_id)
     assert_response :success
   end
@@ -47,7 +46,7 @@ class NotificationRecipientsControllerTest < ActionController::TestCase
     notice_id = 1
     refute response['notifications'].map{|n| n['id']}.include?(notice_id)
     refute NotificationRecipient.find_by_id(notice_id)
-    delete :destroy, { :id => notice_id }
+    delete :destroy, params: { :id => notice_id }
     assert_response :not_found
   end
 

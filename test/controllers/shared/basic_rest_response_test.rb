@@ -4,7 +4,7 @@ module BasicRestResponseTest
   module ClassMethods
     def basic_index_test(collection = nil)
       context 'GET #index' do
-        setup { get :index, {}, set_session_user }
+        setup { get :index, session: set_session_user }
         should respond_with(:success)
         should render_template(:index)
         test 'assigns a collection instance variable' do
@@ -16,7 +16,7 @@ module BasicRestResponseTest
 
     def basic_new_test
       context 'GET #new' do
-        setup { get :new, {}, set_session_user }
+        setup { get :new, session: set_session_user }
         should respond_with(:success)
         should render_template(:new)
       end
@@ -25,7 +25,7 @@ module BasicRestResponseTest
     def basic_edit_test(object_found = nil)
       context 'GET #edit' do
         setup do
-          get :edit, { :id => @model }, set_session_user
+          get :edit, params: { :id => @model }, session: set_session_user
         end
 
         should respond_with(:success)

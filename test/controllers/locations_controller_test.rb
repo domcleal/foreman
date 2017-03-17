@@ -2,7 +2,7 @@ require 'test_helper'
 
 class LocationsControllerTest < ActionController::TestCase
   test "should get index" do
-    get :index, {}, set_session_user
+    get :index, session: set_session_user
     assert_response :success
   end
 
@@ -10,7 +10,7 @@ class LocationsControllerTest < ActionController::TestCase
     location = Location.new :name => "location1"
     as_admin do
       assert location.save!
-      get :edit, {:id => location}, set_session_user
+      get :edit, params: { :id => location }, session: set_session_user
     end
     assert_response :success
   end
@@ -19,7 +19,7 @@ class LocationsControllerTest < ActionController::TestCase
     location = taxonomies(:location2)
 
     as_admin do
-      post :update, {:commit => "Submit", :id => location.id, :location => {:name => "New Name"} }, set_session_user
+      post :update, params: { :commit => "Submit", :id => location.id, :location => {:name => "New Name"} }, session: set_session_user
     end
 
     updated_location = Location.find_by_id(location.id)
@@ -33,7 +33,7 @@ class LocationsControllerTest < ActionController::TestCase
       name = "location_dup_name"
       location = Location.new :name => name
       assert location.save!
-      put :create, {:commit => "Submit", :location => {:name => name} }, set_session_user
+      put :create, params: { :commit => "Submit", :location => {:name => name} }, session: set_session_user
     end
 
     assert @response.body.include? "has already been taken"
@@ -47,7 +47,7 @@ class LocationsControllerTest < ActionController::TestCase
       assert location.save!
 
       assert_difference('Location.count', -1) do
-        delete :destroy, {:id => location}, set_session_user
+        delete :destroy, params: { :id => location }, session: set_session_user
         assert_match /Successfully deleted/, flash[:notice]
       end
     end
@@ -57,7 +57,7 @@ class LocationsControllerTest < ActionController::TestCase
     as_admin do
       location = Location.create!(:name => "random-location")
       Location.current = location
-      delete :destroy, {:id => location.id}, set_session_user.merge(:location_id => location.id)
+      delete :destroy, params: { :id => location.id }, session: set_session_user.merge(:location_id => location.id)
     end
 
     assert_nil Location.current
@@ -66,7 +66,7 @@ class LocationsControllerTest < ActionController::TestCase
 
   test "should save location on session expiry" do
     # login and select an org
-    get :index, {}, set_session_user
+    get :index, session: set_session_user
     session[:location_id] = taxonomies(:location1).id
 
     # session is expired, but try to load a page
@@ -80,7 +80,7 @@ class LocationsControllerTest < ActionController::TestCase
   end
 
   test "should display a warning if current location has been deleted" do
-    get :index, {}, set_session_user.merge(:location_id => 1234)
+    get :index, session: set_session_user.merge(:location_id => 1234)
     assert_equal "Location you had selected as your context has been deleted.", flash[:warning]
   end
 
@@ -89,7 +89,7 @@ class LocationsControllerTest < ActionController::TestCase
     location = taxonomies(:location1)
     cnt_hosts_no_location = Host.where(:location_id => nil).count
     assert_difference "location.hosts.count", cnt_hosts_no_location do
-      post :assign_all_hosts, {:id => location.id}, set_session_user
+      post :assign_all_hosts, params: { :id => location.id }, session: set_session_user
     end
     assert_redirected_to :controller => :locations, :action => :index
     assert_equal flash[:notice], "All hosts previously with no location are now assigned to Location 1"
@@ -102,14 +102,14 @@ class LocationsControllerTest < ActionController::TestCase
                             :environment => environments(:production),
                             :location => nil)
     assert_difference "location.taxable_taxonomies.count", 1 do
-      post :assign_all_hosts, {:id => location.id}, set_session_user
+      post :assign_all_hosts, params: { :id => location.id }, session: set_session_user
     end
   end
 
   # Assign Selected Hosts
   test "be able to select hosts with no location to selected location" do
     location = taxonomies(:location1)
-    get :assign_hosts, {:id => location.id}, set_session_user
+    get :assign_hosts, params: { :id => location.id }, session: set_session_user
     assert_response :success
   end
   test "assigned selected hosts with no location to selected location" do
@@ -118,9 +118,7 @@ class LocationsControllerTest < ActionController::TestCase
     selected_hosts_no_location_ids = hosts.map(&:id)
 
     assert_difference "location.hosts.count", 2 do
-      put :assign_selected_hosts, {:id => location.id,
-                                   :location => {:host_ids => selected_hosts_no_location_ids}
-                                  }, set_session_user
+      put :assign_selected_hosts, params: { :id => location.id, :location => {:host_ids => selected_hosts_no_location_ids} }, session: set_session_user
     end
     assert_redirected_to :controller => :locations, :action => :index
     assert_equal flash[:notice], "Selected hosts are now assigned to Location 1"
@@ -130,24 +128,24 @@ class LocationsControllerTest < ActionController::TestCase
   test "should show all mismatches and button Fix All Mismatches if there are" do
     FactoryGirl.create_list(:host, 2, :with_environment, :location => taxonomies(:location1))
     TaxableTaxonomy.delete_all
-    get :mismatches, {}, set_session_user
+    get :mismatches, session: set_session_user
     assert_response :success
     assert_match "Fix All Mismatches", @response.body
   end
 
   test "button Fix All Mismatches should work" do
-    post :import_mismatches, {}, set_session_user
+    post :import_mismatches, session: set_session_user
     assert_redirected_to :controller => :locations, :action => :index
     assert_equal flash[:notice], "All mismatches between hosts and locations/organizations have been fixed"
     # check that there are no mismatches
-    get :mismatches, {}, set_session_user
+    get :mismatches, session: set_session_user
     assert_match "No hosts are mismatched", @response.body
   end
 
   #Clone
   test "should present clone wizard" do
     location = taxonomies(:location1)
-    get :clone_taxonomy, {:id => location.id}, set_session_user
+    get :clone_taxonomy, params: { :id => location.id }, session: set_session_user
     assert_response :success
     assert_match "Clone", @response.body
   end
@@ -158,10 +156,8 @@ class LocationsControllerTest < ActionController::TestCase
     location_dup = location.clone
 
     assert_difference "Location.unscoped.count", 1 do
-      post :create, {
-        :location => location_dup.selected_ids.each { |_,v| v.uniq! }
-          .merge(:name => 'location_dup_name')
-      }, set_session_user
+      post :create, params: { :location => location_dup.selected_ids.each { |_,v| v.uniq! }
+          .merge(:name => 'location_dup_name') }, session: set_session_user
     end
 
     new_location = Location.unscoped.order(:id).last
@@ -177,7 +173,7 @@ class LocationsControllerTest < ActionController::TestCase
 
   test "should clear out Location.current" do
     @request.env['HTTP_REFERER'] = root_url
-    get :clear, {}, set_session_user
+    get :clear, session: set_session_user
     assert_nil Location.current
     assert_nil session[:location_id]
     assert_redirected_to root_url
@@ -185,7 +181,7 @@ class LocationsControllerTest < ActionController::TestCase
 
   test "should nest a location" do
     location = taxonomies(:location1)
-    get :nest, {:id => location.id}, set_session_user
+    get :nest, params: { :id => location.id }, session: set_session_user
     assert_response :success
     assert_template 'new'
     assert_equal location.id, assigns(:taxonomy).parent_id
@@ -197,21 +193,21 @@ class LocationsControllerTest < ActionController::TestCase
     location = as_admin { FactoryGirl.create(:location, :users => [user1, user2]) }
 
     User.any_instance.expects(:expire_topbar_cache).times(2+User.only_admin.count) #2 users, all admins
-    put :update, { :id => location.id, :location => {:name => "Topbar Loc" }}, set_session_user
+    put :update, params: { :id => location.id, :location => {:name => "Topbar Loc" } }, session: set_session_user
   end
 
   test 'user with view_params rights should see parameters in an os' do
     setup_user "edit", "locations"
     setup_user "view", "params"
     location = FactoryGirl.create(:location, :with_parameter)
-    get :edit, {:id => location.id}, set_session_user.merge(:user => users(:one).id)
+    get :edit, params: { :id => location.id }, session: set_session_user.merge(:user => users(:one).id)
     assert_not_nil response.body['Parameter']
   end
 
   test 'user without view_params rights should not see parameters in an os' do
     setup_user "edit", "locations"
     location = FactoryGirl.create(:location, :with_parameter)
-    get :edit, {:id => location.id}, set_session_user.merge(:user => users(:one).id)
+    get :edit, params: { :id => location.id }, session: set_session_user.merge(:user => users(:one).id)
     assert_nil response.body['Parameter']
   end
 
@@ -220,7 +216,7 @@ class LocationsControllerTest < ActionController::TestCase
     location.update_attributes(:organization_ids => [taxonomies(:organization2).id])
     saved_location = Location.find_by_id(location.id)
     assert_equal 1, saved_location.organization_ids.count
-    put :update, { :id => location.id, :location => {:organization_ids => [""]}}, set_session_user
+    put :update, params: { :id => location.id, :location => {:organization_ids => [""]} }, session: set_session_user
     updated_location = Location.find_by_id(location.id)
     assert_equal 0, updated_location.organization_ids.count
   end
@@ -233,14 +229,14 @@ class LocationsControllerTest < ActionController::TestCase
       location = FactoryGirl.create(:location)
       Location.stubs(:current).returns(location)
 
-      post :create, {:location => {:name => "test_loc"} }, set_session_user
+      post :create, params: { :location => {:name => "test_loc"} }, session: set_session_user
 
       assert_redirected_to /step2/
       Location.unstub(:current)
     end
 
     test 'redirects to step 3 if no unassigned hosts exist' do
-      post :create, {:location => {:name => "test_loc"} }, set_session_user
+      post :create, params: { :location => {:name => "test_loc"} }, session: set_session_user
 
       assert_redirected_to /edit/
     end
@@ -251,7 +247,7 @@ class LocationsControllerTest < ActionController::TestCase
 
       Host.stubs(:authorized).returns(Host.where('1=0'))
 
-      post :create, {:location => {:name => "test_loc"} }, set_session_user
+      post :create, params: { :location => {:name => "test_loc"} }, session: set_session_user
 
       assert_redirected_to /edit/
       Host.unstub(:authorized)

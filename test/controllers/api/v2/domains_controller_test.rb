@@ -2,27 +2,27 @@ require 'test_helper'
 
 class Api::V2::DomainsControllerTest < ActionController::TestCase
   test "should get index" do
-    get :index, { }
+    get :index
     assert_response :success
     assert_not_nil assigns(:domains)
   end
 
   test "should show domain" do
-    get :show, { :id => Domain.first.to_param }
+    get :show, params: { :id => Domain.first.to_param }
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
   end
 
   test "should create valid domain" do
-    post :create, { :domain => { :name => "domain.net" } }
+    post :create, params: { :domain => { :name => "domain.net" } }
     assert_response :created
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
   end
 
   test "should not create invalid domain" do
-    post :create, { :domain => { :fullname => "" } }
+    post :create, params: { :domain => { :fullname => "" } }
     assert_response :unprocessable_entity
   end
 
@@ -32,20 +32,20 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     # Skipping this test until resolved
     skip if ActiveRecord::Base.connection_config[:adapter].eql?"sqlite3"
     invalid_proxy_id = SmartProxy.last.id + 100
-    post :create, { :domain => { :name => "doma.in", :dns_id => invalid_proxy_id } }
+    post :create, params: { :domain => { :name => "doma.in", :dns_id => invalid_proxy_id } }
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert_includes(show_response["error"]["full_messages"], "Dns Invalid smart-proxy id")
     assert_response :unprocessable_entity
   end
 
   test "should update valid domain" do
-    put :update, { :id => Domain.first.to_param, :domain => { :name => "domain.new" } }
+    put :update, params: { :id => Domain.first.to_param, :domain => { :name => "domain.new" } }
     assert_equal "domain.new", Domain.unscoped.first.name
     assert_response :success
   end
 
   test "should not update invalid domain" do
-    put :update, { :id => Domain.first.to_param, :domain => { :name => "" } }
+    put :update, params: { :id => Domain.first.to_param, :domain => { :name => "" } }
     assert_response :unprocessable_entity
   end
 
@@ -54,7 +54,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     domain.hosts.clear
     domain.hostgroups.clear
     domain.subnets.clear
-    delete :destroy, { :id => domain.to_param }
+    delete :destroy, params: { :id => domain.to_param }
     domain = ActiveSupport::JSON.decode(@response.body)
     assert_response :ok
     refute Domain.find_by_id(domain['id'])
@@ -67,28 +67,28 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
   end
 
   test "should get domains for location only" do
-    get :index, {:location_id => taxonomies(:location1).id }
+    get :index, params: { :location_id => taxonomies(:location1).id }
     assert_response :success
     assert_equal taxonomies(:location1).domains.length, assigns(:domains).length
     assert_equal assigns(:domains), taxonomies(:location1).domains
   end
 
   test "should get domains for organization only" do
-    get :index, {:organization_id => taxonomies(:organization1).id }
+    get :index, params: { :organization_id => taxonomies(:organization1).id }
     assert_response :success
     assert_equal taxonomies(:organization1).domains.length, assigns(:domains).length
     assert_equal taxonomies(:organization1).domains, assigns(:domains)
   end
 
   test "should get domains for both location and organization" do
-    get :index, {:location_id => taxonomies(:location1).id, :organization_id => taxonomies(:organization1).id }
+    get :index, params: { :location_id => taxonomies(:location1).id, :organization_id => taxonomies(:organization1).id }
     assert_response :success
     assert_equal 1, assigns(:domains).length
     assert_equal assigns(:domains), [domains(:mydomain)]
   end
 
   test "should show domain with correct child nodes including location and organization" do
-    get :show, { :id => domains(:mydomain).to_param }
+    get :show, params: { :id => domains(:mydomain).to_param }
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
@@ -102,7 +102,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
   test "user without view_params permission can't see domain parameters" do
     setup_user "view", "domains"
     domain_with_parameter = FactoryGirl.create(:domain, :with_parameter)
-    get :show, {:id => domain_with_parameter.to_param, :format => 'json'}
+    get :show, params: { :id => domain_with_parameter.to_param, :format => 'json' }
     assert_empty JSON.parse(response.body)['parameters']
   end
 
@@ -110,7 +110,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     setup_user "view", "domains"
     setup_user "view", "params"
     domain_with_parameter = FactoryGirl.create(:domain, :with_parameter)
-    get :show, {:id => domain_with_parameter.to_param, :format => 'json'}
+    get :show, params: { :id => domain_with_parameter.to_param, :format => 'json' }
     assert_not_empty JSON.parse(response.body)['parameters']
   end
 
@@ -118,7 +118,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     test "should show a domain parameter as hidden unless show_hidden_parameters is true" do
       domain = FactoryGirl.create(:domain)
       domain.domain_parameters.create!(:name => "foo", :value => "bar", :hidden_value => true)
-      get :show, { :id => domain.id }
+      get :show, params: { :id => domain.id }
       show_response = ActiveSupport::JSON.decode(@response.body)
       assert_equal '*****', show_response['parameters'].first['value']
     end
@@ -126,7 +126,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     test "should show a domain parameter as unhidden when show_hidden_parameters is true" do
       domain = FactoryGirl.create(:domain)
       domain.domain_parameters.create!(:name => "foo", :value => "bar", :hidden_value => true)
-      get :show, { :id => domain.id, :show_hidden_parameters => 'true' }
+      get :show, params: { :id => domain.id, :show_hidden_parameters => 'true' }
       show_response = ActiveSupport::JSON.decode(@response.body)
       assert_equal 'bar', show_response['parameters'].first['value']
     end
@@ -136,7 +136,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     domain = FactoryGirl.create(:domain)
     param_params = { :name => "foo", :value => "bar" }
     domain.domain_parameters.create!(param_params)
-    put :update, { :id => domain.id, :domain => { :domain_parameters_attributes => [{ :name => param_params[:name], :value => "new_value" }] } }
+    put :update, params: { :id => domain.id, :domain => { :domain_parameters_attributes => [{ :name => param_params[:name], :value => "new_value" }] } }
     assert_response :success
     assert param_params[:name], domain.parameters.first.name
   end
@@ -146,7 +146,7 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     param_1 = { :name => "foo", :value => "bar" }
     param_2 = { :name => "boo", :value => "test" }
     domain.domain_parameters.create!([param_1, param_2])
-    put :update, { :id => domain.id, :domain => { :domain_parameters_attributes => [{ :name => param_1[:name], :value => "new_value" }] } }
+    put :update, params: { :id => domain.id, :domain => { :domain_parameters_attributes => [{ :name => param_1[:name], :value => "new_value" }] } }
     assert_response :success
     assert_equal 1, domain.parameters.count
   end
