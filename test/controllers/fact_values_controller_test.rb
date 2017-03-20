@@ -30,10 +30,10 @@ class FactValuesControllerTest < ActionController::TestCase
   def test_index_with_sort
     FactoryGirl.create(:fact_value)
     @request.env['HTTP_REFERER'] = fact_values_path
-    get :index, {order: 'origin ASC'}, set_session_user
+    get :index, params: {order: 'origin ASC'}, session: set_session_user
     assert_response :success
     assert_not_nil :fact_values
-    get :index, {order: 'wrong ASC'}, set_session_user
+    get :index, params: {order: 'wrong ASC'}, session: set_session_user
     assert_response :redirect
   end
 end
