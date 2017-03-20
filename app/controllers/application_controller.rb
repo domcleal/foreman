@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
           redirect_to edit_user_path(:id => User.current)
         end
         format.text do
-          render :plain => msg, :status => :unprocessable_entity, :content_type => Mime::TEXT
+          render :plain => msg, :status => :unprocessable_entity, :content_type => Mime[:text]
         end
       end
       true
