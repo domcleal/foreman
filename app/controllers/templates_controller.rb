@@ -130,7 +130,7 @@ class TemplatesController < ApplicationController
 
   def load_history
     return unless @template
-    @history = Audit.descending.where(:auditable_id => @template.id, :auditable_type => @template.class.base_class, :action => 'update')
+    @history = Audit.descending.where(:auditable_id => @template.id, :auditable_type => @template.class.base_class.name, :action => 'update')
   end
 
   def action_permission
