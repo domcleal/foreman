@@ -502,9 +502,9 @@ class HostsControllerTest < ActionController::TestCase
 
   test "find multiple hosts by filter query" do
     setup_user_and_host "edit"
-    post :update_multiple_owner, { :search => "",
+    post :update_multiple_owner, params: { :search => "",
       :owner => { :id => users(:one).id_and_type}},
-      set_session_user.merge(:user => users(:admin).id)
+      session: set_session_user.merge(:user => users(:admin).id)
     as_admin do
       assert_equal users(:one).id_and_type, @host1.reload.is_owned_by
       assert_equal users(:one).id_and_type, @host2.reload.is_owned_by
@@ -513,9 +513,9 @@ class HostsControllerTest < ActionController::TestCase
 
   test "use filter query which generate a collection" do
     setup_user_and_host "edit"
-    post :update_multiple_owner, { :search => "owner = #{users(:admin).login}",
+    post :update_multiple_owner, params: { :search => "owner = #{users(:admin).login}",
       :owner => { :id => users(:one).id_and_type}},
-      set_session_user.merge(:user => users(:admin).id)
+      session: set_session_user.merge(:user => users(:admin).id)
     as_admin do
       assert_equal users(:one).id_and_type, @host1.reload.is_owned_by
       assert_equal users(:one).id_and_type, @host2.reload.is_owned_by
@@ -524,9 +524,9 @@ class HostsControllerTest < ActionController::TestCase
 
   test "use a filter query which generates empty collection" do
     setup_user_and_host "edit"
-    post :update_multiple_owner, { :search => "owner = #{users(:one).login}",
+    post :update_multiple_owner, params: { :search => "owner = #{users(:one).login}",
       :owner => { :id => users(:one).id_and_type}},
-       set_session_user.merge(:user => users(:admin).id)
+      session: set_session_user.merge(:user => users(:admin).id)
     as_admin do
       assert_equal users(:admin).id_and_type, @host1.reload.is_owned_by
       assert_equal users(:admin).id_and_type, @host2.reload.is_owned_by
@@ -535,9 +535,9 @@ class HostsControllerTest < ActionController::TestCase
 
   test "use empty filter query when it exists in params" do
     setup_user_and_host "edit"
-    post :update_multiple_owner, {:host_ids => [@host1.id], :search => "",
+    post :update_multiple_owner, params: {:host_ids => [@host1.id], :search => "",
       :owner => { :id => users(:one).id_and_type}},
-      set_session_user.merge(:user => users(:admin).id)
+      session: set_session_user.merge(:user => users(:admin).id)
     as_admin do
       assert_equal users(:one).id_and_type, @host1.reload.is_owned_by
       assert_equal users(:one).id_and_type, @host2.reload.is_owned_by
