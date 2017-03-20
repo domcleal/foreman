@@ -1,12 +1,5 @@
 ---
 # Pending fixes, compatible with Rails 4.2 and 5.0
-- message: Accessing mime types via constants is deprecated. Please change `Mime::JSON`
-    to `Mime[:json]`.
-  callstack: test/controllers/notification_recipients_controller_test.rb
-- message: Accessing mime types via constants is deprecated. Please change `Mime::TEXT`
-    to `Mime[:text]`.
-  callstack: app/controllers/application_controller.rb:87:in `block (2 levels) in
-    require_mail'
 - message: Passing a class as a value in an Active Record query is deprecated and
     will be removed. Pass a string instead.
   callstack: app/controllers/templates_controller.rb:124:in `load_history'
