@@ -1393,7 +1393,7 @@ class HostTest < ActiveSupport::TestCase
       host, parser = setup_host_with_nic_parser({:macaddress => '00:00:00:11:22:33', :virtual => false, :ipaddress => '10.10.0.1', :ipaddress6 => '2001:db8::1'})
 
       # primary already existed so it's updated
-      assert_no_difference 'host.interfaces(true).count' do
+      assert_no_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       assert_equal '10.10.0.1', host.interfaces.where(:mac => '00:00:00:11:22:33').first.ip
@@ -1404,7 +1404,7 @@ class HostTest < ActiveSupport::TestCase
       host, parser = setup_host_with_nic_parser({:macaddress => '00:00:00:11:22:34', :virtual => false, :ipaddress => '10.10.0.1', :ipaddress6 => '2001:db8::1'})
       host.managed = true
 
-      assert_difference 'host.interfaces(true).count' do
+      assert_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       assert_equal '10.10.0.1', host.interfaces.where(:mac => '00:00:00:11:22:34').first.ip
@@ -1422,7 +1422,7 @@ class HostTest < ActiveSupport::TestCase
       host.update_attribute :mac, '00:00:00:11:22:33'
       host.update_attribute :ip, '10.0.0.100'
 
-      assert_difference 'host.interfaces(true).count' do
+      assert_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       assert_equal '10.0.0.100', host.ip
@@ -1433,7 +1433,7 @@ class HostTest < ActiveSupport::TestCase
       host.update_attribute :mac, '00:00:00:11:22:44'
       FactoryGirl.create(:nic_managed, :host => host, :mac => '00:00:00:11:22:33', :ip => '10.10.0.1', :virtual => true, :identifier => 'eth0_0', :attached_to => 'eth0', :name => 'second')
 
-      assert_difference 'host.interfaces(true).count' do
+      assert_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
     end
@@ -1443,7 +1443,7 @@ class HostTest < ActiveSupport::TestCase
       host.primary_interface.update_attribute :identifier, 'eth0'
       FactoryGirl.create(:nic_managed, :host => host, :mac => '00:00:00:11:22:33', :ip => '10.10.0.200', :virtual => true, :attached_to => 'eth0', :identifier => 'eth0_0')
 
-      assert_no_difference 'host.interfaces(true).count' do
+      assert_no_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       assert_equal '10.10.0.1', host.interfaces.where(:identifier => 'eth0_0').first.ip
@@ -1452,7 +1452,7 @@ class HostTest < ActiveSupport::TestCase
     test "#set_interfaces creates IPMI device if parameters are found" do
       host, parser = setup_host_with_ipmi_parser({:ipaddress => '192.168.0.1', :macaddress => '00:00:00:11:33:55'})
 
-      assert_difference 'host.interfaces(true).count' do
+      assert_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       bmc = host.interfaces.where(:type => 'Nic::BMC').first
@@ -1464,7 +1464,7 @@ class HostTest < ActiveSupport::TestCase
       host, parser = setup_host_with_ipmi_parser({:ipaddress => '192.168.0.1', :macaddress => '00:00:00:11:33:55'})
       FactoryGirl.create(:nic_bmc, :host => host, :mac => '00:00:00:11:33:55', :ip => '10.10.0.200', :virtual => false)
 
-      assert_no_difference 'host.interfaces(true).count' do
+      assert_no_difference 'host.interfaces.tap { |i| i.reload }.count' do
         host.set_interfaces(parser)
       end
       bmcs = host.interfaces.where(:type => 'Nic::BMC')
