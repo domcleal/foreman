@@ -97,7 +97,7 @@ class ApplicationController < ActionController::Base
     logger.debug "not found: #{exception}" if exception
     respond_to do |format|
       format.html { render "common/404", :status => :not_found }
-      format.any { head :status => :not_found}
+      format.any { head :not_found}
     end
     true
   end
