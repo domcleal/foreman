@@ -137,7 +137,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
     proxy = smart_proxies(:puppetmaster)
     fake_data = {'env1' => 1, 'special_environment' => 4}
     ProxyStatus::Puppet.any_instance.expects(:environment_stats).returns(fake_data)
-    xhr :get, :puppet_environments, { :id => proxy.id }, set_session_user
+    get :puppet_environments, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/plugins/_puppet_envs'
     assert @response.body.include?('special_environment')
@@ -146,7 +146,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
 
   test '#puppet_dashboard' do
     proxy = smart_proxies(:puppetmaster)
-    xhr :get, :puppet_dashboard, { :id => proxy.id }, set_session_user
+    get :puppet_dashboard, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/plugins/_puppet_dashboard'
     assert @response.body.include? 'Latest Events'
@@ -162,7 +162,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
         "message" => "A debug message"
       }]})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :log_pane, { :id => proxy.id }, set_session_user
+    get :log_pane, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_list'
     assert @response.body.include?('debug message')
@@ -179,7 +179,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
       }]})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
     SmartProxy.any_instance.expects(:expired_logs=).with('42').returns('42')
-    xhr :get, :expire_logs, { :id => proxy.id, :from => 42 }, set_session_user
+    get :expire_logs, params: { :id => proxy.id, :from => 42 }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_list'
     assert @response.body.include?('debug message')
@@ -194,7 +194,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
           "BMC" => "Initialization error"
         }}})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :failed_modules, { :id => proxy.id }, set_session_user
+    get :failed_modules, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_failed_modules'
     assert @response.body.include?('BMC')
@@ -214,7 +214,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
         { "timestamp" => 1003, "level" => "FATAL", "message" => "Message" }
       ]})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :errors_card, { :id => proxy.id }, set_session_user
+    get :errors_card, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_errors_card'
     assert @response.body.include?('2 log messages')
@@ -230,7 +230,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
       },
       "logs" => []})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :errors_card, { :id => proxy.id }, set_session_user
+    get :errors_card, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_errors_card'
     assert @response.body.include?('pficon-ok')
@@ -251,7 +251,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
       },
       "logs" => []})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :modules_card, { :id => proxy.id }, set_session_user
+    get :modules_card, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_modules_card'
     assert @response.body.include?('4 active features')
@@ -267,7 +267,7 @@ class SmartProxiesControllerTest < ActionController::TestCase
       },
       "logs" => []})
     ProxyStatus::Logs.any_instance.expects(:logs).returns(fake_data)
-    xhr :get, :modules_card, { :id => proxy.id }, set_session_user
+    get :modules_card, params: { :id => proxy.id }, session: set_session_user, xhr: true
     assert_response :success
     assert_template 'smart_proxies/logs/_modules_card'
     assert @response.body.include?('pficon-ok')
