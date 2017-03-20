@@ -567,7 +567,7 @@ class User < ApplicationRecord
     if admin && User.unscoped.only_admin.except_hidden.size <= 1
       errors.add :base, _("Can't delete the last admin account")
       logger.warn "Unable to delete the last admin account"
-      false
+      throw :abort
     end
   end
 
@@ -584,7 +584,7 @@ class User < ApplicationRecord
     if auth_source.is_a? AuthSourceHidden
       errors.add :base, _("Can't delete internal admin account")
       logger.warn "Unable to delete internal admin account"
-      false
+      throw :abort
     end
   end
 
