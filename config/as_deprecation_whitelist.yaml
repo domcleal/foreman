@@ -22,10 +22,6 @@
     and will be removed in Rails 5.1. Please call `reload` on the result collection
     proxy instead.
   callstack: test/models/host_test.rb
-- message: Passing conditions to delete_all is deprecated and will be removed in
-    Rails 5.1. To achieve the same use where(conditions).delete_all.
-- message: Passing conditions to destroy_all is deprecated and will be removed in
-    Rails 5.1. To achieve the same use where(conditions).destroy_all.
 - message: The :status option on `head` has been deprecated and will be removed in
     Rails 5.1. Please pass the status as a separate parameter before the options,
     instead.
