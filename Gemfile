@@ -1,6 +1,8 @@
 # foreman plugins import this file therefore __FILE__ cannot be used
 FOREMAN_GEMFILE = __FILE__ unless defined? FOREMAN_GEMFILE
 
+require_relative 'config/boot_settings'
+
 source 'https://rubygems.org'
 
 gem 'rails', '4.2.8'
