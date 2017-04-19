@@ -1,3 +1,5 @@
+Better
+
 ![Foreman](https://raw.githubusercontent.com/theforeman/foreman-graphics/master/logo/foreman_medium.png)
 
 [![Build Status](http://ci.theforeman.org/buildStatus/icon?job=test_develop)](http://ci.theforeman.org/job/test_develop/)
